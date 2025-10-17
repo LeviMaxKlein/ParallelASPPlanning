@@ -1,0 +1,9 @@
+{
+  "id": [
+    "gripper",
+    "prob18.pddl"
+  ],
+  "memory_limit": 2000,
+  "run_dir": "runs-00001-00100/00038",
+  "time_limit": 2000
+}
