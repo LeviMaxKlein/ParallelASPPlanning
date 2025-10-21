@@ -1,7 +1,14 @@
 #include <incmode>.
 
 #program base.
-holds(X,V,0) :- init(X,V).
+fluent(X) :- variable(X).
+value(X,V) :- contains(X,V).
+
+prec(A,X,V) :- precondition(A,X,V).
+post(A,X,V) :- postcondition(A,_,X,V).
+
+holds(X,V,0) :- initialState(X,V).
+#show occurs/2.
 
 #program check(t).
 :- query(t), goal(X,V), not holds(X,V,t).

@@ -1,9 +1,0 @@
-{
-  "id": [
-    "zenotravel",
-    "p12.pddl"
-  ],
-  "memory_limit": 2000,
-  "run_dir": "runs-00001-00100/00012",
-  "time_limit": 2000
-}
