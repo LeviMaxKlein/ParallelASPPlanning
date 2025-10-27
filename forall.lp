@@ -1,5 +1,4 @@
 #program step(t).
-% forall step plan
 :- occurs(A,t), prec(A,X,V), not holds(X,V,t-1).
 
 :- occurs(A,t), prec(A,X,V), not post(A,X,_), not holds(X,V,t).
