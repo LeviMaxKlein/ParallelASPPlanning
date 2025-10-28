@@ -49,8 +49,9 @@ ATTRIBUTES = [
 ]
 exp = Experiment(environment=ENV)
 exp.add_resource("downward", "../downward", symlink=True)
-exp.add_resource("plasp", "plasp/build/release/bin/plasp", symlink=True)
+exp.add_resource("plasp", "../plasp", symlink=True)
 exp.add_resource("plasp_wrapper", "plasp_wrapper.py", symlink=True)
+exp.add_resource("clingo", "../clingo/clingo", symlink=True)
 exp.add_resource("common", "common.lp", symlink=True)
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, ["zenotravel", "gripper"]):
@@ -58,10 +59,10 @@ for algo in ALGORITHM:
         run.add_resource(algo, f"{algo}.lp", symlink=True)
         run.add_command("downward_pddl_to_sas", [sys.executable, "{downward}/fast-downward.py", "--translate", BENCHMARKS_DIR + "/" + task.domain + "/domain.pddl", BENCHMARKS_DIR + "/" + task.domain + "/" + task.problem])
         run.add_command("plasp_sas_to_asp", [sys.executable, "{plasp_wrapper}"])
-        run.add_command("clingo_solve", ["clingo", "{common}", f"{{{algo}}}", "output.lp"])
+        run.add_command("clingo_solve", ["{clingo}", "{common}", f"{{{algo}}}", "output.lp"])
         run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp"])
         run.set_property("algorithm", algo)
-        run.set_property("time_limit", 2000)
+        run.set_property("time_limit", 120)
         run.set_property("memory_limit", 2000)
         run.set_property("id", [algo, task.domain, task.problem])
 exp.add_step("build", exp.build)
