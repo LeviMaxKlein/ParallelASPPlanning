@@ -33,5 +33,4 @@ class BWUniEnvironment(SlurmEnvironment):
     @classmethod
     def is_present(cls):
         node = platform.node()
-        return node.startswith("uc3n0") or node.startswith("uc3n1")
-        #return bool(re.match(r"uc3n\d+", node)) # TODO need to adapt this
+        return bool(re.match(r"uc3n991", node))
