@@ -107,7 +107,7 @@ def remove_unsat_times(run):
 exp = Experiment(environment=ENV)
 exp.add_parser(make_parser())
 for algo in ALGORITHM:
-    for task in suites.build_suite(BENCHMARKS_DIR, ["zenotravel"]):
+    for task in suites.build_suite(BENCHMARKS_DIR, SUITE_NAMES):
         run = exp.add_run()
         run.add_resource(algo, f"{algo}.lp", symlink=True)
         run.add_command("downward_pddl_to_sas", [sys.executable, Path(SCRIPT_DIR) / "../downward/fast-downward.py", "--translate", Path(BENCHMARKS_DIR) / task.domain / "domain.pddl", Path(BENCHMARKS_DIR) / task.domain / task.problem])
