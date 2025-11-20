@@ -80,6 +80,7 @@ def make_parser():
 
 def create_plots():
     properties_file = Path(SCRIPT_DIR) / "../experiment-eval/properties"
+    print(properties_file)
 
     if not os.path.exists(properties_file):
         print(f"Properties file not found: {properties_file}")
@@ -97,28 +98,23 @@ def remove_explained_errors(run):
     return True
 
 def remove_unsat_times(run):
-    unsat_times = run.get("clingo_unsat_time")
+    unsat_time = run.get("clingo_unsat_time")
     result = run.get("result")
-    if unsat_times:
-        run["clingo_unsat_times"] = [unsat_time for unsat_time in unsat_times if result != "SATISFIABLE"]
+    if unsat_time:
+        run["clingo_unsat_time"] = 0 if result == "SATISFIABLE" else unsat_time
     return True
 
 exp = Experiment(environment=ENV)
-exp.add_resource("fast_downward", "../downward/fast-downward.py", symlink=True)
-exp.add_resource("plasp", "../plasp", symlink=True)
-exp.add_resource("plasp_wrapper", "plasp_wrapper.py", symlink=True)
-exp.add_resource("clingo", "../clingo/clingo", symlink=True)
-exp.add_resource("common", "common.lp", symlink=True)
 exp.add_parser(make_parser())
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, ["zenotravel"]):
         run = exp.add_run()
         run.add_resource(algo, f"{algo}.lp", symlink=True)
-        run.add_command("downward_pddl_to_sas", [sys.executable, "{fast_downward}", "--translate", Path(BENCHMARKS_DIR) / task.domain / "domain.pddl", Path(BENCHMARKS_DIR) / task.domain / task.problem])
-        run.add_command("plasp_sas_to_asp", [sys.executable, "{plasp_wrapper}"])
-        run.add_command("clingo_solve", ["{clingo}", "{common}", f"{{{algo}}}", "output.lp"])
+        run.add_command("downward_pddl_to_sas", [sys.executable, Path(SCRIPT_DIR) / "../downward/fast-downward.py", "--translate", Path(BENCHMARKS_DIR) / task.domain / "domain.pddl", Path(BENCHMARKS_DIR) / task.domain / task.problem])
+        run.add_command("plasp_sas_to_asp", [sys.executable, Path(SCRIPT_DIR) / "plasp_wrapper.py"])
+        run.add_command("clingo_solve", [SCRIPT_DIR + "/../clingo/clingo", Path(SCRIPT_DIR) / "common.lp", f"{{{algo}}}", "output.lp"])
         run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp"])
-        run.set_property("component_optins", "clingo {common} {algo} output.lp")
+        run.set_property("component_optins", "clingo common.lp {algo} output.lp")
         run.set_property("domain", task.domain)
         run.set_property("problem", task.problem)
         run.set_property("algorithm", algo)
@@ -129,7 +125,7 @@ exp.add_step("build", exp.build)
 exp.add_step("start", exp.start_runs)
 exp.add_step("parse", exp.parse)
 exp.add_fetcher(name="fetch")
-exp.add_report(BaseReport(attributes=ATTRIBUTES), outfile="report.html", filter = [remove_explained_errors, remove_unsat_times])
+exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = [remove_explained_errors, remove_unsat_times]), outfile="report.html")
 exp.add_step("plots", lambda: create_plots())
 exp.run_steps()
 
