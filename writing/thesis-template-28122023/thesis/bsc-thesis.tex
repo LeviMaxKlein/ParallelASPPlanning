@@ -1,0 +1,185 @@
+% This template was initially provided by Dulip Withanage.
+% Modifications 
+% were made by Conny Junghans and Jannik Strötgen
+% and Sascha Hunold
+
+\documentclass[
+     12pt,                    % font size
+     a4paper,             % paper format
+     BCOR10mm,     % binding correction
+     DIV14,                 % stripe size for margin calculation
+     listof=totoc,                    % table listing in toc
+     bibliography=totoc,       % bibliography in toc
+     index=totoc,              % index in toc
+%     parskip            % paragraph skip instead of paragraph indent
+     twoside,
+     headsepline
+     ]{scrreprt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% PACKAGES:
+
+% Use German :
+% make sure texlive-lang-german is installed (for TexLive)
+\usepackage[ngerman]{babel}
+% Input encoding
+\usepackage[utf8]{inputenc}
+% Font encoding
+\usepackage[T1]{fontenc}
+% Index-generation
+\usepackage{makeidx}
+% Einbinden von URLs:
+\usepackage{url}
+% Special \LaTex symbols (e.g. \BibTeX):
+\usepackage{doc}
+% Include Graphic-files:
+\usepackage{graphicx}
+
+% Fuer anderthalbzeiligen Textsatz
+\usepackage{setspace}
+
+% hyperrefs in the documents
+\usepackage[bookmarks=true,colorlinks,pdfpagelabels,pdfstartview = FitH,bookmarksopen = true,bookmarksnumbered = true,linkcolor = black,plainpages = false,hypertexnames = false,citecolor = black,urlcolor=black]{hyperref} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% OTHER SETTINGS:
+
+% Pagestyle:
+\pagestyle{headings}
+
+% Choose language
+\newcommand{\setlang}[1]{\selectlanguage{#1}\nonfrenchspacing}
+
+
+\begin{document}
+
+% TITLE:
+\pagenumbering{roman} 
+\begin{titlepage}
+
+
+\vspace*{1cm}
+\begin{center}
+\vspace*{3cm}
+\textbf{ 
+\Large Ruprecht-Karls-Universität Heidelberg\\
+\smallskip
+\Large Institut für Informatik\\
+\smallskip
+\Large Lehrstuhl für Artificial Intelligence for Programming\\
+\smallskip
+}
+
+\vspace{3cm}
+
+\textbf{\large Bachelorarbeit ODER Masterarbeit} % Studienarbeit, Interdisziplinaeres Projekt
+
+\vspace{0.5\baselineskip}
+{\huge
+Der Titel meiner Arbeit wird mir noch bekannt gegeben
+}
+\end{center}
+
+\vfill 
+
+{\large
+\begin{tabular}[l]{ll}
+Name: & Name des Autors\\
+Matrikelnummer: & Matrikelnummer des Autors\\
+Betreuer: & Name des Betreuers\\
+Datum der Abgabe: & dd.mm.yyyy
+\end{tabular}
+}
+
+\end{titlepage}
+
+\onehalfspacing
+
+\thispagestyle{empty}
+
+\vspace*{100pt}
+\noindent
+Ich versichere, dass ich diese Bachelor-Arbeit selbstständig verfasst und nur die angegebenen
+Quellen und Hilfsmittel verwendet habe.
+
+\vspace*{50pt}
+
+\noindent
+Heidelberg, dd.mm.yyyy
+\cleardoublepage
+
+\section*{Zusammenfassung}
+
+Dies ist eine Zusammenfassung der Arbeit.
+
+\section*{Abstract}
+
+This is the abstract.
+
+\cleardoublepage
+
+\tableofcontents
+\cleardoublepage
+\pagenumbering{arabic} 
+
+% List of figures (Abbildungsverzeichnis):
+\listoffigures
+% List of tables (Tabellenverzeichnis):
+\listoftables
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Einleitung}\label{intro}
+This chapter contains an overview of the topic as well as the goals and contributions of your work.
+
+\section{Motivation}
+
+\section{Ziele der Arbeit}
+
+\section{Aufbau der Arbeit}
+Here you describe the structure of the thesis. For example:
+
+In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorgestellt.
+
+
+\chapter{Grundlagen}\label{background}
+
+\section{Scheduling}
+Here you discuss some basics for your work and outline existing research in the area of your thesis by citing research papers like~\cite{BCFLMR_TPDS08} by Beaumont \textit{et al.} or~\cite{legrand_ccgrid03,TelBook}.
+
+Außerdem sind in Tabelle~\ref{tab:foobar} Studenten aufgeführt, die besonders erwähnenswert gearbeitet haben.
+
+\begin{table}[htb]
+\centering
+\captionabove{\label{tab:foobar}Ausgezeichnete Studenten}
+\begin{tabular}{ll}
+\hline
+Name & Vorname \\
+\hline
+Müller  &  Horst \\
+Meyer & Fred \\
+\hline
+\end{tabular}
+\end{table}
+
+Will man auf eine Abbildung verweisen, kann man das folgendermaßen tun, siehe Abbildung~\ref{fig:foobar}.
+Man sollte aber nicht vergessen, diese Grafik zu beschreiben und ggf. auf die Ursprungsquelle hinzuweisen, wenn die Grafik nicht vom Autoren selbst erstellt wurde.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=.4\linewidth]{vert}
+\caption[Kurzname der tollen Grafik]{\label{fig:foobar}Das ist eine tolle Grafik.}
+\end{figure}
+
+\clearpage
+Hier sind noch mehr Grundlagen.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

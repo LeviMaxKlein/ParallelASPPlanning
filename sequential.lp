@@ -1,3 +1,0 @@
-#program step(t).
-:- occurs ( A , t ) , prec ( A , X , V ) , not holds ( X , V ,t -1).
-:- #count { A : occurs ( A , t )} > 1.

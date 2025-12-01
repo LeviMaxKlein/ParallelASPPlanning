@@ -1,0 +1,199 @@
+% This template was initially provided by Dulip Withanage.
+% Modifications 
+% were made by Conny Junghans and Jannik Strötgen
+% and Sascha Hunold
+
+\documentclass[
+     12pt,                    % font size
+     a4paper,             % paper format
+     BCOR10mm,     % binding correction
+     DIV14,                 % stripe size for margin calculation
+     listof=totoc,                    % table listing in toc
+     bibliography=totoc,       % bibliography in toc
+     index=totoc,              % index in toc
+%     parskip            % paragraph skip instead of paragraph indent
+     twoside,
+     headsepline
+     ]{scrreprt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% PACKAGES:
+
+% Use German :
+% Input encoding
+\usepackage[utf8]{inputenc}
+% Font encoding
+\usepackage[T1]{fontenc}
+% Index-generation
+\usepackage{makeidx}
+% Einbinden von URLs:
+\usepackage{url}
+% Special \LaTex symbols (e.g. \BibTeX):
+\usepackage{doc}
+% Include Graphic-files:
+\usepackage{graphicx}
+
+\usepackage{setspace}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem*{definition}{Definition}
+\newtheorem*{example}{Example}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+
+% hyperrefs in the documents
+\usepackage[bookmarks=true,colorlinks,pdfpagelabels,pdfstartview = FitH,bookmarksopen = true,bookmarksnumbered = true,linkcolor = black,plainpages = false,hypertexnames = false,citecolor = black,urlcolor=black]{hyperref} 
+
+\usepackage[backend=biber, style=authoryear, sorting=ynt]{biblatex}
+\addbibresource{references.bib}
+\renewcommand*{\nameyeardelim}{\addspace}
+
+\DeclareCiteCommand{\parencite}
+  {\usebibmacro{prenote}}
+  {\bibopenparen\printtext[bibhyperref]{\printnames{labelname}\nameyeardelim\printfield{year}}\bibcloseparen}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+\DeclareCiteCommand{\textcite}
+  {\usebibmacro{prenote}}
+  {\printtext[bibhyperref]{\printnames{labelname}\nameyeardelim\bibopenparen\printfield{year}\bibcloseparen}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% OTHER SETTINGS:
+
+% Pagestyle:
+\pagestyle{headings}
+
+% Choose language
+\newcommand{\setlang}[1]{\selectlanguage{#1}\nonfrenchspacing}
+
+\begin{document}
+% TITLE:
+% TITLE:
+\pagenumbering{roman} 
+\begin{titlepage}
+
+
+\vspace*{1cm}
+\begin{center}
+\vspace*{3cm}
+\textbf{ 
+\Large Ruprecht-Karls-Universität Heidelberg\\
+\smallskip
+\Large Institut für Informatik\\
+\smallskip
+}
+
+\vspace{3cm}
+
+\textbf{\large Bachelor Thesis}
+
+\vspace{0.5\baselineskip}
+{\huge
+Parallel ASP Planning
+}
+\end{center}
+
+\vfill 
+
+{\large
+\begin{tabular}[l]{ll}
+Name: & Levi Maximilian Klein\\
+Student ID: & 4283957\\
+Supervisor: & Dr. Gnad\\
+Submission date: & 17.02.2026
+\end{tabular}
+}
+
+\end{titlepage}
+
+\onehalfspacing
+
+\thispagestyle{empty}
+
+\vspace*{100pt}
+\noindent
+Ich versichere, dass ich diese Bachelor-Arbeit selbstständig verfasst und nur die angegebenen
+Quellen und Hilfsmittel verwendet habe.
+
+\vspace*{50pt}
+
+\noindent
+Heidelberg, dd.mm.yyyy
+\cleardoublepage
+
+\section*{Zusammenfassung}
+
+Dies ist eine Zusammenfassung der Arbeit.
+
+\section*{Abstract}
+
+This is the abstract.
+
+\cleardoublepage
+
+\tableofcontents
+\cleardoublepage
+\pagenumbering{arabic} 
+
+% List of figures (Abbildungsverzeichnis):
+\listoffigures
+% List of tables (Tabellenverzeichnis):
+\listoftables
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Einleitung}\label{intro}
+This chapter contains an overview of the topic as well as the goals and contributions of your work.
+
+\section{Motivation}
+
+\section{Ziele der Arbeit}
+
+\section{Aufbau der Arbeit}
+Here you describe the structure of the thesis. For example:
+
+In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorgestellt.
+
+
+\chapter{Basics}\label{background}
+\section{Definitions}
+\begin{definition}[multivalued planning task]
+    A STRIPS-like multivalued planning task according to \parencite{Helmert2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
+    \begin{itemize}
+      \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ has a finite domain $x^d$ and in every state, $x$ takes exactly one value from its domain.
+      \item $s_0$, the \textbf{initial state}, is a total function, s.t. $s_0(x) \in x^d$ for each $x \in \mathcal{F}$
+      \item $s_*$, the \textbf{goal conditions}, is a partial function, s.t. $s_*(x) \in x^d$, for each $x \in dom(s_*)$
+      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action as $a = \langle a^c, a^e \rangle$, where $a^c$ is the precondition of $a$ and $a^e$ is the postcondition of $a$. Both $a^c$ and $a^e$ are partial variable assignments over $\mathcal{F}$
+    \end{itemize}
+\end{definition}
+\begin{definition}[successor state]
+  Let $s$ be state and $a \in \mathcal{O}$ an action.\\
+  The \textbf{successor state} $o(a,s)$, obtained by applying action $a$ in state $s$, is defined if the precondtion of $a$ holds, i.e., $a^c(x) = s(x)$ for all $x \in dom(a^c)$. Then
+  $$
+  s'(x) = o(a,s) = \begin{cases} a^e(x) & \text{if } x \in dom(a^e) \\ s(x) & \text{otherwise.} \end{cases}
+  $$ 
+\end{definition}
+\begin{remark}
+  Let $A_n = \langle a_1, \dots, a_n \rangle$ be a sequence of actions with length n. We define the application of $A_n$ to a state $s$ recursevily by 
+  $$
+    o(A_n,s)) = o(a_n,o(A_{n-1},s))
+  $$
+  if $o(A_i, s)$ is defined for all $1 \le i \le n$ 
+\end{remark}
+\begin{definition}[sequential plan]
+  A \textbf{sequential plan} is a sequence of actions $A_n = \langle a_1, \dots, a_n \rangle$, s.t. 
+  $s' = o(A_n,s)$ is defined and $s'(x) = s_*(x)$ for all $x \in dom(s_*)$.
+\end{definition}
+\printbibliography
+\end{document}

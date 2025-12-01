@@ -3,6 +3,7 @@
 
 import os
 import sys
+import json
 
 from bw_cluster_environments import BWUniEnvironment
 from pathlib import Path
@@ -36,10 +37,9 @@ else:
     ENV = LocalEnvironment(processes=1)
 BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SUITE_NAMES = ["agricola-opt18-strips", "airport", "barman-opt11-strips", "barman-opt14-strips", "blocks", "childsnack-opt14-strips", "data-network-opt18-strips", "depot", "driverlog", "elevators-opt08-strips", "elevators-opt11-strips", "floortile-opt11-strips", "floortile-opt14-strips", "freecell", "ged-opt14-strips", "grid", "gripper", "hiking-opt14-strips", "logistics00", "logistics98", "miconic", "movie", "mprime", "mystery", "nomystery-opt11-strips", "openstacks-opt08-strips", "openstacks-opt11-strips", "openstacks-opt14-strips", "openstacks-strips", "organic-synthesis-opt18-strips", "organic-synthesis-split-opt18-strips", "parcprinter-08-strips", "parcprinter-opt11-strips", "parking-opt11-strips", "parking-opt14-strips", "pathways", "pegsol-08-strips", "pegsol-opt11-strips", "petri-net-alignment-opt18-strips", "pipesworld-notankage", "pipesworld-tankage", "psr-small", "quantum-layout-opt23-strips", "rovers", "satellite", "scanalyzer-08-strips", "scanalyzer-opt11-strips", "snake-opt18-strips", "sokoban-opt08-strips", "sokoban-opt11-strips", "spider-opt18-strips", "storage", "termes-opt18-strips", "tetris-opt14-strips", "tidybot-opt11-strips", "tidybot-opt14-strips", "tpp", "transport-opt08-strips", "transport-opt11-strips", "transport-opt14-strips", "trucks-strips", "visitall-opt11-strips", "visitall-opt14-strips", "woodworking-opt08-strips", "woodworking-opt11-strips", "zenotravel"]
-SUITE = [os.path.join(BENCHMARKS_DIR, names) for names in SUITE_NAMES]
+SUITES = ["agricola-sat18-strips", "airport", "barman-sat11-strips", "barman-sat14-strips", "blocks", "childsnack-sat14-strips", "data-network-sat18-strips", "depot", "driverlog", "elevators-sat08-strips", "elevators-sat11-strips", "floortile-sat11-strips", "floortile-sat14-strips", "freecell", "ged-sat14-strips", "grid", "gripper", "hiking-sat14-strips", "logistics00", "logistics98", "miconic", "movie", "mprime", "mystery", "nomystery-sat11-strips", "openstacks-sat08-strips", "openstacks-sat11-strips", "openstacks-sat14-strips", "openstacks-strips", "organic-synthesis-sat18-strips", "organic-synthesis-split-sat18-strips", "parcprinter-08-strips", "parcprinter-sat11-strips", "parking-sat11-strips", "parking-sat14-strips", "pathways", "pegsol-08-strips", "pegsol-sat11-strips", "pipesworld-notankage", "pipesworld-tankage", "psr-small", "quantum-layout-sat23-strips", "rovers", "satellite", "scanalyzer-08-strips", "scanalyzer-sat11-strips", "snake-sat18-strips", "sokoban-sat08-strips", "sokoban-sat11-strips", "spider-sat18-strips", "storage", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips", "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips", "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
 ALGORITHM = ["sequential", "forall", "exists", "relaxed"]
-TIME_LIMIT = 600
+TIME_LIMIT = 1800
 MEMORY_LIMIT = 8000
 
 ATTRIBUTES = [
@@ -66,16 +66,25 @@ def make_parser():
         else:
             props["error"] = "solved"
 
-    parser = Parser()
-    parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True)
-    parser.add_pattern("result", r"(SATISFIABLE|UNSATISFIABLE|UNKNOWN)", type=str, file="run.log")
-    parser.add_pattern("clingo_total_time", r"Time\s+:\s+(\d+\.\d+)s", type=float, file="run.log")
-    parser.add_pattern("clingo_search_time", r"Solving:\s+(\d+\.\d+)s", type=float, file="run.log")
-    parser.add_pattern("clingo_first_model_time", r"1st Model:\s+(\d+\.\d+)s", type=float, file="run.log")
-    parser.add_pattern("clingo_unsat_time", r"Unsat:\s+(\d+\.\d+)s", type=float, file="run.log")
+    def parse_json_output(content, props):
+        try:
+            data = json.loads(content)
+            if 'Time' in data:
+                props['clingo_total_time'] = data['Time'].get('Total', 0)
+                props['clingo_search_time'] = data['Time'].get('Solve', 0)
+                props['clingo_unsat_time'] = data['Time'].get('Unsat', 0)
+                props['clingo_first_model_time'] = data['Time'].get('Model', 0)
+            
+            # Result
+            if 'Result' in data:
+                props['result'] = data['Result']
+        except (json.JSONDecodeError, KeyError) as e:
+            pass
 
+    parser = Parser()
     parser.add_function(solved)
     parser.add_function(error)
+    parser.add_function(parse_json_output, file="output.json")
     return parser
 
 def create_plots():
@@ -87,9 +96,9 @@ def create_plots():
         raise FileNotFoundError
     create_heat_map(properties_file)
 
-
 def remove_explained_errors(run):
-    explained_messages = ["run.err: ../../common.lp:11:1-16: info: no atoms over signature occur in program:\n  occurs/2\n\n"]
+    explained_messages = [
+        'run.err: /pfs/data6/home/hd/hd_hd/hd_we303/ParallelASPPlanning/common.lp:22:1-16: info: no atoms over signature occur in program:\n  occurs/2\n']
     errors = run.get("unexplained_errors")
     if errors:
         run["unexplained_errors"] = [
@@ -107,14 +116,17 @@ def remove_unsat_times(run):
 exp = Experiment(environment=ENV)
 exp.add_parser(make_parser())
 for algo in ALGORITHM:
-    for task in suites.build_suite(BENCHMARKS_DIR, SUITE_NAMES):
+    for task in suites.build_suite(BENCHMARKS_DIR, ["zenotravel"]):
         run = exp.add_run()
-        run.add_resource(algo, f"{algo}.lp", symlink=True)
-        run.add_command("downward_pddl_to_sas", [sys.executable, Path(SCRIPT_DIR) / "../downward/fast-downward.py", "--translate", Path(BENCHMARKS_DIR) / task.domain / "domain.pddl", Path(BENCHMARKS_DIR) / task.domain / task.problem])
-        run.add_command("plasp_sas_to_asp", [sys.executable, Path(SCRIPT_DIR) / "plasp_wrapper.py"])
-        run.add_command("clingo_solve", [SCRIPT_DIR + "/../clingo/clingo", Path(SCRIPT_DIR) / "common.lp", f"{{{algo}}}", "output.lp"])
-        run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp"])
-        run.set_property("component_optins", "clingo common.lp {algo} output.lp")
+        run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
+        run.add_command("downward_pddl_to_sas", [sys.executable, Path(SCRIPT_DIR) / "../downward/fast-downward.py", "--translate", task.domain_file, task.problem_file])
+        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate output.sas > output.lp"], shell=True)
+        #run.add_command("clingo_solve", [SCRIPT_DIR + "/../clingo/clingo", "ouf=2", f"--time-limit={TIME_LIMIT}", Path(SCRIPT_DIR) / "algorithms" / "common.lp", f"{{{algo}}}", "output.lp"])
+        run.add_command("clingo_solve", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 --time-limit={TIME_LIMIT} {Path(SCRIPT_DIR) / 'algorithms' / 'common.lp'} {{{algo}}} output.lp > output.json"], shell=True)
+        run.add_command("clingo_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/clingo_to_sas_plan.py"])
+        run.add_command("validate_plan", ["validate", task.domain_file, task.problem_file, "sas_plan"])
+        run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp", "output.json"])
+        run.set_property("component_optins", f"clingo --timit-limit={TIME_LIMIT} common.lp {algo} output.lp")
         run.set_property("domain", task.domain)
         run.set_property("problem", task.problem)
         run.set_property("algorithm", algo)
@@ -128,4 +140,3 @@ exp.add_fetcher(name="fetch")
 exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = [remove_explained_errors, remove_unsat_times]), outfile="report.html")
 exp.add_step("plots", lambda: create_plots())
 exp.run_steps()
-
