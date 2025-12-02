@@ -6,9 +6,9 @@ from pathlib import Path
 
 data = {}
 try:
-    if not os.path.exists("output.json"):
+    if not os.path.exists("sequential.json"):
         raise FileNotFoundError
-    with open("output.json", 'r') as f:
+    with open("sequential.json", 'r') as f:
         data = json.load(f)
 except (json.JSONDecodeError, IOError) as e:
         print(f"Error reading properties file: {e}")
