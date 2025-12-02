@@ -3,6 +3,64 @@ import numpy as np
 import os
 import json
 
+def get_algo_stats(data):
+    results = {}
+    problem_solutions = {} # {(domain, problem): {algo: time}}
+    num_problems = {}
+    for run_data in data.values():
+        algo = run_data.get("algorithm")
+        domain = run_data.get("domain")
+        problem = run_data.get("problem")
+        result = 1 if run_data.get("result", "UNKNOWN") != "UNKNOWN" else 0
+        time = run_data.get("clingo_total_time", 0) if result == 1 else 0
+        if algo not in results:
+            results[algo] = {}
+        if domain not in results[algo]:
+            results[algo][domain] = 0
+
+        results[algo][domain] += result
+
+        key = (domain, problem)
+        if key not in problem_solutions:
+            problem_solutions[key] = {}
+        if result == 1:
+            problem_solutions[key][algo] = time
+
+    for (domain, _) in problem_solutions.keys():
+        if domain not in num_problems:
+            num_problems[domain] = 0
+        num_problems[domain] +=1
+
+    return results, problem_solutions, num_problems
+
+
+def filter_times(problem_solutions, algos):
+    filtered_times = {algo: {} for algo in algos}
+    for (domain, _), times in problem_solutions.items():
+        if len(times) == len(algos):
+            for algo in algos:
+                if algo in times:
+                    if domain not in filtered_times[algo]:
+                        filtered_times[algo][domain] = []
+                    filtered_times[algo][domain].append(times[algo])
+    return filtered_times
+
+
+def create_matrices(algo_stats, filtered_times, algos, domains, num_problems):
+    result_matrix = np.zeros((len(algos), len(domains)), dtype=int)
+    normalized_result_matrix = np.zeros((len(algos), len(domains)))
+    time_matrix = np.zeros((len(algos), len(domains)))
+    for i, algo in enumerate(algos):
+        for j, domain in enumerate(domains):
+            result_matrix[i,j] = algo_stats[algo][domain]
+            normalized_result_matrix[i,j] = result_matrix[i,j] / num_problems[domain]
+            if domain in filtered_times[algo]:
+                time_matrix[i,j] = np.mean(filtered_times[algo][domain])
+            else:
+                time_matrix[i,j] = 0
+    return result_matrix, normalized_result_matrix, time_matrix
+
+
 def create_heat_map(properties_file):
     data = {}
     try:
@@ -12,40 +70,13 @@ def create_heat_map(properties_file):
             data = json.load(f)
     except (json.JSONDecodeError, IOError) as e:
             print(f"Error reading properties file: {e}")
-    errors = []
-    algo_stats = {}
-    for run_data in data.values():
-        error = run_data.get("unexplained_errors", [])
-        if error and isinstance(error,list):
-            for err_msg in error:
-                if err_msg not in errors and "driver.log" not in err_msg:
-                    errors.append(err_msg)
-                    print(error)
-        algo = run_data.get("algorithm")
-        domain = run_data.get("domain")
-        time = run_data.get("clingo_total_time", 0)
-        result = 1 if run_data.get("result", "UNKNOWN") != "UNKNOWN" else 0
-        if algo not in algo_stats:
-            algo_stats[algo] = {}
-        if domain not in algo_stats[algo]:
-            algo_stats[algo][domain] = {"results": 0, "times": []}
+    
+    results, problem_solutions, num_problems = get_algo_stats(data)
+    algos = list(results.keys())
+    domains = list(results[algos[0]].keys())
 
-        algo_stats[algo][domain]["results"] += result
-        algo_stats[algo][domain]["times"].append(time)
-
-    algos = list(algo_stats.keys())
-    domains = list(algo_stats[algos[0]].keys())
-    num_problems = {}
-    for d in algo_stats[algos[0]].keys():
-        num_problems[d] = len(algo_stats[algos[0]][d]["times"])
-    result_matrix = np.zeros((len(algos), len(domains)), dtype=int)
-    normalized_result_matrix = np.zeros((len(algos), len(domains)))
-    time_matrix = np.zeros((len(algos), len(domains)))
-    for i, algo in enumerate(algos):
-        for j, domain in enumerate(domains):
-            result_matrix[i,j] = algo_stats[algo][domain]["results"]
-            time_matrix[i,j] = np.mean(algo_stats[algo][domain]["times"])
-            normalized_result_matrix[i,j] = result_matrix[i,j] / num_problems[domain]
+    filtered_times = filter_times(problem_solutions, algos)
+    result_matrix, normalized_result_matrix, time_matrix = create_matrices(results, filtered_times, algos, domains, num_problems)
 
     chunk_size = 10
     for chunk_idx in range(0, len(domains), chunk_size):
@@ -63,7 +94,7 @@ def create_heat_map(properties_file):
                             ha="center", va="center", color="black")
         ax.set_title(f"Solved instances (Part {chunk_idx//chunk_size + 1})")
         fig.tight_layout()
-        plt.savefig(f"solved_part{chunk_idx//chunk_size + 1}.png")
+        plt.savefig(f"plots/solved_part{chunk_idx//chunk_size + 1}.png")
         plt.close()
 
         chunk_time = time_matrix[:, chunk_idx:chunk_idx+chunk_size]
@@ -79,10 +110,10 @@ def create_heat_map(properties_file):
         ax2.set_yticks(range(len(algos)), labels=algos)
         for i in range(len(algos)):
             for j in range(len(chunk_domains)):
-                text = ax2.text(j, i, f"{time_matrix[i,j]:.2f}s",
+                text = ax2.text(j, i, f"{chunk_time[i,j]:.2f}s",
                             ha="center", va="center", color="black")
         ax2.set_title(f"Average Solving Time (Part {chunk_idx//chunk_size + 1})")
         fig2.tight_layout()
-        plt.savefig(f"avg_time_part{chunk_idx//chunk_size + 1}.png")
+        plt.savefig(f"plots/avg_time_part{chunk_idx//chunk_size + 1}.png")
 
     

@@ -9,6 +9,7 @@ from bw_cluster_environments import BWUniEnvironment
 from pathlib import Path
 
 from downward.reports.absolute import AbsoluteReport
+from downward.reports.scatter import ScatterPlotReport
 from downward import suites
 from lab.environments import LocalEnvironment
 from lab.experiment import Experiment
@@ -97,13 +98,11 @@ def create_plots():
     create_heat_map(properties_file)
 
 def remove_explained_errors(run):
-    explained_messages = [
-        'run.err: /pfs/data6/home/hd/hd_hd/hd_we303/ParallelASPPlanning/common.lp:22:1-16: info: no atoms over signature occur in program:\n  occurs/2\n']
     errors = run.get("unexplained_errors")
     if errors:
         run["unexplained_errors"] = [
             error for error in errors
-            if all(msg not in error for msg in explained_messages)]
+            if ": info:" not in error]
     return True
 
 def remove_unsat_times(run):
@@ -121,10 +120,11 @@ for algo in ALGORITHM:
         run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
         run.add_command("downward_pddl_to_sas", [sys.executable, Path(SCRIPT_DIR) / "../downward/fast-downward.py", "--translate", task.domain_file, task.problem_file])
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate output.sas > output.lp"], shell=True)
-        #run.add_command("clingo_solve", [SCRIPT_DIR + "/../clingo/clingo", "ouf=2", f"--time-limit={TIME_LIMIT}", Path(SCRIPT_DIR) / "algorithms" / "common.lp", f"{{{algo}}}", "output.lp"])
         run.add_command("clingo_solve", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 --time-limit={TIME_LIMIT} {Path(SCRIPT_DIR) / 'algorithms' / 'common.lp'} {{{algo}}} output.lp > output.json"], shell=True)
-        run.add_command("clingo_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/clingo_to_sas_plan.py"])
-        run.add_command("validate_plan", ["validate", task.domain_file, task.problem_file, "sas_plan"])
+        run.add_command("extract_occurs", [sys.executable, f"{SCRIPT_DIR}/extract_occurs.py"])
+        run.add_command("parallel_to_seq", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 {Path(SCRIPT_DIR) / "algorithms" / "parallel_to_sequential.lp"} plan.lp > sequential.json"], shell=True)
+        run.add_command("lp_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/lp_to_sas_plan.py"])
+        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, "sas_plan"])
         run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp", "output.json"])
         run.set_property("component_optins", f"clingo --timit-limit={TIME_LIMIT} common.lp {algo} output.lp")
         run.set_property("domain", task.domain)

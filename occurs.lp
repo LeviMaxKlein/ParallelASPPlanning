@@ -1,0 +1,14 @@
+occurs(action(("board","person2","plane1","city0")),1).
+occurs(action(("board","person3","plane1","city0")),1).
+occurs(action(("board","person4","plane1","city1")),1).
+occurs(action(("refuel","plane2","city2","fl0","fl1")),1).
+occurs(action(("zoom","plane1","city1","city0","fl6","fl5","fl4")),1).
+occurs(action(("board","person1","plane1","city3")),2).
+occurs(action(("debark","person3","plane1","city3")),2).
+occurs(action(("debark","person4","plane1","city3")),2).
+occurs(action(("fly","plane1","city0","city3","fl4","fl3")),2).
+occurs(action(("refuel","plane2","city2","fl1","fl2")),2).
+occurs(action(("debark","person1","plane1","city2")),3).
+occurs(action(("debark","person2","plane1","city3")),3).
+occurs(action(("fly","plane1","city3","city2","fl3","fl2")),3).
+occurs(action(("fly","plane2","city2","city2","fl2","fl1")),3).
