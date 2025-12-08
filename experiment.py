@@ -102,7 +102,10 @@ def remove_explained_errors(run):
     errors = run.get("unexplained_errors")
     if errors:
         print(f"Found errors: {errors}")
-        filtered= [error for error in errors if "occurs" not in error]
+        filtered= [
+            error for error in errors
+            if "occurs" not in error and "output-to-slurm.err" not in error
+        ]
         print(f"After filtering: {filtered}")
         run["unexplained_errors"]=filtered
         #run["unexplained_errors"] = [
