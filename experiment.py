@@ -106,16 +106,6 @@ def create_plots():
         raise FileNotFoundError
     create_heat_map(properties_file)
 
-def remove_explained_errors(run):
-    errors = run.get("unexplained_errors")
-    if errors:
-        filtered= [
-            error for error in errors
-            if "occurs" not in error and "output-to-slurm.err" not in error
-        ]
-        run["unexplained_errors"]=filtered
-    return True
-
 def remove_unsat_times(run):
     unsat_time = run.get("clingo_unsat_time")
     result = run.get("result")
@@ -129,7 +119,6 @@ for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
         run = exp.add_run()
         run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
-        #run.add_command("downward_pddl_to_sas", [sys.executable, Path(SCRIPT_DIR) / "../downward/fast-downward.py", "--translate", task.domain_file, task.problem_file])
         run.add_command("cpddl_pddl_to_sas", [f"{Path(SCRIPT_DIR)}/../cpddl/bin/pddl", "--fdr-out", "./output.sas", task.domain_file, task.problem_file])
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate output.sas > output.lp"], shell=True)
         run.add_command("clingo_solve", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 --time-limit={TIME_LIMIT} {Path(SCRIPT_DIR) / 'algorithms' / 'common.lp'} {{{algo}}} output.lp > output.json"], shell=True)
@@ -138,7 +127,7 @@ for algo in ALGORITHM:
         run.add_command("lp_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/lp_to_sas_plan.py"])
         run.add_command("validate_plan", ["Validate", "-v", task.domain_file, task.problem_file, "sas_plan"])
         run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp", "sequential.json", "plan.lp", "sas_plan"])
-        run.set_property("component_optins", f"clingo --timit-limit={TIME_LIMIT} common.lp {algo} output.lp")
+        run.set_property("component_optins", f"clingo --outf=2 --timit-limit={TIME_LIMIT} common.lp {algo} output.lp > output.json")
         run.set_property("domain", task.domain)
         run.set_property("problem", task.problem)
         run.set_property("algorithm", algo)
