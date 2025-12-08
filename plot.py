@@ -11,7 +11,7 @@ def get_algo_stats(data):
         algo = run_data.get("algorithm")
         domain = run_data.get("domain")
         problem = run_data.get("problem")
-        result = 1 if run_data.get("result", "UNKNOWN") != "UNKNOWN" else 0
+        result = run_data.get("solved", 0)
         time = run_data.get("clingo_total_time", 0) if result == 1 else 0
         if algo not in results:
             results[algo] = {}

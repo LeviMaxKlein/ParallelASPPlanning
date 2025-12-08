@@ -51,6 +51,7 @@ ATTRIBUTES = [
     "clingo_search_time",
     "clingo_first_model_time",
     "clingo_unsat_time",
+    "clingo_wrong_plan",
     Attribute("solved", absolute=True)
 ]
 
@@ -67,6 +68,12 @@ def make_parser():
             props["error"] = "unsolved"
         else:
             props["error"] = "solved"
+    
+    def check_wrong_plan(content, props):
+        if props.get("result") == "SATISFIABLE" and solved == 0:
+            props["clingo_wrong_plan"] = 1
+        else:
+            props["clingo_wrong_plan"] = 0 
 
     def parse_json_output(content, props):
         try:
@@ -84,9 +91,10 @@ def make_parser():
             pass
 
     parser = Parser()
-    parser.add_function(solved)
-    parser.add_function(error)
     parser.add_function(parse_json_output, file="output.json")
+    parser.add_function(solved)
+    parser.add_function(check_wrong_plan)
+    parser.add_function(error)
     return parser
 
 def create_plots():
@@ -141,6 +149,6 @@ exp.add_step("build", exp.build)
 exp.add_step("start", exp.start_runs)
 exp.add_step("parse", exp.parse)
 exp.add_fetcher(name="fetch", filter= remove_explained_errors)
-exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = [remove_unsat_times]), outfile="report.html")
+exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = remove_unsat_times), outfile="report.html")
 exp.add_step("plots", lambda: create_plots())
 exp.run_steps()
