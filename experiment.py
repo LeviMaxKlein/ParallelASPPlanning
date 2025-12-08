@@ -101,9 +101,13 @@ def create_plots():
 def remove_explained_errors(run):
     errors = run.get("unexplained_errors")
     if errors:
-        run["unexplained_errors"] = [
-            error for error in errors
-            if "occurs:" not in error]
+        print(f"Found errors: {errors}")
+        filtered= [error for error in errors if "occurs" not in error]
+        print(f"After filtering: {filtered}")
+        run["unexplained_errors"]=filtered
+        #run["unexplained_errors"] = [
+        #    error for error in errors
+         #   if "occurs:" not in error]
     return True
 
 def remove_unsat_times(run):
@@ -116,7 +120,7 @@ def remove_unsat_times(run):
 exp = Experiment(environment=ENV)
 exp.add_parser(make_parser())
 for algo in ALGORITHM:
-    for task in suites.build_suite(BENCHMARKS_DIR, ["zenotravel"]):
+    for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
         run = exp.add_run()
         run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
         #run.add_command("downward_pddl_to_sas", [sys.executable, Path(SCRIPT_DIR) / "../downward/fast-downward.py", "--translate", task.domain_file, task.problem_file])
@@ -138,7 +142,7 @@ for algo in ALGORITHM:
 exp.add_step("build", exp.build)
 exp.add_step("start", exp.start_runs)
 exp.add_step("parse", exp.parse)
-exp.add_fetcher(name="fetch")
-exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = [remove_explained_errors, remove_unsat_times]), outfile="report.html")
+exp.add_fetcher(name="fetch", filter= remove_explained_errors)
+exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = [remove_unsat_times]), outfile="report.html")
 exp.add_step("plots", lambda: create_plots())
 exp.run_steps()
