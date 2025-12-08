@@ -32,7 +32,7 @@ REMOTE = BWUniEnvironment.is_present()
 if REMOTE:
     ENV = BWUniEnvironment(
     email="levi.klein@stud.uni-heidelberg.de",
-    memory_per_cpu="8192M", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
+    memory_per_cpu="32768", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
     )
 else:
     ENV = LocalEnvironment(processes=1)
@@ -42,7 +42,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SUITES = ["agricola-sat18-strips", "airport", "barman-sat11-strips", "barman-sat14-strips", "blocks", "childsnack-sat14-strips", "data-network-sat18-strips", "depot", "driverlog", "elevators-sat08-strips", "elevators-sat11-strips", "floortile-sat11-strips", "floortile-sat14-strips", "freecell", "ged-sat14-strips", "grid", "gripper", "hiking-sat14-strips", "logistics00", "logistics98", "miconic", "movie", "mprime", "mystery", "nomystery-sat11-strips", "openstacks-sat08-strips", "openstacks-sat11-strips", "openstacks-sat14-strips", "openstacks-strips", "organic-synthesis-sat18-strips", "organic-synthesis-split-sat18-strips", "parcprinter-08-strips", "parcprinter-sat11-strips", "parking-sat11-strips", "parking-sat14-strips", "pathways", "pegsol-08-strips", "pegsol-sat11-strips", "pipesworld-notankage", "pipesworld-tankage", "psr-small", "quantum-layout-sat23-strips", "rovers", "satellite", "scanalyzer-08-strips", "scanalyzer-sat11-strips", "snake-sat18-strips", "sokoban-sat08-strips", "sokoban-sat11-strips", "spider-sat18-strips", "storage", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips", "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips", "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
 ALGORITHM = ["sequential", "forall", "exists", "relaxed"]
 TIME_LIMIT = 1800
-MEMORY_LIMIT = 8000
+MEMORY_LIMIT = 32600
 
 ATTRIBUTES = [
     "error",
@@ -57,7 +57,7 @@ ATTRIBUTES = [
 
 def make_parser():
     def solved(content, props):
-        if props.get("result", "UNKNOWN") != "UNKNOWN":
+        if "successful plan" in content.lower():
             props["solved"] = 1
         else:
             props["solved"] = 0
@@ -103,7 +103,7 @@ def remove_explained_errors(run):
     if errors:
         run["unexplained_errors"] = [
             error for error in errors
-            if ": info:" not in error]
+            if "occurs:" not in error]
     return True
 
 def remove_unsat_times(run):
@@ -127,7 +127,7 @@ for algo in ALGORITHM:
         run.add_command("parallel_to_seq", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 {Path(SCRIPT_DIR) / "algorithms" / "parallel_to_sequential.lp"} plan.lp > sequential.json"], shell=True)
         run.add_command("lp_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/lp_to_sas_plan.py"])
         run.add_command("validate_plan", ["Validate", "-v", task.domain_file, task.problem_file, "sas_plan"])
-        #run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp", "output.json", "sequential.json", "plan.lp", "sas_plan"])
+        run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp", "sequential.json", "plan.lp", "sas_plan"])
         run.set_property("component_optins", f"clingo --timit-limit={TIME_LIMIT} common.lp {algo} output.lp")
         run.set_property("domain", task.domain)
         run.set_property("problem", task.problem)
