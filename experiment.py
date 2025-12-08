@@ -101,16 +101,11 @@ def create_plots():
 def remove_explained_errors(run):
     errors = run.get("unexplained_errors")
     if errors:
-        print(f"Found errors: {errors}")
         filtered= [
             error for error in errors
             if "occurs" not in error and "output-to-slurm.err" not in error
         ]
-        print(f"After filtering: {filtered}")
         run["unexplained_errors"]=filtered
-        #run["unexplained_errors"] = [
-        #    error for error in errors
-         #   if "occurs:" not in error]
     return True
 
 def remove_unsat_times(run):
