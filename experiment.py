@@ -70,7 +70,7 @@ def make_parser():
             props["error"] = "solved"
     
     def check_wrong_plan(content, props):
-        if props.get("result") == "SATISFIABLE" and solved == 0:
+        if props.get("result") == "SATISFIABLE" and props.get("solved") == 0:
             props["clingo_wrong_plan"] = 1
         else:
             props["clingo_wrong_plan"] = 0 
@@ -134,7 +134,7 @@ for algo in ALGORITHM:
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate output.sas > output.lp"], shell=True)
         run.add_command("clingo_solve", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 --time-limit={TIME_LIMIT} {Path(SCRIPT_DIR) / 'algorithms' / 'common.lp'} {{{algo}}} output.lp > output.json"], shell=True)
         run.add_command("extract_occurs", [sys.executable, f"{SCRIPT_DIR}/extract_occurs.py"])
-        run.add_command("parallel_to_seq", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 {Path(SCRIPT_DIR) / "algorithms" / "parallel_to_sequential.lp"} plan.lp > sequential.json"], shell=True)
+        run.add_command("parallel_to_seq", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 output.lp {Path(SCRIPT_DIR) / "algorithms" / "parallel_to_sequential.lp"} plan.lp > sequential.json"], shell=True)
         run.add_command("lp_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/lp_to_sas_plan.py"])
         run.add_command("validate_plan", ["Validate", "-v", task.domain_file, task.problem_file, "sas_plan"])
         run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp", "sequential.json", "plan.lp", "sas_plan"])
@@ -148,7 +148,7 @@ for algo in ALGORITHM:
 exp.add_step("build", exp.build)
 exp.add_step("start", exp.start_runs)
 exp.add_step("parse", exp.parse)
-exp.add_fetcher(name="fetch", filter= remove_explained_errors)
+exp.add_fetcher(name="fetch")
 exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = remove_unsat_times), outfile="report.html")
 exp.add_step("plots", lambda: create_plots())
 exp.run_steps()
