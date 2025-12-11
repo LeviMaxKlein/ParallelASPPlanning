@@ -10,15 +10,16 @@ def get_algo_stats(data):
     for run_data in data.values():
         algo = run_data.get("algorithm")
         domain = run_data.get("domain")
+        grouped_domain = domain.split("-")[0]
         problem = run_data.get("problem")
         result = run_data.get("solved", 0)
         time = run_data.get("clingo_total_time", 0) if result == 1 else 0
         if algo not in results:
             results[algo] = {}
-        if domain not in results[algo]:
-            results[algo][domain] = 0
+        if grouped_domain not in results[algo]:
+            results[algo][grouped_domain] = 0
 
-        results[algo][domain] += result
+        results[algo][grouped_domain] += result
 
         key = (domain, problem)
         if key not in problem_solutions:
@@ -27,9 +28,10 @@ def get_algo_stats(data):
             problem_solutions[key][algo] = time
 
     for (domain, _) in problem_solutions.keys():
-        if domain not in num_problems:
-            num_problems[domain] = 0
-        num_problems[domain] +=1
+        grouped_domain = domain.split("-")[0]
+        if grouped_domain not in num_problems:
+            num_problems[grouped_domain] = 0
+        num_problems[grouped_domain] +=1
 
     return results, problem_solutions, num_problems
 
@@ -37,12 +39,13 @@ def get_algo_stats(data):
 def filter_times(problem_solutions, algos):
     filtered_times = {algo: {} for algo in algos}
     for (domain, _), times in problem_solutions.items():
+        grouped_domain = domain.split("-")[0]
         if len(times) == len(algos):
             for algo in algos:
                 if algo in times:
-                    if domain not in filtered_times[algo]:
-                        filtered_times[algo][domain] = []
-                    filtered_times[algo][domain].append(times[algo])
+                    if grouped_domain not in filtered_times[algo]:
+                        filtered_times[algo][grouped_domain] = []
+                    filtered_times[algo][grouped_domain].append(times[algo])
     return filtered_times
 
 

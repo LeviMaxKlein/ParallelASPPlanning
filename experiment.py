@@ -9,12 +9,12 @@ from bw_cluster_environments import BWUniEnvironment
 from pathlib import Path
 
 from downward.reports.absolute import AbsoluteReport
-from downward.reports.scatter import ScatterPlotReport
 from downward import suites
 from lab.environments import LocalEnvironment
 from lab.experiment import Experiment
 from lab.parser import Parser
 from lab.reports import Attribute
+from lab.experiment import ARGPARSER
 from plot import create_heat_map
 
 class BaseReport(AbsoluteReport):
@@ -29,21 +29,24 @@ class BaseReport(AbsoluteReport):
     ]
 
 REMOTE = BWUniEnvironment.is_present()
-if REMOTE:
-    ENV = BWUniEnvironment(
+ENV = BWUniEnvironment(
     email="levi.klein@stud.uni-heidelberg.de",
     memory_per_cpu="32768", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
-    )
-else:
-    ENV = LocalEnvironment(processes=1)
+    ) if REMOTE else LocalEnvironment(processes=1)
 
+ARGPARSER.add_argument(
+    "--heuristic", action="store_true", help="run experiment with a heuristic"
+)
+ARGPARSER.add_argument(
+    "--strong-mutex", action="store_true", help="run experiment with stronger mutexes"
+)
+TMPDIR = os.environ.get("TMPDIR", "/tmp")
 BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SUITES = ["agricola-sat18-strips", "airport", "barman-sat11-strips", "barman-sat14-strips", "blocks", "childsnack-sat14-strips", "data-network-sat18-strips", "depot", "driverlog", "elevators-sat08-strips", "elevators-sat11-strips", "floortile-sat11-strips", "floortile-sat14-strips", "freecell", "ged-sat14-strips", "grid", "gripper", "hiking-sat14-strips", "logistics00", "logistics98", "miconic", "movie", "mprime", "mystery", "nomystery-sat11-strips", "openstacks-sat08-strips", "openstacks-sat11-strips", "openstacks-sat14-strips", "openstacks-strips", "organic-synthesis-sat18-strips", "organic-synthesis-split-sat18-strips", "parcprinter-08-strips", "parcprinter-sat11-strips", "parking-sat11-strips", "parking-sat14-strips", "pathways", "pegsol-08-strips", "pegsol-sat11-strips", "pipesworld-notankage", "pipesworld-tankage", "psr-small", "quantum-layout-sat23-strips", "rovers", "satellite", "scanalyzer-08-strips", "scanalyzer-sat11-strips", "snake-sat18-strips", "sokoban-sat08-strips", "sokoban-sat11-strips", "spider-sat18-strips", "storage", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips", "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips", "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
-ALGORITHM = ["sequential", "forall", "exists", "relaxed"]
+ALGORITHM = ["sequential", "forall", "exists", "guess_and_check", "relaxed"]
 TIME_LIMIT = 1800
 MEMORY_LIMIT = 32600
-
 ATTRIBUTES = [
     "error",
     "result",
@@ -54,7 +57,6 @@ ATTRIBUTES = [
     "clingo_wrong_plan",
     Attribute("solved", absolute=True)
 ]
-
 
 def make_parser():
     def solved(content, props):
@@ -97,6 +99,13 @@ def make_parser():
     parser.add_function(error)
     return parser
 
+def remove_unsat_times(run):
+    unsat_time = run.get("clingo_unsat_time")
+    result = run.get("result")
+    if unsat_time:
+        run["clingo_unsat_time"] = 0 if result == "SATISFIABLE" else unsat_time
+    return True
+
 def create_plots():
     properties_file = Path(SCRIPT_DIR) / "../experiment-eval/properties"
     print(properties_file)
@@ -106,28 +115,50 @@ def create_plots():
         raise FileNotFoundError
     create_heat_map(properties_file)
 
-def remove_unsat_times(run):
-    unsat_time = run.get("clingo_unsat_time")
-    result = run.get("result")
-    if unsat_time:
-        run["clingo_unsat_time"] = 0 if result == "SATISFIABLE" else unsat_time
-    return True
+args, _ = ARGPARSER.parse_known_args()
+
+exp_name = "ParallelASPPlanning"
+if args.heuristic:
+    exp_name += "_with_heuristic"
+if args.strong_mutex:
+    exp_name += "_withstrong_mutex"
 
 exp = Experiment(environment=ENV)
+exp.path = "data/"+exp_name
 exp.add_parser(make_parser())
+
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
         run = exp.add_run()
         run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
-        run.add_command("cpddl_pddl_to_sas", [f"{Path(SCRIPT_DIR)}/../cpddl/bin/pddl", "--fdr-out", "./output.sas", task.domain_file, task.problem_file])
-        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate output.sas > output.lp"], shell=True)
-        run.add_command("clingo_solve", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 --time-limit={TIME_LIMIT} {Path(SCRIPT_DIR) / 'algorithms' / 'common.lp'} {{{algo}}} output.lp > output.json"], shell=True)
+        cppdl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
+        if args.strong_mutex:
+            cppdl_command.append("--h2")
+        cppdl_command.extend(["--fdr-out", f"{TMPDIR}/output.sas", task.domain_file, task.problem_file])
+        run.add_command("cpddl_pddl_to_sas", cppdl_command)
+
+        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {TMPDIR}/output.sas > {TMPDIR}/output.lp"], shell=True)
+
+        clingo_command = f"{SCRIPT_DIR}/../clingo/clingo --outf=2 --time-limit={TIME_LIMIT} {SCRIPT_DIR}/algorithms/common.lp {{{algo}}} {TMPDIR}/output.lp"
+        if args.heuristic:
+            clingo_command += f" {SCRIPT_DIR}/algorithms/heuristic.lp"
+        clingo_command += " > output.json"
+        run.add_command("clingo_solve", [clingo_command], shell=True)
+
         run.add_command("extract_occurs", [sys.executable, f"{SCRIPT_DIR}/extract_occurs.py"])
-        run.add_command("parallel_to_seq", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 output.lp {Path(SCRIPT_DIR) / "algorithms" / "parallel_to_sequential.lp"} plan.lp > sequential.json"], shell=True)
-        run.add_command("lp_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/lp_to_sas_plan.py"])
-        run.add_command("validate_plan", ["Validate", "-v", task.domain_file, task.problem_file, "sas_plan"])
-        run.add_command("remove_tmp_files", ["rm", "-f", "output.sas", "output.lp", "sequential.json", "plan.lp", "sas_plan"])
-        run.set_property("component_optins", f"clingo --outf=2 --timit-limit={TIME_LIMIT} common.lp {algo} output.lp > output.json")
+        if algo in ["forall", "sequential"]:
+            run.add_command("convert_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/occurs2sas_plan.py"])
+        else:
+            run.add_command("parallel_to_seq", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 {TMPDIR}/output.lp {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {TMPDIR}/plan.lp > {TMPDIR}/sequential.json"], shell=True)
+            run.add_command("convert_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/convert2sas_plan.py"])
+        run.add_command("validate_plan", ["Validate", "-v", task.domain_file, task.problem_file, f"{TMPDIR}/sas_plan"])
+
+        cpddl_opts = "--h2" if args.strong_mutex else ""
+        clingo_opts = f"--outf=2 --time-limit={TIME_LIMIT}"
+        if args.heuristic:
+            clingo_opts += " heuristic.lp"
+        run.set_property("cpddl_options", cpddl_opts)
+        run.set_property("clingo_options", clingo_opts)
         run.set_property("domain", task.domain)
         run.set_property("problem", task.problem)
         run.set_property("algorithm", algo)
