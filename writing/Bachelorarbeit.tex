@@ -4,7 +4,7 @@
 % and Sascha Hunold
 
 \documentclass[
-     12pt,                    % font size
+     11pt,                    % font size
      a4paper,             % paper format
      BCOR10mm,     % binding correction
      DIV14,                 % stripe size for margin calculation
@@ -34,12 +34,12 @@
 \usepackage{doc}
 % Include Graphic-files:
 \usepackage{graphicx}
-
+\usepackage{microtype}
 \usepackage{setspace}
-
+\usepackage{enumitem}
+\setlist{itemsep=1pt, parsep=0pt, topsep=2pt}
 \usepackage{amssymb}
 \usepackage{amsmath}
-
 \usepackage{amsthm}
 \theoremstyle{definition}
 \newtheorem*{definition}{Definition}
@@ -47,7 +47,16 @@
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
+\usepackage{colonequals}
+\newcommand*{\logeq}{\ratio\Longleftrightarrow}
 
+\newtheoremstyle{bfnote}%
+  {}{}
+  {}{}
+  {\bfseries}{.}
+  { }{\thmname{#1}\thmnumber{ #2}\thmnote{ \textit{#3}}}
+\theoremstyle{bfnote}
+\newtheorem{defi}{Definition}
 % hyperrefs in the documents
 \usepackage[bookmarks=true,colorlinks,pdfpagelabels,pdfstartview = FitH,bookmarksopen = true,bookmarksnumbered = true,linkcolor = black,plainpages = false,hypertexnames = false,citecolor = black,urlcolor=black]{hyperref} 
 
@@ -66,6 +75,7 @@
   {\printtext[bibhyperref]{\printnames{labelname}\nameyeardelim\bibopenparen\printfield{year}\bibcloseparen}}
   {\multicitedelim}
   {\usebibmacro{postnote}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % OTHER SETTINGS:
@@ -168,32 +178,146 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 
 \chapter{Basics}\label{background}
 \section{Definitions}
-\begin{definition}[multivalued planning task]
+\begin{defi}[Multi-valued planning task]
     A STRIPS-like multivalued planning task according to \parencite{Helmert2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
     \begin{itemize}
       \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ has a finite domain $x^d$ and in every state, $x$ takes exactly one value from its domain.
       \item $s_0$, the \textbf{initial state}, is a total function, s.t. $s_0(x) \in x^d$ for each $x \in \mathcal{F}$
       \item $s_*$, the \textbf{goal conditions}, is a partial function, s.t. $s_*(x) \in x^d$, for each $x \in dom(s_*)$
-      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action as $a = \langle a^c, a^e \rangle$, where $a^c$ is the precondition of $a$ and $a^e$ is the postcondition of $a$. Both $a^c$ and $a^e$ are partial variable assignments over $\mathcal{F}$
+      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action as $a = \langle a^c, a^e \rangle$, where $a^c$ is the precondition of $a$ and $a^e$ is the postcondition of $a$. Both $a^c$ and $a^e$ are partial variable assignments over $\mathcal{F}$.
     \end{itemize}
-\end{definition}
-\begin{definition}[successor state]
+\end{defi}
+
+\begin{example}
+  Consider the following example for a plan to leave the house:
+  \begin{itemize}
+    \item $\mathcal{F} = \{door, location\}$ with $door^d = \{open, closed\}$, $location^d = \{inside, outside\}$
+    \item Initial state: $s_0 = \{door{=}closed, location{=}inside\}$
+    \item Goal: $s_* = \{door{=}closed, location{=}outside\}$
+    \item Actions: $\mathcal{O} = \{openDoor, closeDoor, goOut\}$, where
+    \vspace{-1em}
+    \begin{align*}
+      openDoor &= \langle\{door{=}closed\}, \{door{=}open\}\rangle\\
+      closeDoor &= \langle\{door{=}open\}, \{door{=}closed\}\rangle\\
+      goOut &= \langle\{location{=}inside, door{=}open\}, \{location{=}outside\}\rangle
+    \end{align*}
+  \end{itemize}
+\end{example}
+\begin{defi}[Successor state]
   Let $s$ be state and $a \in \mathcal{O}$ an action.\\
-  The \textbf{successor state} $o(a,s)$, obtained by applying action $a$ in state $s$, is defined if the precondtion of $a$ holds, i.e., $a^c(x) = s(x)$ for all $x \in dom(a^c)$. Then
+  The \textit{successor state} $o(a,s)$, obtained by applying action $a$ in state $s$, is defined if the precondtion of $a$ holds, i.e., $a^c(x) = s(x)$ for all $x \in dom(a^c)$. Then
   $$
   s'(x) = o(a,s) = \begin{cases} a^e(x) & \text{if } x \in dom(a^e) \\ s(x) & \text{otherwise.} \end{cases}
   $$ 
-\end{definition}
+\end{defi}
 \begin{remark}
-  Let $A_n = \langle a_1, \dots, a_n \rangle$ be a sequence of actions with length n. We define the application of $A_n$ to a state $s$ recursevily by 
+  Let $A_n = \langle a_1, \dots, a_n \rangle$ be a sequence of actions with length n. We define the application of $A_n$ to a state $s$ recursevily by
   $$
-    o(A_n,s)) = o(a_n,o(A_{n-1},s))
+    o(A_n,s) = o(a_n,o(A_{n-1},s))
   $$
-  if $o(A_i, s)$ is defined for all $1 \le i \le n$ 
+  if $o(A_i, s)$ is defined for all $1 \le i \le n$.
 \end{remark}
-\begin{definition}[sequential plan]
-  A \textbf{sequential plan} is a sequence of actions $A_n = \langle a_1, \dots, a_n \rangle$, s.t. 
-  $s' = o(A_n,s)$ is defined and $s'(x) = s_*(x)$ for all $x \in dom(s_*)$.
-\end{definition}
+\begin{defi}[Sequential plan]
+  A \textit{sequential plan} is a sequence of actions $A_n = \langle a_1, \dots, a_n \rangle$, s.t. 
+  $s' = o(A_n,s_0)$ is defined and $s'(x) = s_*(x)$ for all $x \in dom(s_*)$.
+\end{defi}
+
+\begin{example}
+  Consider the planning task from the previous example. A sequential plan would be $A = \langle openDoor, goOut, closeDoor \rangle$. Since
+  \begin{align*}
+    o(A, s_0) &= o(\langle openDoor, goOut, closeDoor\rangle, \{door{=}closed, location{=}inside\})))\\
+    &= o(\langle goOut, closeDoor \rangle, \{door{=}open, location{=}inside\}))\\
+    &= o(closeDoor, \{door{=}open, location{=}outside\})\\
+    &= \{door{=}closed, location{=}outside\} = s_*
+  \end{align*}
+\end{example}
+\hspace{-1.5em}
+To get to parallel actions and plans, we need the definition of confluent actions.
+
+\begin{defi}[confluent]
+  Let $A = \{a_1, \dots, a_n\} \subseteq \mathcal{O}$ be a set of actions.\\
+  $A$ is \textit{confluent} $\logeq a_i^e(x) = a_j^e(x)$ for all $1 \le i < j \le n$ and each $x \in dom(a_i^e) \cap dom(a_j^e)$
+\end{defi}
+
+\begin{remark}
+  $A$ is confluent $\Leftrightarrow B$ is confluent for all $B \subseteq A$
+\end{remark}
+
+\begin{example}
+  In our example $\{openDoor, goOut\}$ and $\{closeDoor, goOut\}$ are confluent sets. We extend our example with the fluents $light$ and $key$ with $light^d = key^d = \{0, 1\}$ and two actions $lightsOut$ and $getKey$ with
+  $lightsOut$ $=$ $\langle\{location{=}inside,$ $light{=}1\}, \{light{=}0\}\rangle\\$
+  $getKey$ $=$ $\langle\{location{=}inside,$ $key{=}0\}, \{key{=}1\}\rangle$
+  Finally $openDoor^c = \{door{=}closed, key{=}1\}$. Our new goal is $s_*=\{location{=}outside, door{=}closed, light{=}0\}$. 
+  Now for example $\{getKey,$ $openDoor,$ $goOut,$ $lightsOut\}$ and $\{getKey, closeDoor, goOut, lightsOut\}$ are also confluent sets.
+\end{example}
+
+\begin{example}
+  In our example $\{openDoor, goOut\}$ and $\{closeDoor, goOut\}$ are confluent sets. \\
+  We extend our example with the fluents $light$ and $key$ with $light^d = key^d = \{0, 1\}$ and two actions $lightsOut$ and $getKey$:
+  \vspace{-1em}
+  \begin{flalign*}
+    lightsOut &= \langle\{location{=}inside, light{=}1\}, \{light{=}0\}\rangle& \\
+    getKey &= \langle\{location{=}inside, key{=}0\}, \{key{=}1\}\rangle&
+  \end{flalign*}
+  \noindent Additionally, we modify the precondition: $openDoor^c = \{door{=}closed, key{=}1\}$.
+  \noindent Our new goal is $s_* = \{location{=}outside, door{=}closed, light{=}0\}$. 
+  
+  \noindent Now for example $\{getKey, openDoor, goOut, lightsOut\}$ and $\{getKey, closeDoor, goOut, lightsOut\}$ are also confluent sets.
+\end{example}
+
+\begin{defi}[Parallel representations]
+  Let $s$ be a state and $A = \{a_1, \dots, a_n\}$ be a confluent set of actions. Then $A$ is
+  \begin{enumerate}[label=(\roman*)]
+    \item 
+      \(
+        \text{\textit{$\forall$-step serializable} in $s$}
+        \begin{aligned}
+          &\logeq\; o(\langle a_{\pi(1)}, \dots, a_{\pi(n)} \rangle, s)\ \text{is defined for all permutations }\pi
+        \end{aligned}
+      \)
+    \item 
+      \(
+        \begin{aligned}[t]
+          \text{\textit{$\exists$-step serializable} in $s$}
+          &\logeq\; o(\langle a_{\pi(1)}, \dots, a_{\pi(n)} \rangle, s)\ \text{is defined for some permutation }\pi \\
+          &\phantom{\logeq}\; ~\text{ and } a^c(x) = s(x) \text{ for each } a \in A \text{ and } x \in dom(a^c)
+        \end{aligned}[t]
+      \)
+    \item 
+      \(
+        \begin{aligned}[t]
+          \text{\textit{relaxed $\exists$-step serializable} in $s$}
+          &\logeq\; o(\langle a_{\pi(1)}, \dots, a_{\pi(n)} \rangle, s)\ \text{is defined for some} \\
+          &\phantom{\logeq}\; ~\text{ permutation }\pi
+        \end{aligned}[t]
+      \)
+  \end{enumerate}
+\end{defi}
+
+
+\begin{remark}
+  $A$ is $\forall$-step serializable $\Rightarrow$ $A$ is $\exists$-step serializable $\Rightarrow$ $A$ is relaxed $\exists$-step serializable.
+\end{remark}
+
+\begin{defi}[Parallel Plans]
+  Let $A = \langle A_1, \dots, A_n \rangle$ be a sequence of confluent sets of actions. $A$ is a \textit{$\forall$-step, $\exists$-step or relaxed $\exists$-step plan} iff
+  \begin{itemize}
+    \item $s_n(x) = s_*(x)$ for each $x \in dom(s_*)$
+    \item $A_i$ is $\forall$-step, $\exists$-step or relaxed $\exists$-step serializable in $s_{i-1}$ for $1 \le i \le n$, where \\
+    $
+    s_i(x) = \begin{cases} a^e(x) & \text{if } x \in dom(a^e) \\ s_{i-1}(x) & \text{else} \end{cases} \text{ for each } a \in A_i
+    $
+  \end{itemize}
+\end{defi}
+
+\begin{example}
+  In our modified example we have:
+  \begin{itemize}
+    \item $\forall$-step plan: $\langle\{getKey, lightsOut\}, \{openDoor\}, \{goOut\}, \{closeDoor\}\rangle$
+    \item $\exists$-step plan: $\langle\{getKey, lightsOut\}, \{openDoor\}, \{goOut, closeDoor\}\rangle$
+    \item relaxed $\exists$-step plan: $\langle\{getKey, lightsOut, openDoor, goOut\}, \{closeDoor\}\rangle$
+  \end{itemize}
+\end{example}
+
 \printbibliography
 \end{document}

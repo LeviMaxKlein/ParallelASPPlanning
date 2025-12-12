@@ -13,11 +13,13 @@ holds(X, V, 0) :- initialState(X, V).
 :- query(t), goal(X, V), not holds(X, V, t).
 
 #program step(t).
-{holds(X, V, t) : value(X, V)} = 1 :- fluent(X).
-{occurs(A, t)} :- action(A) .
+{holds(X, V, t) : value(X, V)} = 1 :- fluent(X). %holds is a fluent 
+{occurs(A, t)} :- action(A). %occurs is an action
 
-:- occurs(A, t), post(A, X, V), not holds(X, V, t).
-:- holds(X, V, t), not holds(X, V, t-1), not occurs(A, t) : post(A, X, V).
-:- occurs(A, t), prec(A, X, V), not holds(X, V, t -1).
+:- occurs(A, t), post(A, X, V), not holds(X, V, t). %postcondition must be executed
+:- holds(X, V, t), not holds(X, V, t-1), not occurs(A, t) : post(A, X, V). %only actions can change fluents
+:- occurs(A, t), prec(A, X, V), not holds(X, V, t-1). %precondition has to hold
 
-#show occurs/2.
+#show.
+#show occurs(A, t) : occurs(A, t).
+#show holds(X, V, t): holds(X, V, t).

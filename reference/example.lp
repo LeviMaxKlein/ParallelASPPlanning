@@ -16,20 +16,20 @@ goal(x5,1).
 
 action(a1).
 precondition(a1,x1,0).
-postcondition(a1,x1,1).
-postcondition(a1,x2,1).
+postcondition(a1,effect(unconditional),x1,1).
+postcondition(a1,effect(unconditional),x2,1).
 
 action(a2).
 precondition(a2,x3,0).
-postcondition(a2,x1,1).
-postcondition(a2,x3,1).
+postcondition(a2,effect(unconditional),x1,1).
+postcondition(a2,effect(unconditional),x3,1).
 
 action(a3).
 precondition(a3,x2,1).
 precondition(a3,x3,1).
-postcondition(a3,x4,1).
+postcondition(a3,effect(unconditional),x4,1).
 
 action(a4).
 precondition(a4,x2,1).
 precondition(a4,x3,1).
-postcondition(a4,x5,1).
+postcondition(a4,effect(unconditional),x5,1).
