@@ -6,10 +6,12 @@ fluent(X,V) :- initialState(X,V), fluent(X).
 value(X,V) :- contains(X, V).
 prec(A, X, V) :- precondition(A, X, V).
 post(A, X, V) :- postcondition(A, _, X, V).
-holds(X, V, 0) :- initialState(X, V).
 
 mutex(G,X) :- mutexGroup(G), contains(G,X,V), fluent(X,V).
 mutex(G)   :- mutexGroup(G), #count{X : mutex(G,X)} > 1.
+
+% Initial state
+holds(X, V, 0) :- initialState(X, V).
 :- fluent(X), #count{V : holds(X,V,0)} > 1.
 :- mutex(G), #count{X,V : holds(X,V,0), contains(G,X,V)} > 1.
 

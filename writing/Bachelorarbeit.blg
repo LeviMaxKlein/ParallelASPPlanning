@@ -1,15 +1,15 @@
 [0] Config.pm:307> INFO - This is Biber 2.17
 [0] Config.pm:310> INFO - Logfile is 'Bachelorarbeit.blg'
-[77] biber:340> INFO - === Fri Dec 12, 2025, 22:47:41
-[92] Biber.pm:418> INFO - Reading 'Bachelorarbeit.bcf'
-[149] Biber.pm:972> INFO - Found 1 citekeys in bib section 0
-[161] Biber.pm:4383> INFO - Processing section 0
-[171] Biber.pm:4574> INFO - Looking for bibtex file 'references.bib' for section 0
-[172] bibtex.pm:1713> INFO - LaTeX decoding ...
-[176] bibtex.pm:1518> INFO - Found BibTeX data source 'references.bib'
-[215] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[216] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[216] Biber.pm:4203> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
-[216] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
-[219] bbl.pm:654> INFO - Writing 'Bachelorarbeit.bbl' with encoding 'UTF-8'
-[219] bbl.pm:757> INFO - Output to Bachelorarbeit.bbl
+[63] biber:340> INFO - === Sun Dec 14, 2025, 17:29:39
+[75] Biber.pm:418> INFO - Reading 'Bachelorarbeit.bcf'
+[125] Biber.pm:972> INFO - Found 1 citekeys in bib section 0
+[136] Biber.pm:4383> INFO - Processing section 0
+[143] Biber.pm:4574> INFO - Looking for bibtex file 'references.bib' for section 0
+[144] bibtex.pm:1713> INFO - LaTeX decoding ...
+[147] bibtex.pm:1518> INFO - Found BibTeX data source 'references.bib'
+[178] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[178] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[178] Biber.pm:4203> INFO - Sorting list 'ynt/global//global/global' of type 'entry' with template 'ynt' and locale 'en-US'
+[178] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
+[180] bbl.pm:654> INFO - Writing 'Bachelorarbeit.bbl' with encoding 'UTF-8'
+[180] bbl.pm:757> INFO - Output to Bachelorarbeit.bbl

@@ -43,9 +43,12 @@
 \usepackage{amsthm}
 \theoremstyle{definition}
 \newtheorem*{definition}{Definition}
-\newtheorem*{example}{Example}
+\theoremstyle{remark}
+\newtheorem{example}{\textit{Example}}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
+
+\usepackage{minted}
 
 \usepackage{colonequals}
 \newcommand*{\logeq}{\ratio\Longleftrightarrow}
@@ -244,14 +247,6 @@ To get to parallel actions and plans, we need the definition of confluent action
 \end{remark}
 
 \begin{example}
-  In our example $\{openDoor, goOut\}$ and $\{closeDoor, goOut\}$ are confluent sets. We extend our example with the fluents $light$ and $key$ with $light^d = key^d = \{0, 1\}$ and two actions $lightsOut$ and $getKey$ with
-  $lightsOut$ $=$ $\langle\{location{=}inside,$ $light{=}1\}, \{light{=}0\}\rangle\\$
-  $getKey$ $=$ $\langle\{location{=}inside,$ $key{=}0\}, \{key{=}1\}\rangle$
-  Finally $openDoor^c = \{door{=}closed, key{=}1\}$. Our new goal is $s_*=\{location{=}outside, door{=}closed, light{=}0\}$. 
-  Now for example $\{getKey,$ $openDoor,$ $goOut,$ $lightsOut\}$ and $\{getKey, closeDoor, goOut, lightsOut\}$ are also confluent sets.
-\end{example}
-
-\begin{example}
   In our example $\{openDoor, goOut\}$ and $\{closeDoor, goOut\}$ are confluent sets. \\
   We extend our example with the fluents $light$ and $key$ with $light^d = key^d = \{0, 1\}$ and two actions $lightsOut$ and $getKey$:
   \vspace{-1em}
@@ -262,7 +257,7 @@ To get to parallel actions and plans, we need the definition of confluent action
   \noindent Additionally, we modify the precondition: $openDoor^c = \{door{=}closed, key{=}1\}$.
   \noindent Our new goal is $s_* = \{location{=}outside, door{=}closed, light{=}0\}$. 
   
-  \noindent Now for example $\{getKey, openDoor, goOut, lightsOut\}$ and $\{getKey, closeDoor, goOut, lightsOut\}$ are also confluent sets.
+  \noindent Now for example $\{getKey, openDoor, goOut, lightsOut\}$ and $\{getKey,$ $closeDoor,$ $goOut,$ $lightsOut\}$ are also confluent sets.
 \end{example}
 
 \begin{defi}[Parallel representations]
@@ -318,6 +313,11 @@ To get to parallel actions and plans, we need the definition of confluent action
     \item relaxed $\exists$-step plan: $\langle\{getKey, lightsOut, openDoor, goOut\}, \{closeDoor\}\rangle$
   \end{itemize}
 \end{example}
-
+\subsection{ASP}
+Our little example looks like this in ASP:
+\inputminted[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize,linenos]{prolog}{encodings/example.lp}
+\noindent Combining these facts with encodings, gives us the corresponding \textit{sequential, $\forall$-step, $\exists$-step} or \textit{relaxed $\exists$-step plan}.
+\inputminted[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize,linenos]{prolog}{encodings/EX_common.lp}
+\inputminted[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize,linenos]{prolog}{encodings/EX_seq.lp}
 \printbibliography
 \end{document}
