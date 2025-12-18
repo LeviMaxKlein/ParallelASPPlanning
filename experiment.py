@@ -32,7 +32,7 @@ class BaseReport(AbsoluteReport):
 REMOTE = BWUniEnvironment.is_present()
 ENV = BWUniEnvironment(
     email="levi.klein@stud.uni-heidelberg.de",
-    memory_per_cpu="32768", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
+    memory_per_cpu="16384", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
     ) if REMOTE else LocalEnvironment(processes=1)
 
 ARGPARSER.add_argument(
@@ -64,8 +64,8 @@ SUITES = args.domains if args.domains else [
     "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips",
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
 ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed"]
-TIME_LIMIT = 1800
-MEMORY_LIMIT = 32600 if REMOTE else 16000
+TIME_LIMIT = 1_800
+MEMORY_LIMIT = 16_284 if REMOTE else 8_192
 ATTRIBUTES = [
     "error",
     "result",
@@ -95,24 +95,14 @@ def make_parser():
             props["clingo_wrong_plan"] = 1
         else:
             props["clingo_wrong_plan"] = 0 
-
-    def parse_json_output(content, props):
-        try:
-            data = json.loads(content)
-            if 'Time' in data:
-                props['clingo_total_time'] = data['Time'].get('Total', 0)
-                props['clingo_search_time'] = data['Time'].get('Solve', 0)
-                props['clingo_unsat_time'] = data['Time'].get('Unsat', 0)
-                props['clingo_first_model_time'] = data['Time'].get('Model', 0)
-            
-            # Result
-            if 'Result' in data:
-                props['result'] = data['Result']
-        except (json.JSONDecodeError, KeyError) as e:
-            pass
-
+  
     parser = Parser()
-    parser.add_function(parse_json_output, file="output.json")
+    parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
+    parser.add_pattern("result", r"^(SATISFIABLE|UNSATISFIABLE|UNKNOWN)", type=str, file="run.log")
+    parser.add_pattern("clingo_total_time", r"Time\s*:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_search_time", r"Solving:\s*([\d.]+)s", type=float,file="run.log")
+    parser.add_pattern("clingo_first_model_time", r"1st Model:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_unsat_time", r"Unsat:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_function(solved)
     parser.add_function(check_wrong_plan)
     parser.add_function(error)
