@@ -47,7 +47,6 @@ ARGPARSER.add_argument(
     "--domains", nargs="?", help="specify domains"
 )
 args, _ = ARGPARSER.parse_known_args()
-TMPDIR = os.environ.get("TMPDIR", "/tmp")
 BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -125,9 +124,8 @@ def remove_unsat_times(run):
     return True
 
 def create_plots():
-    properties_file = Path(SCRIPT_DIR) / "../experiment-eval/properties"
+    properties_file = exp.path / "properties"
     print(properties_file)
-
     if not os.path.exists(properties_file):
         print(f"Properties file not found: {properties_file}")
         raise FileNotFoundError
