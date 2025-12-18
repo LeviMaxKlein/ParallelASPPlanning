@@ -16,6 +16,7 @@ from lab.parser import Parser
 from lab.reports import Attribute
 from lab.experiment import ARGPARSER
 from plot import create_heat_map
+import uuid
 
 class BaseReport(AbsoluteReport):
     INFO_ATTRIBUTES = ["time_limit", "memory_limit"]
@@ -44,7 +45,7 @@ ARGPARSER.add_argument(
     "--algos", nargs="*", help="specify algorithm: sequential, forall, exists, exists_edge, relaxed" 
 )
 ARGPARSER.add_argument(
-    "--domains", nargs="?", help="specify domains"
+    "--domains", nargs="*", help="specify domains"
 )
 args, _ = ARGPARSER.parse_known_args()
 TMPDIR = os.environ.get("TMPDIR", "/tmp")
@@ -64,7 +65,7 @@ SUITES = args.domains if args.domains else [
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
 ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed"]
 TIME_LIMIT = 1800
-MEMORY_LIMIT = 32600
+MEMORY_LIMIT = 32600 if REMOTE else 16000
 ATTRIBUTES = [
     "error",
     "result",
@@ -152,29 +153,29 @@ exp.add_parser(make_parser())
 
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
+
         run = exp.add_run()
         run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
         cppdl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
         if args.strong_mutex:
             cppdl_command.append("--h2")
-        cppdl_command.extend(["--fdr-out", f"{TMPDIR}/output.sas", task.domain_file, task.problem_file])
+        cppdl_command.extend(["--fdr-out", "output.sas", task.domain_file, task.problem_file])
         run.add_command("cpddl_pddl_to_sas", cppdl_command)
 
-        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {TMPDIR}/output.sas > {TMPDIR}/output.lp"], shell=True)
+        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate output.sas > output.lp"], shell=True)
 
-        clingo_command = f"{SCRIPT_DIR}/../clingo/clingo --outf=2 --time-limit={TIME_LIMIT} {SCRIPT_DIR}/algorithms/common.lp {{{algo}}} {TMPDIR}/output.lp"
+        clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}", f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}", "output.lp"]
         if args.heuristic:
-            clingo_command += f" {SCRIPT_DIR}/algorithms/heuristic.lp"
-        clingo_command += " > output.json"
-        run.add_command("clingo_solve", [clingo_command], shell=True)
+            clingo_command.append(f" {SCRIPT_DIR}/algorithms/heuristic.lp")
+        run.add_command("clingo_solve", clingo_command)
+        run.add_command("to_parallel", [
+            f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
+            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
+        ], shell=True)
+        #run.add_command("to_parallel", [f"grep -A1 -e \"ANSWER\" run.log | tail -n1 | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp output.lp | grep -A1 -e \"ANSWER\" - | tail -n1 > seq_plan.lp"], shell=True)
+        run.add_command("to_sas", [sys.executable, f"{SCRIPT_DIR}/occurs2sas_plan.py"])
 
-        run.add_command("extract_occurs", [sys.executable, f"{SCRIPT_DIR}/extract_occurs.py"])
-        if algo in ["forall", "sequential"]:
-            run.add_command("convert_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/occurs2sas_plan.py"])
-        else:
-            run.add_command("parallel_to_seq", [f"{SCRIPT_DIR}/../clingo/clingo --outf=2 {TMPDIR}/output.lp {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {TMPDIR}/plan.lp > {TMPDIR}/sequential.json"], shell=True)
-            run.add_command("convert_to_sas_plan", [sys.executable, f"{SCRIPT_DIR}/convert2sas_plan.py"])
-        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, f"{TMPDIR}/sas_plan"])
+        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, "sas_plan"])
 
         cpddl_opts = "--h2" if args.strong_mutex else ""
         clingo_opts = f"--outf=2 --time-limit={TIME_LIMIT}"

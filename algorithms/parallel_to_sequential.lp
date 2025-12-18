@@ -55,4 +55,4 @@ select(A,T,N+1) :- applicable(A,T,N), continue(A,T,N).
 % DISPLAY PART
 
 #show.
-#show sequence(A,N) : select(A,T,N).
+#show (A,N) : select(A,T,N).
