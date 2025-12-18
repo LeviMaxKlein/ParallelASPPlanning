@@ -28,12 +28,18 @@ class BaseReport(AbsoluteReport):
         "error",
         "node",
     ]
-
+BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REMOTE = BWUniEnvironment.is_present()
-ENV = BWUniEnvironment(
-    email="levi.klein@stud.uni-heidelberg.de",
-    memory_per_cpu="16384", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
-    ) if REMOTE else LocalEnvironment(processes=1)
+if REMOTE:
+    ENV = BWUniEnvironment(
+        email="levi.klein@stud.uni-heidelberg.de",
+        memory_per_cpu="16384", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
+        extra_options=f"#SBATCH --chdir={SCRIPT_DIR}"
+        )
+    ENV.job_dir = SCRIPT_DIR
+else:
+    ENV= LocalEnvironment(processes=1)
 
 ARGPARSER.add_argument(
     "--heuristic", action="store_true", help="run with a heuristic"
@@ -48,9 +54,7 @@ ARGPARSER.add_argument(
     "--domains", nargs="*", help="specify domains"
 )
 args, _ = ARGPARSER.parse_known_args()
-TMPDIR = os.environ.get("TMPDIR", "/tmp")
-BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 SUITES = args.domains if args.domains else [
     "agricola-sat18-strips", "airport", "barman-sat11-strips", "barman-sat14-strips", "blocks", "childsnack-sat14-strips",
@@ -138,7 +142,7 @@ if args.strong_mutex:
     exp_name += "_withstrong_mutex"
 
 exp = Experiment(environment=ENV)
-exp.path = "data/"+exp_name
+exp.path = os.path.join(SCRIPT_DIR, "data", exp_name)
 exp.add_parser(make_parser())
 
 for algo in ALGORITHM:
