@@ -1,14 +1,26 @@
 # Fdb version 3
+<<<<<<< HEAD
 ["biber Bachelorarbeit"] 1765729778 "Bachelorarbeit.bcf" "Bachelorarbeit.bbl" "Bachelorarbeit" 1766075992
   "Bachelorarbeit.bcf" 1766075992 107055 d0a0b866a0f467fe0d3c317919a11f42 "pdflatex"
+=======
+["biber Bachelorarbeit"] 1765729778 "Bachelorarbeit.bcf" "Bachelorarbeit.bbl" "Bachelorarbeit" 1766052058
+  "Bachelorarbeit.bcf" 1766052058 107055 d0a0b866a0f467fe0d3c317919a11f42 "pdflatex"
+>>>>>>> refs/remotes/origin/main
   "references.bib" 1764242211 926 d5ef1393c434e223da58b686f57ddeb8 ""
   (generated)
   "Bachelorarbeit.bbl"
   "Bachelorarbeit.blg"
+<<<<<<< HEAD
 ["pdflatex"] 1766075991 "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" "Bachelorarbeit.pdf" "Bachelorarbeit" 1766075992
   "/dev/null" 1766061757 0 d41d8cd98f00b204e9800998ecf8427e ""
   "/etc/texmf/web2c/texmf.cnf" 1746363055 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" 1766070791 11531 b6903e9584ace2086ecb22b7341b7e9a ""
+=======
+["pdflatex"] 1766052056 "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" "Bachelorarbeit.pdf" "Bachelorarbeit" 1766052058
+  "/dev/null" 1766045675 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "/etc/texmf/web2c/texmf.cnf" 1746363055 475 c0e671620eb5563b2130f56340a5fde8 ""
+  "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" 1766052053 11531 b6903e9584ace2086ecb22b7341b7e9a ""
+>>>>>>> refs/remotes/origin/main
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbi1095.tfm" 1136768653 3072 19a65fbc725cfc66f5a5fc183b9d418b ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm" 1136768653 3584 21b378cca2e40816b0e6d74a4dc98f04 ""
@@ -192,6 +204,7 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1751557385 4379155 98693266ff65f58d9f98aff394de12d2 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1751568831 2798882 a51df6958f631b8af8f4b9fdb679cf14 ""
+<<<<<<< HEAD
   "Bachelorarbeit.aux" 1766075992 5599 2c08f93c770bb5013ed8c17e7aa14272 "pdflatex"
   "Bachelorarbeit.bbl" 1765729779 1714 06368238f7633da52a0e27b8ece09091 "biber Bachelorarbeit"
   "Bachelorarbeit.lof" 1766075992 125 878e959a435117d55c24436fa60f8482 "pdflatex"
@@ -200,6 +213,17 @@
   "Bachelorarbeit.run.xml" 1766075992 2381 3736809d80bc06dc76277c6eaeeea8eb "pdflatex"
   "Bachelorarbeit.tex" 1766070791 11531 b6903e9584ace2086ecb22b7341b7e9a ""
   "Bachelorarbeit.toc" 1766075992 761 7bae5217e89c1fba24ae61ebb0a3aa8f "pdflatex"
+=======
+  "Bachelorarbeit.aux" 1766052058 5599 2f251d11505589989be4b7e449d37525 "pdflatex"
+  "Bachelorarbeit.bbl" 1765729779 1714 06368238f7633da52a0e27b8ece09091 "biber Bachelorarbeit"
+  "Bachelorarbeit.lof" 1766052058 125 878e959a435117d55c24436fa60f8482 "pdflatex"
+  "Bachelorarbeit.lot" 1766052058 125 878e959a435117d55c24436fa60f8482 "pdflatex"
+  "Bachelorarbeit.out" 1766052057 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "Bachelorarbeit.run.xml" 1766052058 2381 3736809d80bc06dc76277c6eaeeea8eb "pdflatex"
+  "Bachelorarbeit.tex" 1766052053 11531 b6903e9584ace2086ecb22b7341b7e9a ""
+  "Bachelorarbeit.toc" 1766052058 761 7bae5217e89c1fba24ae61ebb0a3aa8f "pdflatex"
+  "_minted-Bachelorarbeit/19D4204DB45E844F699FA55AA863E06538D9813A536C3402D61769D4E45811C7.pygtex" 1765807467 3873 c8349ef4feca074470892a6a9eac1c51 ""
+>>>>>>> refs/remotes/origin/main
   "_minted-Bachelorarbeit/501CB354C7A5C433765464F9992E3840281033C4255F613AE9708CB3A8382A8D.pygtex" 1765727117 723 79007907deacc0a5d2830269279e577f ""
   "_minted-Bachelorarbeit/9D456D3F9CBFEE7D4F2BD714B9D3510338D9813A536C3402D61769D4E45811C7.pygtex" 1766075991 3467 455c86146fa94795424639af48a8a092 ""
   "_minted-Bachelorarbeit/D0B8EBFC51B20A208EAC8B35AFDA3F785147C8CA9EF1776C2F164A61B109E7D3.pygtex" 1765729387 2376 956de7aa52e0cb0b821401c47a261d38 ""
