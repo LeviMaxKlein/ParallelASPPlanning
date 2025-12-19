@@ -3,8 +3,7 @@
 
 import os
 import sys
-import json
-
+import uuid
 from bw_cluster_environments import BWUniEnvironment
 from pathlib import Path
 
@@ -16,7 +15,6 @@ from lab.parser import Parser
 from lab.reports import Attribute
 from lab.experiment import ARGPARSER
 from plot import create_heat_map
-import uuid
 
 class BaseReport(AbsoluteReport):
     INFO_ATTRIBUTES = ["time_limit", "memory_limit"]
@@ -30,11 +28,12 @@ class BaseReport(AbsoluteReport):
     ]
 BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+TMPDIR = Path(os.environ.get("TMPDIR", "/tmp"))
 REMOTE = BWUniEnvironment.is_present()
 if REMOTE:
     ENV = BWUniEnvironment(
         email="levi.klein@stud.uni-heidelberg.de",
-        memory_per_cpu="16384", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
+        memory_per_cpu="8192", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
         extra_options=f"#SBATCH --chdir={SCRIPT_DIR}"
         )
     ENV.job_dir = SCRIPT_DIR
@@ -68,7 +67,7 @@ SUITES = args.domains if args.domains else [
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
 ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed"]
 TIME_LIMIT = 1_800
-MEMORY_LIMIT = 16_284 if REMOTE else 8_192
+MEMORY_LIMIT = 8000
 ATTRIBUTES = [
     "error",
     "result",
@@ -145,30 +144,32 @@ exp.add_parser(make_parser())
 
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
-
         run = exp.add_run()
         run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
+
+        run_id = str(uuid.uuid4())
+        temp_path = f"{TMPDIR}/run_{run_id}"
+        run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
+
         cppdl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
         if args.strong_mutex:
             cppdl_command.append("--h2")
-        cppdl_command.extend(["--fdr-out", "output.sas", task.domain_file, task.problem_file])
+        cppdl_command.extend(["--fdr-out", f"{temp_path}/output.sas", task.domain_file, task.problem_file])
         run.add_command("cpddl_pddl_to_sas", cppdl_command)
 
-        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate output.sas > output.lp"], shell=True)
-
-        clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}", f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}", "output.lp"]
+        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
+        clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}", f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}", f"{temp_path}/output.lp"]
         if args.heuristic:
-            clingo_command.append(f" {SCRIPT_DIR}/algorithms/heuristic.lp")
+            clingo_command.append(f"{SCRIPT_DIR}/algorithms/heuristic.lp")
         run.add_command("clingo_solve", clingo_command)
         run.add_command("to_parallel", [
             f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
-            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
+            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {temp_path}/output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
         ], shell=True)
-        #run.add_command("to_parallel", [f"grep -A1 -e \"ANSWER\" run.log | tail -n1 | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp output.lp | grep -A1 -e \"ANSWER\" - | tail -n1 > seq_plan.lp"], shell=True)
         run.add_command("to_sas", [sys.executable, f"{SCRIPT_DIR}/occurs2sas_plan.py"])
 
         run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, "sas_plan"])
-
+        run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
         cpddl_opts = "--h2" if args.strong_mutex else ""
         clingo_opts = f"--outf=2 --time-limit={TIME_LIMIT}"
         if args.heuristic:
