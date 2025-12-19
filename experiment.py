@@ -119,7 +119,7 @@ def remove_unsat_times(run):
     return True
 
 def create_plots():
-    properties_file = exp.path / "properties"
+    properties_file = Path(exp.path + "-eval") / "properties"
     print(properties_file)
     if not os.path.exists(properties_file):
         print(f"Properties file not found: {properties_file}")
