@@ -86,6 +86,16 @@ def make_parser():
         else:
             props["solved"] = 0
     
+    def get_result_from_models(content, props):
+        models = props.get("models")
+        if models:
+            if models > 0:
+                props["result"] = "SATISFIABLE"
+            else:
+                props["result"] = "UNSATISFIABLE"
+        else:
+            props["result"] = "UNKNOWN"
+    
     def error(content, props):
         if props.get("result", "UNKNOWN") == "UNKNOWN":
             props["error"] = "unsolved"
@@ -100,12 +110,13 @@ def make_parser():
   
     parser = Parser()
     parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
-    parser.add_pattern("result", r"^(SATISFIABLE|UNSATISFIABLE|UNKNOWN)", type=str, file="run.log")
+    parser.add_pattern("models", r"Models\s*:\s*(\d+)", type=int, file="run.log")
     parser.add_pattern("clingo_total_time", r"Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_search_time", r"Solving:\s*([\d.]+)s", type=float,file="run.log")
     parser.add_pattern("clingo_first_model_time", r"1st Model:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_unsat_time", r"Unsat:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_function(solved)
+    parser.add_function(get_result_from_models)
     parser.add_function(check_wrong_plan)
     parser.add_function(error)
     return parser
@@ -128,10 +139,10 @@ def create_plots():
 
 exp_name = "ParallelASPPlanning"
 if args.domains:
-    for domain in args.domains:
+    for domain in sorted(args.domains):
         exp_name += f"_{domain}"
 if args.algos:
-    for algo in args.algos:
+    for algo in sorted(args.algos):
         exp_name += f"_{algo}"
 if args.heuristic:
     exp_name += "_with_heuristic"
@@ -170,8 +181,9 @@ for algo in ALGORITHM:
 
         run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, "sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
+        run.add_command("cleanup", ["rm", "-f", "seq_plan.lp", "sas_plan"])
         cpddl_opts = "--h2" if args.strong_mutex else ""
-        clingo_opts = f"--outf=2 --time-limit={TIME_LIMIT}"
+        clingo_opts = f"--outf=1 --time-limit={TIME_LIMIT}"
         if args.heuristic:
             clingo_opts += " heuristic.lp"
         run.set_property("cpddl_options", cpddl_opts)
