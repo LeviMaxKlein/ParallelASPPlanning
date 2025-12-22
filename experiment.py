@@ -65,7 +65,7 @@ SUITES = args.domains if args.domains else [
     "sokoban-sat11-strips", "spider-sat18-strips", "storage", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips",
     "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips",
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
-ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed"]
+ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess"]
 TIME_LIMIT = 1_800
 MEMORY_LIMIT = 8000
 ATTRIBUTES = [
@@ -169,14 +169,28 @@ for algo in ALGORITHM:
         run.add_command("cpddl_pddl_to_sas", cppdl_command)
 
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
-        clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}", f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}", f"{temp_path}/output.lp"]
+        clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}"]
+        if algo == "guess":
+            clingo_command.append(f"{{{algo}}}")
+        else:
+            clingo_command.extend([f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}"])
+        clingo_command.append(f"{temp_path}/output.lp")            
+        #clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}", f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}", f"{temp_path}/output.lp"]
         if args.heuristic:
             clingo_command.append(f"{SCRIPT_DIR}/algorithms/heuristic.lp")
         run.add_command("clingo_solve", clingo_command)
-        run.add_command("to_parallel", [
+
+        if algo == "guess":
+            run.add_command("check", [
             f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
-            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {temp_path}/output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
+            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/check.lp {temp_path}/output.lp || echo"
         ], shell=True)
+            
+        else:
+            run.add_command("to_parallel", [
+                f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
+                f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {temp_path}/output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
+            ], shell=True)
         run.add_command("to_sas", [sys.executable, f"{SCRIPT_DIR}/occurs2sas_plan.py"])
 
         run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, "sas_plan"])
