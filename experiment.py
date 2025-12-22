@@ -169,10 +169,11 @@ for algo in ALGORITHM:
         run.add_command("cpddl_pddl_to_sas", cppdl_command)
 
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
-        clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}", f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}", f"{temp_path}/output.lp"]
+        clingo_command = f"{SCRIPT_DIR}/../clingo/clingo --outf=1 --time-limit={TIME_LIMIT} {SCRIPT_DIR}/algorithms/common.lp {{{algo}}} {temp_path}/output.lp"
         if args.heuristic:
-            clingo_command.append(f"{SCRIPT_DIR}/algorithms/heuristic.lp")
-        run.add_command("clingo_solve", clingo_command)
+            clingo_command += f" {SCRIPT_DIR}/algorithms/heuristic.lp"
+        clingo_command += f" | sed -n '/ANSWER/,$p' -"
+        run.add_command("clingo_solve", [clingo_command], shell=True)
         run.add_command("to_parallel", [
             f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
             f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {temp_path}/output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
