@@ -6,13 +6,12 @@ plan = Path("seq_plan.lp")
 
 actions = plan.read_text() if plan.exists() else ""
 
-matches = re.findall(r'\(action\(\(([^)]+)\)\),(\d+)\)', actions)
+matches = re.findall(r'\(action\((.+?)\),(\d+)\)', actions)
 
 pairs = []
-for action_args, timestep in matches:
-    args = [arg.strip().strip('"') for arg in action_args.split(",")]
-    t = int(timestep)
-    pairs.append((t, args))
+for action_content, timestep in matches:
+    args = re.findall(r'"([^"]+)"', action_content)
+    pairs.append((timestep, args))
 
 sas_plan = Path("sas_plan")
 with sas_plan.open("w") as f:
