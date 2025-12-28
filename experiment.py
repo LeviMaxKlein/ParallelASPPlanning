@@ -129,7 +129,7 @@ def remove_unsat_times(run):
     return True
 
 def remove_explained_errors(run):
-    explained_messages = ["INTERRUPTED by signal!", "'driver.log is missing. Probably the run was never started.'", "Sending shutdown signal...",
+    explained_messages = ["INTERRUPTED by signal!", "driver.log is missing. Probably the run was never started.", "Sending shutdown signal...",
                           "info: atom does not occur in any rule head"]
     errors = run.get("unexplained_errors")
     if errors:
