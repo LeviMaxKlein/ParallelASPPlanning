@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import os
 import sys
 import uuid
@@ -44,7 +43,7 @@ args, _ = ARGPARSER.parse_known_args()
 BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TMPDIR = Path(os.environ.get("TMPDIR", "/tmp"))
-ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess"]
+ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guessAndCheck"]
 TIME_LIMIT = 1_800
 MEMORY_LIMIT = 8000
 ATTRIBUTES = [
@@ -138,12 +137,14 @@ def create_plots():
         raise FileNotFoundError
     create_heat_map(properties_file)
 
+
 exp_name = "ParallelASPPlanning"
 if args.domains:
     for domain in sorted(args.domains):
         exp_name += f"_{domain}"
 if args.algos:
     for algo in sorted(args.algos):
+
         exp_name += f"_{algo}"
 if args.heuristic:
     exp_name += "_with_heuristic"
@@ -157,47 +158,27 @@ exp.add_parser(make_parser())
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
         run = exp.add_run()
-        run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
+        if "guessAndCheck" in algo:
+            run.add_resource("guess", f"algorithms/guess.lp", symlink=True)
+            run.add_resource("check", f"algorithms/check.lp", symlink=True)
+        else:
+            run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
 
         run_id = str(uuid.uuid4())
         temp_path = f"{TMPDIR}/run_{run_id}"
         run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
-
-        cppdl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
+        cpddl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
         if args.strong_mutex:
-            cppdl_command.append("--h2")
-        cppdl_command.extend(["--fdr-out", f"{temp_path}/output.sas", task.domain_file, task.problem_file])
-        run.add_command("cpddl_pddl_to_sas", cppdl_command)
+            cpddl_command.append("--h2")
+        cpddl_command += ["--fdr-out", f"{temp_path}/output.sas", task.domain_file, task.problem_file]
+
+        run.add_command("cpddl_pddl_to_sas", cpddl_command)
 
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
-        clingo_command = f"{SCRIPT_DIR}/../clingo/clingo --outf=1 --time-limit={TIME_LIMIT}"
+        
+        run.add_command("run_clingo", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, temp_path, f"{{{algo}}}" if "guessAndCheck" not in algo else algo, str(TIME_LIMIT), str(args.heuristic)])
 
-        #clingo_command = [f"{SCRIPT_DIR}/../clingo/clingo", "--outf=1", f"--time-limit={TIME_LIMIT}", f"{SCRIPT_DIR}/algorithms/common.lp", f"{{{algo}}}", f"{temp_path}/output.lp"]
-        if algo == "guess":
-            clingo_command += f"{{{algo}}}"
-        else:
-            clingo_command += f"{SCRIPT_DIR}/algorithms/common.lp {{{algo}}}"
-        clingo_command += f" {temp_path}/output.lp"
-
-        if args.heuristic:
-            clingo_command.append(f"{SCRIPT_DIR}/algorithms/heuristic.lp")
-        clingo_command += f" | sed -n '/ANSWER/,$p' -"
-        run.add_command("clingo_solve", clingo_command)
-
-        if algo == "guess":
-            run.add_command("check", [
-            f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
-            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/check.lp {temp_path}/output.lp | sed -n '/ANSWER/,$p' -"
-        ], shell=True)
-            
-
-        run.add_command("to_parallel", [
-            f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
-            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {temp_path}/output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
-        ], shell=True)
-        run.add_command("to_sas", [sys.executable, f"{SCRIPT_DIR}/occurs2sas_plan.py"])
-
-        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, "sas_plan"])
+        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, f"{temp_path}/sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
         run.add_command("cleanup", ["rm", "-f", "seq_plan.lp", "sas_plan"])
         cpddl_opts = "--h2" if args.strong_mutex else ""
