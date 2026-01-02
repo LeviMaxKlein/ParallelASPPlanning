@@ -53,6 +53,8 @@ ATTRIBUTES = [
     "clingo_search_time",
     "clingo_first_model_time",
     "clingo_unsat_time",
+    "clingo_guess_time",
+    "clingo_check_time",
     "clingo_wrong_plan",
     Attribute("solved", absolute=True)
 ]
@@ -108,6 +110,12 @@ def make_parser():
             props["clingo_wrong_plan"] = 1
         else:
             props["clingo_wrong_plan"] = 0 
+        
+    def sum_guess_and_check_times(content, props):
+        guess_time = props.get("clingo_guess_time")
+        check_time = props.get("clingo_check_time")
+        if guess_time is not None and check_time is not None:
+            props["clingo_total_time"] = guess_time + check_time
   
     parser = Parser()
     parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
@@ -116,9 +124,12 @@ def make_parser():
     parser.add_pattern("clingo_search_time", r"Solving:\s*([\d.]+)s", type=float,file="run.log")
     parser.add_pattern("clingo_first_model_time", r"1st Model:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_unsat_time", r"Unsat:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_guess_time", r"GUESS[\s\S]*?Time\s*:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_check_time", r"CHECK[\s\S]*?Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_function(solved)
     parser.add_function(get_result_from_models)
     parser.add_function(check_wrong_plan)
+    parser.add_function(sum_guess_and_check_times)
     parser.add_function(error)
     return parser
 

@@ -6,6 +6,20 @@ import re
 from pathlib import Path
 
 
+def extract_result(output):
+    if "ANSWER" in output:
+        return output.split("ANSWER")[-1].strip()
+    return None
+
+
+def extract_answer(output):
+    return output.split("\n")[0].strip()
+
+
+def extract_time(output):
+    return "\n".join(output.split("\n")[1:])
+
+
 def run_clingo(script_dir, temp_path, algo, time_limit, heuristic):
     if not Path(f"{temp_path}/output.lp").exists():
         return None
@@ -30,22 +44,7 @@ def run_clingo(script_dir, temp_path, algo, time_limit, heuristic):
     return extract_result(result.stdout)
 
 
-def extract_result(output):
-    if "ANSWER" in output:
-        return output.split("ANSWER")[-1].strip()
-    return None
-
-
-def extract_answer(output):
-    return output.split("\n")[0].strip()
-
-
-def extract_time(output):
-    return "\n".join(output.split("\n")[1:])
-
-
 def run_check(script_dir, temp_path, plan):
-    """Validiere Plan mit check-Algorithmus (nur für guess)"""
     if not plan:
         return None
 
@@ -116,8 +115,10 @@ def main():
     if "guessAndCheck" in algo:
         check_output = run_check(script_dir, temp_path, plan)
         if check_output:
+            print("GUESS")
             print(extract_time(clingo_output))
-            print("CHECK \n", extract_time(check_output))
+            print("CHECK")
+            print(extract_time(check_output))
         else:
             return
     
