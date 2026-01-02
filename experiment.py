@@ -25,6 +25,19 @@ class BaseReport(AbsoluteReport):
         "error",
         "node",
     ]
+BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+TMPDIR = Path(os.environ.get("TMPDIR", "/tmp"))
+REMOTE = BWUniEnvironment.is_present()
+if REMOTE:
+    ENV = BWUniEnvironment(
+        email="levi.klein@stud.uni-heidelberg.de",
+        memory_per_cpu="32768", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
+        extra_options=f"#SBATCH --chdir={SCRIPT_DIR}"
+        )
+    ENV.job_dir = SCRIPT_DIR
+else:
+    ENV= LocalEnvironment(processes=1)
 
 ARGPARSER.add_argument(
     "--heuristic", action="store_true", help="run with a heuristic"
@@ -77,10 +90,22 @@ SUITES = args.domains if args.domains else [
     "openstacks-strips", "organic-synthesis-sat18-strips", "organic-synthesis-split-sat18-strips", "parcprinter-08-strips", "parcprinter-sat11-strips",
     "parking-sat11-strips", "parking-sat14-strips", "pathways", "pegsol-08-strips", "pegsol-sat11-strips", "pipesworld-notankage", "pipesworld-tankage",
     "psr-small", "quantum-layout-sat23-strips", "rovers", "satellite", "scanalyzer-08-strips", "scanalyzer-sat11-strips", "snake-sat18-strips", "sokoban-sat08-strips",
-    "sokoban-sat11-strips", "spider-sat18-strips", "storage", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips",
+    "sokoban-sat11-strips", "spider-sat18-strips", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips",
     "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips",
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
-
+ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed"]
+TIME_LIMIT = 1_800
+MEMORY_LIMIT = 31000 if REMOTE else 8192
+ATTRIBUTES = [
+    "error",
+    "result",
+    "clingo_total_time",
+    "clingo_search_time",
+    "clingo_first_model_time",
+    "clingo_unsat_time",
+    "clingo_wrong_plan",
+    Attribute("solved", absolute=True)
+]
 
 def make_parser():
     def solved(content, props):
@@ -140,6 +165,16 @@ def remove_unsat_times(run):
         run["clingo_unsat_time"] = 0 if result == "SATISFIABLE" else unsat_time
     return True
 
+def remove_explained_errors(run):
+    explained_messages = ["INTERRUPTED by signal!", "driver.log\" is missing", "driver.log is missing", "Sending shutdown signal...",
+                          "info: atom does not occur in any rule head"]
+    errors = run.get("unexplained_errors")
+    if errors:
+        run["unexplained_errors"] = [
+            error for error in errors
+            if all(msg not in error for msg in explained_messages)]
+    return True
+
 def create_plots():
     properties_file = Path(exp.path + "-eval") / "properties"
     print(properties_file)
@@ -180,10 +215,9 @@ for algo in ALGORITHM:
         run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
         cpddl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
         if args.strong_mutex:
-            cpddl_command.append("--h2")
-        cpddl_command += ["--fdr-out", f"{temp_path}/output.sas", task.domain_file, task.problem_file]
-
-        run.add_command("cpddl_pddl_to_sas", cpddl_command)
+            cppdl_command.append("--h2")
+        cppdl_command.extend(["--fdr-out", f"{temp_path}/output.sas", "--time-limit", TIME_LIMIT, task.domain_file, task.problem_file])
+        run.add_command("cpddl_pddl_to_sas", cppdl_command)
 
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
         
@@ -207,7 +241,7 @@ for algo in ALGORITHM:
 exp.add_step("build", exp.build)
 exp.add_step("start", exp.start_runs)
 exp.add_step("parse", exp.parse)
-exp.add_fetcher(name="fetch")
+exp.add_fetcher(name="fetch", filter=remove_explained_errors)
 exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = remove_unsat_times), outfile="report.html")
 exp.add_step("plots", lambda: create_plots())
 exp.run_steps()
