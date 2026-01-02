@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import os
 import sys
 import uuid
@@ -53,6 +52,35 @@ ARGPARSER.add_argument(
     "--domains", nargs="*", help="specify domains"
 )
 args, _ = ARGPARSER.parse_known_args()
+
+BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+TMPDIR = Path(os.environ.get("TMPDIR", "/tmp"))
+ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guessAndCheck"]
+TIME_LIMIT = 1_800
+MEMORY_LIMIT = 8000
+ATTRIBUTES = [
+    "error",
+    "result",
+    "clingo_total_time",
+    "clingo_search_time",
+    "clingo_first_model_time",
+    "clingo_unsat_time",
+    "clingo_guess_time",
+    "clingo_check_time",
+    "clingo_wrong_plan",
+    Attribute("solved", absolute=True)
+]
+REMOTE = BWUniEnvironment.is_present()
+if REMOTE:
+    ENV = BWUniEnvironment(
+        email="levi.klein@stud.uni-heidelberg.de",
+        memory_per_cpu="8192", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
+        extra_options=f"#SBATCH --chdir={SCRIPT_DIR}"
+        )
+    ENV.job_dir = SCRIPT_DIR
+else:
+    ENV= LocalEnvironment(processes=1)
 
 SUITES = args.domains if args.domains else [
     "agricola-sat18-strips", "airport", "barman-sat11-strips", "barman-sat14-strips", "blocks", "childsnack-sat14-strips",
@@ -107,6 +135,12 @@ def make_parser():
             props["clingo_wrong_plan"] = 1
         else:
             props["clingo_wrong_plan"] = 0 
+        
+    def sum_guess_and_check_times(content, props):
+        guess_time = props.get("clingo_guess_time")
+        check_time = props.get("clingo_check_time")
+        if guess_time is not None and check_time is not None:
+            props["clingo_total_time"] = guess_time + check_time
   
     parser = Parser()
     parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
@@ -115,9 +149,12 @@ def make_parser():
     parser.add_pattern("clingo_search_time", r"Solving:\s*([\d.]+)s", type=float,file="run.log")
     parser.add_pattern("clingo_first_model_time", r"1st Model:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_unsat_time", r"Unsat:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_guess_time", r"GUESS[\s\S]*?Time\s*:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_check_time", r"CHECK[\s\S]*?Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_function(solved)
     parser.add_function(get_result_from_models)
     parser.add_function(check_wrong_plan)
+    parser.add_function(sum_guess_and_check_times)
     parser.add_function(error)
     return parser
 
@@ -153,6 +190,7 @@ if args.domains:
         exp_name += f"_{domain}"
 if args.algos:
     for algo in sorted(args.algos):
+
         exp_name += f"_{algo}"
 if args.heuristic:
     exp_name += "_with_heuristic"
@@ -166,31 +204,26 @@ exp.add_parser(make_parser())
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
         run = exp.add_run()
-        run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
+        if "guessAndCheck" in algo:
+            run.add_resource("guess", f"algorithms/guess.lp", symlink=True)
+            run.add_resource("check", f"algorithms/check.lp", symlink=True)
+        else:
+            run.add_resource(algo, f"algorithms/{algo}.lp", symlink=True)
 
         run_id = str(uuid.uuid4())
         temp_path = f"{TMPDIR}/run_{run_id}"
         run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
-
-        cppdl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
+        cpddl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
         if args.strong_mutex:
             cppdl_command.append("--h2")
         cppdl_command.extend(["--fdr-out", f"{temp_path}/output.sas", "--time-limit", TIME_LIMIT, task.domain_file, task.problem_file])
         run.add_command("cpddl_pddl_to_sas", cppdl_command)
 
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
-        clingo_command = f"{SCRIPT_DIR}/../clingo/clingo --outf=1 --time-limit={TIME_LIMIT} {SCRIPT_DIR}/algorithms/common.lp {{{algo}}} {temp_path}/output.lp"
-        if args.heuristic:
-            clingo_command += f" {SCRIPT_DIR}/algorithms/heuristic.lp"
-        clingo_command += f" | sed -n '/ANSWER/,$p' -"
-        run.add_command("clingo_solve", [clingo_command], shell=True)
-        run.add_command("to_parallel", [
-            f"MODEL=$(grep -A1 'ANSWER' run.log | tail -n1); "
-            f"[ -n \"$MODEL\" ] && echo \"$MODEL\" | {SCRIPT_DIR}/../clingo/clingo --outf=1 - {SCRIPT_DIR}/algorithms/parallel_to_sequential.lp {temp_path}/output.lp | grep -A1 'ANSWER' - | tail -n1 > seq_plan.lp || touch seq_plan.lp"
-        ], shell=True)
-        run.add_command("to_sas", [sys.executable, f"{SCRIPT_DIR}/occurs2sas_plan.py"])
+        
+        run.add_command("run_clingo", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, temp_path, f"{{{algo}}}" if "guessAndCheck" not in algo else algo, str(TIME_LIMIT), str(args.heuristic)])
 
-        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, "sas_plan"])
+        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, f"{temp_path}/sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
         run.add_command("cleanup", ["rm", "-f", "seq_plan.lp", "sas_plan"])
         cpddl_opts = "--h2" if args.strong_mutex else ""
