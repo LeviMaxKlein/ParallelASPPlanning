@@ -21,7 +21,8 @@ def extract_time(output):
 
 
 def run_clingo(script_dir, temp_path, algo, time_limit, heuristic):
-    if not Path(f"{temp_path}/output.lp").exists():
+    output = Path(f"{temp_path}/output.lp")
+    if not output.exists() or output.stat().st_size == 0:
         return None
     
     cmd = [
@@ -45,7 +46,7 @@ def run_clingo(script_dir, temp_path, algo, time_limit, heuristic):
 
 
 def run_check(script_dir, temp_path, plan):
-    if not plan:
+    if plan is None:
         return None
 
     cmd = [
@@ -106,8 +107,9 @@ def main():
     # Step 1: Solve/Guess
     clingo_output = run_clingo(script_dir, temp_path, algo, time_limit, heuristic)
     
-    if not clingo_output:
+    if clingo_output is None:
         return
+    
     plan = Path(f"{temp_path}/plan.lp")
     with plan.open("w") as f:
             f.write(extract_answer(clingo_output))

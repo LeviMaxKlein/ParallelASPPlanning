@@ -93,7 +93,7 @@ SUITES = args.domains if args.domains else [
     "sokoban-sat11-strips", "spider-sat18-strips", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips",
     "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips",
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
-ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed"]
+ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guessAndCheck"]
 TIME_LIMIT = 1_800
 MEMORY_LIMIT = 31000 if REMOTE else 8192
 ATTRIBUTES = [
@@ -215,9 +215,9 @@ for algo in ALGORITHM:
         run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
         cpddl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
         if args.strong_mutex:
-            cppdl_command.append("--h2")
-        cppdl_command.extend(["--fdr-out", f"{temp_path}/output.sas", "--time-limit", TIME_LIMIT, task.domain_file, task.problem_file])
-        run.add_command("cpddl_pddl_to_sas", cppdl_command)
+            cpddl_command.extend(["--h2", "--P-h2fwbw-time-limit", str(TIME_LIMIT)])
+        cpddl_command.extend(["--fdr-out", f"{temp_path}/output.sas", task.domain_file, task.problem_file])
+        run.add_command("cpddl_pddl_to_sas", cpddl_command)
 
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
         
