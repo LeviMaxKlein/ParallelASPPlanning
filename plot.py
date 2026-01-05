@@ -14,19 +14,22 @@ def get_algo_stats(data):
         problem = run_data.get("problem")
         result = run_data.get("solved", 0)
         time = run_data.get("clingo_total_time", 0) if result == 1 else 0
+
+        # Count and store solved instances per algorithm and grouped domain
         if algo not in results:
             results[algo] = {}
         if grouped_domain not in results[algo]:
             results[algo][grouped_domain] = 0
-
         results[algo][grouped_domain] += result
 
+        # Store individual problem solutions
         key = (domain, problem)
         if key not in problem_solutions:
             problem_solutions[key] = {}
         if result == 1:
             problem_solutions[key][algo] = time
 
+    # Count number of problems per grouped domain
     for (domain, _) in problem_solutions.keys():
         grouped_domain = domain.split("-")[0]
         if grouped_domain not in num_problems:
@@ -36,16 +39,19 @@ def get_algo_stats(data):
     return results, problem_solutions, num_problems
 
 
-def filter_times(problem_solutions, algos):
+def filter_times(problem_solutions: dict, algos: list):
+    """
+    Filter times to include only problems solved by the algorithms given in ``algos``.
+    """
     filtered_times = {algo: {} for algo in algos}
-    for (domain, _), times in problem_solutions.items():
+    for (domain, _), algos_and_times in problem_solutions.items():
         grouped_domain = domain.split("-")[0]
-        if len(times) == len(algos):
+        if len(algos_and_times) == len(algos):
             for algo in algos:
-                if algo in times:
+                if algo in algos_and_times:
                     if grouped_domain not in filtered_times[algo]:
                         filtered_times[algo][grouped_domain] = []
-                    filtered_times[algo][grouped_domain].append(times[algo])
+                    filtered_times[algo][grouped_domain].append(algos_and_times[algo])
     return filtered_times
 
 
@@ -53,18 +59,19 @@ def create_matrices(algo_stats, filtered_times, algos, domains, num_problems):
     result_matrix = np.zeros((len(algos), len(domains)), dtype=int)
     normalized_result_matrix = np.zeros((len(algos), len(domains)))
     time_matrix = np.zeros((len(algos), len(domains)))
-    for i, algo in enumerate(algos):
-        for j, domain in enumerate(domains):
-            result_matrix[i,j] = algo_stats[algo][domain]
-            normalized_result_matrix[i,j] = result_matrix[i,j] / num_problems[domain]
+    for row, algo in enumerate(algos):
+        for col, domain in enumerate(domains):
+            result_matrix[row,col] = algo_stats[algo][domain]
+            normalized_result_matrix[row,col] = result_matrix[row,col] / num_problems[domain]
             if domain in filtered_times[algo]:
-                time_matrix[i,j] = np.mean(filtered_times[algo][domain])
+                time_matrix[row,col] = np.mean(filtered_times[algo][domain])
             else:
-                time_matrix[i,j] = 0
+                time_matrix[row,col] = 0
     return result_matrix, normalized_result_matrix, time_matrix
 
 
-def create_heat_map(properties_file):
+def create_heat_map(exp_path):
+    properties_file = os.path.join(exp_path, "properties")
     data = {}
     try:
         if not os.path.exists(properties_file):
@@ -87,27 +94,27 @@ def create_heat_map(properties_file):
         chunk_result = result_matrix[:, chunk_idx:chunk_idx+chunk_size]
         chunk_normalized_result = normalized_result_matrix[:, chunk_idx:chunk_idx+chunk_size]
         fig, ax = plt.subplots(figsize=(12,6))
-        im = ax.imshow(chunk_normalized_result, cmap='YlGn', aspect='auto')
+        _ = ax.imshow(chunk_normalized_result, cmap='YlGn', aspect='auto')
         ax.set_xticks(range(len(chunk_domains)), labels=chunk_domains,
                     rotation=45, ha="right", rotation_mode="anchor")
         ax.set_yticks(range(len(algos)), labels=algos)
         for i in range(len(algos)):
             for j, d in enumerate(chunk_domains):
-                text = ax.text(j, i, f"{chunk_result[i,j]} / {num_problems[d]}",
+                _ = ax.text(j, i, f"{chunk_result[i,j]} / {num_problems[d]}",
                             ha="center", va="center", color="black")
         ax.set_title(f"Solved instances (Part {chunk_idx//chunk_size + 1})")
         fig.tight_layout()
-        plt.savefig(f"plots/solved_part{chunk_idx//chunk_size + 1}.png")
+        plt.savefig(f"{exp_path}/solved_part{chunk_idx//chunk_size + 1}.png")
         plt.close()
 
         chunk_time = time_matrix[:, chunk_idx:chunk_idx+chunk_size]
         non_zero_times = chunk_time[chunk_time > 0]
-        vmin = non_zero_times.min() if len(non_zero_times) > 0 else 0.01
+        vmin = non_zero_times.min() if len(non_zero_times) > 0 else 0.001
         vmax = non_zero_times.max() if len(non_zero_times) > 0 else 1
         
         fig2, ax2 = plt.subplots(figsize=(12,6))
-        im = ax2.imshow(chunk_time, cmap='YlOrRd', aspect='auto', 
-                        norm=plt.matplotlib.colors.LogNorm(vmin=max(vmin, 0.01), vmax=vmax))
+        _ = ax2.imshow(chunk_time, cmap='YlOrRd', aspect='auto', 
+                       norm=plt.matplotlib.colors.LogNorm(vmin=vmin, vmax=vmax))
         ax2.set_xticks(range(len(chunk_domains)), labels=chunk_domains,
                     rotation=45, ha="right", rotation_mode="anchor")
         ax2.set_yticks(range(len(algos)), labels=algos)
@@ -117,6 +124,5 @@ def create_heat_map(properties_file):
                             ha="center", va="center", color="black")
         ax2.set_title(f"Average Solving Time (Part {chunk_idx//chunk_size + 1})")
         fig2.tight_layout()
-        plt.savefig(f"plots/avg_time_part{chunk_idx//chunk_size + 1}.png")
-
-    
+        plt.savefig(f"{exp_path}/avg_time_part{chunk_idx//chunk_size + 1}.png")
+        plt.close()

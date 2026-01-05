@@ -181,7 +181,7 @@ def create_plots():
     if not os.path.exists(properties_file):
         print(f"Properties file not found: {properties_file}")
         raise FileNotFoundError
-    create_heat_map(properties_file)
+    create_heat_map(Path(exp.path + "-eval"))
 
 
 exp_name = "ParallelASPPlanning"
@@ -226,7 +226,7 @@ for algo in ALGORITHM:
         run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, f"{temp_path}/sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
         run.add_command("cleanup", ["rm", "-f", "seq_plan.lp", "sas_plan"])
-        cpddl_opts = "--h2" if args.strong_mutex else ""
+        cpddl_opts = "--h2 --P-h2fwbw-time-limit" if args.strong_mutex else ""
         clingo_opts = f"--outf=1 --time-limit={TIME_LIMIT}"
         if args.heuristic:
             clingo_opts += " heuristic.lp"
