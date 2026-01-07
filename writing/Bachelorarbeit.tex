@@ -6,8 +6,8 @@
 \documentclass[
      11pt,                    % font size
      a4paper,             % paper format
-     BCOR10mm,     % binding correction
-     DIV14,                 % stripe size for margin calculation
+     BCOR=10mm,     % binding correction
+     DIV=14,                 % stripe size for margin calculation
      listof=totoc,                    % table listing in toc
      bibliography=totoc,       % bibliography in toc
      index=totoc,              % index in toc
@@ -49,6 +49,8 @@
 \newtheorem*{remark}{Remark}
 
 \usepackage{minted}
+\usepackage{scrhack}
+\usepackage{caption}
 
 \usepackage{colonequals}
 \newcommand*{\logeq}{\ratio\Longleftrightarrow}
@@ -152,7 +154,7 @@ Dies ist eine Zusammenfassung der Arbeit.
 
 This is the abstract.
 
-\cleardoublepage
+%\cleardoublepage
 
 \tableofcontents
 \cleardoublepage
@@ -166,33 +168,35 @@ This is the abstract.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Einleitung}\label{intro}
+\chapter{Introduction}\label{intro}
 This chapter contains an overview of the topic as well as the goals and contributions of your work.
 
 \section{Motivation}
 
-\section{Ziele der Arbeit}
+\section{Goal of the Thesis}
 
-\section{Aufbau der Arbeit}
+\section{Structure of the Thesis}
 Here you describe the structure of the thesis. For example:
 
 In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorgestellt.
 
 
-\chapter{Basics}\label{background}
-\section{Definitions}
+\chapter{Theory}\label{background}
+\section{Definition}
 \begin{defi}[Multi-valued planning task]
     A STRIPS-like multivalued planning task according to \parencite{Helmert2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
     \begin{itemize}
       \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ has a finite domain $x^d$ and in every state, $x$ takes exactly one value from its domain.
       \item $s_0$, the \textbf{initial state}, is a total function, s.t. $s_0(x) \in x^d$ for each $x \in \mathcal{F}$
       \item $s_*$, the \textbf{goal conditions}, is a partial function, s.t. $s_*(x) \in x^d$, for each $x \in dom(s_*)$
-      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action as $a = \langle a^c, a^e \rangle$, where $a^c$ is the precondition of $a$ and $a^e$ is the postcondition of $a$. Both $a^c$ and $a^e$ are partial variable assignments over $\mathcal{F}$.
+      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action as $a = \langle a^c, a^e \rangle$, where $a^c$ is the precondition of $a$ and $a^e$ is the postcondition of $a$. 
+            Both $a^c$ and $a^e$ are partial variable assignments over $\mathcal{F}$.
+            %TODO: genauer pre und postcondition erklären
     \end{itemize}
 \end{defi}
 
 \begin{example}
-  Consider the following example for a plan to leave the house:
+  Let us illustrate the definitions with a small example. The plan is to leave the house by opening the door, going outside, and finally closing the door.
   \begin{itemize}
     \item $\mathcal{F} = \{door, location\}$ with $door^d = \{open, closed\}$, $location^d = \{inside, outside\}$
     \item Initial state: $s_0 = \{door{=}closed, location{=}inside\}$
@@ -313,11 +317,70 @@ To get to parallel actions and plans, we need the definition of confluent action
     \item relaxed $\exists$-step plan: $\langle\{getKey, lightsOut, openDoor, goOut\}, \{closeDoor\}\rangle$
   \end{itemize}
 \end{example}
-\subsection{ASP}
-Our little example looks like this in ASP:
-\inputminted[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize,linenos]{prolog}{encodings/example.lp}
-\noindent Combining these facts with encodings, gives us the corresponding \textit{sequential, $\forall$-step, $\exists$-step} or \textit{relaxed $\exists$-step plan}.
-\inputminted[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize,linenos]{prolog}{encodings/EX_common.lp}
-\inputminted[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize,linenos]{prolog}{encodings/EX_seq.lp}
+
+\section{ASP}
+
+Idee: Alles mit den mathematische Formeln von oben beschreiben.
+In ASP we represent planning tasks by facts. A solution of an ASP encoding is called stable model.
+
+\begin{listing}[H]
+  \caption{ASP encoding of the example planning task}
+  \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}{encodings/example.lp}
+  \label{example}
+\end{listing}
+
+\noindent Combining these facts with the right encodings, stable models corresponds to the \textit{sequential, $\forall$-step, $\exists$-step} or \textit{relaxed $\exists$-step plan}.
+
+\begin{listing}[H]
+  \caption{Core for sequential and parallel encodings for planning}
+  \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos,lastline=9]{prolog}{encodings/EX_common.lp}
+  \label{core}
+\end{listing}
+\noindent All planning algorithms share a common incremental encoding using the incmode for clingo as seen in Listing \ref{core} \parencite{clingo14}.
+The program is divided into three subprograms: \textit{base}, \textit{step(t)} and \textit{check(t)}.
+The \textit{base} subprogram contains the static part of the encoding, which is only grounded once. Line 2 defines the initial state $s_0$, 
+where the predicate $holds(X,V,t)$ is used to represent fluents $X$ that have value $V$ at timestep $t$. \\
+\textit{check(t)} is a parametrized subprogram starting at $t=0$. The integrity constraint in Line 4 checks if all fluents $X$ defined in $goal(X,V)$ has value $V$ at timestep $t$, i.e. $s_*(X)=s_t(X)$ $\forall X\in dom(s_*)$.
+$Query(t)$ is true only for the latest integer $t$. \\
+\textit{step(t)} is grounded after check fails for each timestep $t$ starting at $t=1$. Lines 6 defines holds for times step $t$, giving fluent $X$ one value $V$ from its domain.
+and $occurs(A,t)$ in Line 7 are all possible actions in timestep $t$ obeying rules 8 and 9. Line 8 ensures that the postcondition of an action is applied. Note that the postcondtion is applied in the same timestep as the action occurs. 
+It also assert the confluence of any set of action applied in parallel since $holds$ and $post$ has to be true.
+Line 9 makes sure that fluents not affected by any action keep their value from the previous timestep.
+So far, the common core handles the transitions from one state to the next in regards of the postcondition of applied actions.
+So far, the common part takes care of matching succesor states to postconditions of applied actions.
+
+\subsection{encoding for sequential plans}
+
+\begin{listing}[H]
+  \caption{Extension for sequential plans}
+  \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos, firstline=2, firstnumber=1]{prolog}{encodings/EX_seq.lp}
+  \label{seq}
+\end{listing}
+
+\noindent Starting with the extension for sequential plans as seen in Listing \ref{seq}, 
+Line 2 ensures that the precondition of an applied action is met in $t-1$ and Line 3 only allows one action to occur per timestep.
+\begin{example}
+Running this with our example, we get three possible sequential plans.
+\begin{listing}[H]
+  \caption{Output from clingo for sequential encoding}
+  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
+  Answer: 1
+  occurs(getKey,1) occurs(lightOut,2) occurs(openDoor,3) occurs(goOut,4) occurs(closeDoor,5)
+  Answer: 2
+  occurs(getKey,1) occurs(openDoor,2) occurs(lightOut,3) occurs(goOut,4) occurs(closeDoor,5)
+  Answer: 3
+  occurs(lightOut,1) occurs(getKey,2) occurs(openDoor,3) occurs(goOut,4) occurs(closeDoor,5)
+  \end{minted}
+\end{listing}
+\end{example}
+
+\subsection{encoding for \texorpdfstring{$\boldsymbol{\forall}$}{forall}-step plans}
+
+\begin{listing}[H]
+  \caption{Extension for $\forall$-step plans}
+  \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos, firstline=2, firstnumber=1]{prolog}{encodings/EX_forall.lp}
+  \label{forall}
+\end{listing} 
+
 \printbibliography
 \end{document}

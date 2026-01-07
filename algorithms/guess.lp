@@ -28,6 +28,8 @@ holds(X, V, 0) :- initialState(X, V).
 :- holds(X, V, t), not holds(X, V, t-1), not occurs(A, t) : post(A, X, V).
 :- occurs(A, t) , prec(A, X, V), not holds(X, V ,t -1).
 
-
-#show.
-#show occurs(A, t) : occurs(A, t).
+#show. 
+#show occurs(A,t) : occurs(A, t).
+#show prec(A, X, V) : prec(A, X, V).
+#show post(A, X, V) : post(A, X, V).
+#show action(A) : action(A).
