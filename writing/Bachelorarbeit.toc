@@ -7,7 +7,9 @@
 \contentsline {chapter}{\numberline {2}Theory}{4}{chapter.10}%
 \contentsline {section}{\numberline {2.1}Definition}{4}{section.11}%
 \contentsline {section}{\numberline {2.2}ASP}{6}{section.25}%
-\contentsline {subsection}{\numberline {2.2.1}encoding for sequential plans}{8}{subsection.28}%
+\contentsline {subsection}{\numberline {2.2.1}encoding for sequential plans}{7}{subsection.28}%
 \contentsline {subsection}{\numberline {2.2.2}encoding for $\boldsymbol {\forall }$-step plans}{8}{subsection.32}%
-\contentsline {chapter}{\nonumberline Bibliography}{9}{chapter*.34}%
+\contentsline {subsection}{\numberline {2.2.3}encoding for $\boldsymbol {\exists }$-step plans}{9}{subsection.38}%
+\contentsline {subsection}{\numberline {2.2.4}encoding for relaxed $\boldsymbol {\exists }$-step plans}{10}{subsection.43}%
+\contentsline {chapter}{\nonumberline Bibliography}{11}{chapter*.45}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

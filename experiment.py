@@ -56,7 +56,7 @@ args, _ = ARGPARSER.parse_known_args()
 BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TMPDIR = Path(os.environ.get("TMPDIR", "/tmp"))
-ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guessAndCheck"]
+ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess_and_check"]
 TIME_LIMIT = 1_800
 MEMORY_LIMIT = 8000
 ATTRIBUTES = [
@@ -93,7 +93,7 @@ SUITES = args.domains if args.domains else [
     "sokoban-sat11-strips", "spider-sat18-strips", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips",
     "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips",
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
-ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guessAndCheck"]
+ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess_and_check"]
 TIME_LIMIT = 1_800
 MEMORY_LIMIT = 31000 if REMOTE else 8192
 ATTRIBUTES = [
@@ -204,7 +204,7 @@ exp.add_parser(make_parser())
 for algo in ALGORITHM:
     for task in suites.build_suite(BENCHMARKS_DIR, SUITES):
         run = exp.add_run()
-        if "guessAndCheck" in algo:
+        if "guess_and_check" in algo:
             run.add_resource("guess", f"algorithms/guess.lp", symlink=True)
             run.add_resource("check", f"algorithms/check.lp", symlink=True)
         else:
@@ -221,11 +221,10 @@ for algo in ALGORITHM:
 
         run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
         
-        run.add_command("run_clingo", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, temp_path, f"{{{algo}}}" if "guessAndCheck" not in algo else algo, str(TIME_LIMIT), str(args.heuristic)])
+        run.add_command("run_clingo", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, temp_path, f"{{{algo}}}" if "guess_and_check" not in algo else algo, str(TIME_LIMIT), str(args.heuristic)])
 
         run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, f"{temp_path}/sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
-        run.add_command("cleanup", ["rm", "-f", "seq_plan.lp", "sas_plan"])
         cpddl_opts = "--h2 --P-h2fwbw-time-limit" if args.strong_mutex else ""
         clingo_opts = f"--outf=1 --time-limit={TIME_LIMIT}"
         if args.heuristic:

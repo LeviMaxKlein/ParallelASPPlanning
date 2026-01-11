@@ -30,6 +30,3 @@ holds(X, V, 0) :- initialState(X, V).
 
 #show. 
 #show occurs(A,t) : occurs(A, t).
-#show prec(A, X, V) : prec(A, X, V).
-#show post(A, X, V) : post(A, X, V).
-#show action(A) : action(A).
