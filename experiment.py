@@ -53,12 +53,10 @@ ARGPARSER.add_argument(
 )
 args, _ = ARGPARSER.parse_known_args()
 
-BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-TMPDIR = Path(os.environ.get("TMPDIR", "/tmp"))
+
 ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess_and_check"]
 TIME_LIMIT = 1_800
-MEMORY_LIMIT = 8000
+MEMORY_LIMIT = 31000 if REMOTE else 8192
 ATTRIBUTES = [
     "error",
     "result",
@@ -71,17 +69,6 @@ ATTRIBUTES = [
     "clingo_wrong_plan",
     Attribute("solved", absolute=True)
 ]
-REMOTE = BWUniEnvironment.is_present()
-if REMOTE:
-    ENV = BWUniEnvironment(
-        email="levi.klein@stud.uni-heidelberg.de",
-        memory_per_cpu="8192", # adapt according to needs, this is per run and should be 100MB larger than the memory limit of the solver(s)
-        extra_options=f"#SBATCH --chdir={SCRIPT_DIR}"
-        )
-    ENV.job_dir = SCRIPT_DIR
-else:
-    ENV= LocalEnvironment(processes=1)
-
 SUITES = args.domains if args.domains else [
     "agricola-sat18-strips", "airport", "barman-sat11-strips", "barman-sat14-strips", "blocks", "childsnack-sat14-strips",
     "data-network-sat18-strips", "depot", "driverlog", "elevators-sat08-strips", "elevators-sat11-strips", "floortile-sat11-strips",
@@ -93,19 +80,6 @@ SUITES = args.domains if args.domains else [
     "sokoban-sat11-strips", "spider-sat18-strips", "termes-sat18-strips", "tetris-sat14-strips", "thoughtful-sat14-strips", "tidybot-sat11-strips",
     "tpp", "transport-sat08-strips", "transport-sat11-strips", "transport-sat14-strips", "trucks-strips", "visitall-sat11-strips", "visitall-sat14-strips",
     "woodworking-sat08-strips", "woodworking-sat11-strips", "zenotravel"]
-ALGORITHM = args.algos if args.algos else ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess_and_check"]
-TIME_LIMIT = 1_800
-MEMORY_LIMIT = 31000 if REMOTE else 8192
-ATTRIBUTES = [
-    "error",
-    "result",
-    "clingo_total_time",
-    "clingo_search_time",
-    "clingo_first_model_time",
-    "clingo_unsat_time",
-    "clingo_wrong_plan",
-    Attribute("solved", absolute=True)
-]
 
 def make_parser():
     def solved(content, props):
