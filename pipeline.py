@@ -60,6 +60,7 @@ def run_check(script_dir, temp_path, plan, plan_length):
     cmd = [
         f"{script_dir}/../clingo/clingo",
         "--outf=1",
+        f"--time-limit=800",
         plan,
         f"{script_dir}/algorithms/check.lp",
         f"{temp_path}/output.lp",

@@ -11,5 +11,6 @@
 \contentsline {subsection}{\numberline {2.2.2}encoding for $\boldsymbol {\forall }$-step plans}{8}{subsection.32}%
 \contentsline {subsection}{\numberline {2.2.3}encoding for $\boldsymbol {\exists }$-step plans}{9}{subsection.38}%
 \contentsline {subsection}{\numberline {2.2.4}encoding for relaxed $\boldsymbol {\exists }$-step plans}{10}{subsection.43}%
-\contentsline {chapter}{\nonumberline Bibliography}{11}{chapter*.45}%
+\contentsline {section}{\numberline {2.3}Proof of Correctness}{11}{section.47}%
+\contentsline {chapter}{\nonumberline Bibliography}{12}{chapter*.49}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

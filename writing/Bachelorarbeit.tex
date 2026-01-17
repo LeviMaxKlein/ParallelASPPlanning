@@ -41,12 +41,17 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
 \theoremstyle{definition}
 \newtheorem*{definition}{Definition}
 \theoremstyle{remark}
 \newtheorem{example}{\textit{Example}}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
+
+\usepackage[bookmarks=true,colorlinks,pdfpagelabels,pdfstartview = FitH,bookmarksopen = true,bookmarksnumbered = true,linkcolor = blue,plainpages = false,hypertexnames = false,citecolor = blue,urlcolor=blue]{hyperref}
 
 \usepackage{minted}
 \usepackage{scrhack}
@@ -63,8 +68,6 @@
 \theoremstyle{bfnote}
 \newtheorem{defi}{Definition}
 % hyperrefs in the documents
-\usepackage[bookmarks=true,colorlinks,pdfpagelabels,pdfstartview = FitH,bookmarksopen = true,bookmarksnumbered = true,linkcolor = black,plainpages = false,hypertexnames = false,citecolor = black,urlcolor=black]{hyperref} 
-
 \usepackage[backend=biber, style=authoryear, sorting=ynt]{biblatex}
 \addbibresource{references.bib}
 \renewcommand*{\nameyeardelim}{\addspace}
@@ -453,6 +456,53 @@ Line 6 also ensures that actions does not circularly invalidates each other.
 \noindent Finally, the extension for relaxed $\exists$-step plans as seen in Listing \ref{relaxed_exists} is quite similar to the $\exists$-step encoding. 
 The difference between those two is that the precondition of all actions do not have to hold simultaneous but they can "help" each other out.
 This is done by defining the predicate reach/3 in Line 1 and 2 as all fluents that can be reached by the step before or applied action in this timestep. 
+An action can then be safely applied, if its precondition is reachable and as before, all actions that it invalidates are ready (Line 4).
+Again Line 7 ensures that applied action do not circularly invalidate each other.
+\begin{example}
+  Running this with our example, we get three possible relaxed $\exists$-step plans.
+\begin{listing}[H]
+  \caption{Output from clingo for relaxed $\exists$-step encoding}
+  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
+  Answer: 1
+  occurs(openDoor,1) occurs(getKey,1) occurs(closeDoor,2) occurs(goOut,2) occurs(lightOut,2)
+  Answer: 2
+  occurs(openDoor,1) occurs(lightOut,1) occurs(getKey,1) occurs(closeDoor,2) occurs(goOut,2)
+  Answer: 3
+  occurs(openDoor,1) occurs(goOut,1) occurs(lightOut,1) occurs(getKey,1) occurs(closeDoor,2)
+  \end{minted}
+\end{listing}
+\end{example}
+
+\section{Proof of Correctness}
+In order to prove the correctness of the presented encondings, we define the following:
+\begin{itemize}
+  \item $B$ is the rule in Line 1 of Listing \ref{seq}.
+  \item $Q(t)$ is the integrity constraint in the check program directive (Line 5) of Listing \ref{core}.
+  \item $S(t)$ are the rules and integrity constraint in the step program directive (Lines 6-9) of Listing \ref{core}.
+  \item $S^\square(t)$ is the extension for the specific plans,
+        where $\square = s$ for Listing \ref{seq}, $\square=\forall$ for Listing \ref{forall}, $\square=\exists$ for Listing \ref{exists},
+        and $\square=R$ for Listing \ref{relaxed_exists}.  
+\end{itemize}
+For the next theorems, let $I$ be the set of facts representing a planning task $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$,
+  $\langle a_1, \dots, a_n \rangle$ be a sequence of actions and $\langle A_1, \dots, A_m \rangle$ be a sequence of sets of actions.
+\begin{theorem}[Correctness of sequential plans]
+  \phantom{}\\
+  $\langle a_1, \dots, a_n \rangle$ is a sequential plan iff
+  \[
+    I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^s(t) \right) \cup \{query(n). \} 
+  \]
+  has a stable model $M$, s.t.$\{\langle a, t \rangle | occurs(a,t) \in M \} = \{\langle a_t, t \rangle | 1 \le t \le n \}$.
+\end{theorem}
+
+\begin{proof}
+  Let $P^s(n) = I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^s(t) \right) \cup \{query(n). \}$. \\
+  ($\Rightarrow$) $\langle a_1, \dots, a_n \rangle$ is a sequential plan $\Rightarrow$ any stable model $M$ of $P^s(n)$ s.t. $\{\langle a, t \rangle | occurs(a,t) \in M \} = \{\langle a_t, t \rangle | 1 \le t \le n \}$
+  the rule in B ($holds(X, V, 0) = s_0=(X)$), the choice rule in $S(t)$ (for given X and t, there is only one V for holds(X, V, t)) and both integrity constraints in $S(i)$ ($holds(X,V,t) = a^e(X)$ if $X \in dom(a^e)$, $s_{t-1}(X)$ otherwise) make sure that
+  $holds(X, V, 0) = s_0(X)$ and $holds(X, V, t) = o(a_t, s_{t-1})(X)$, i.e.
+  \[
+    \{\langle X,V,t\rangle | holds(X,V,t) \in M\} = \{\langle X,V,t\rangle | X \in \mathcal F, v = o(\langle a_1, \dots, a_t\rangle, s_0)\}.
+  \]
+\end{proof}
 
 \printbibliography
 \end{document}
