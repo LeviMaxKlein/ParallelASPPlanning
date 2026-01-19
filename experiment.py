@@ -64,7 +64,6 @@ ATTRIBUTES = [
     "clingo_search_time",
     "clingo_first_model_time",
     "clingo_unsat_time",
-    "clingo_wrong_plan",
     "clingo_guess_time",
     Attribute("solved", absolute=True)
 ]
@@ -98,16 +97,16 @@ def make_parser():
             props["result"] = "UNKNOWN"
     
     def error(content, props):
-        if props.get("result", "UNKNOWN") == "UNKNOWN":
-            props["error"] = "unsolved"
+        result = props.get("result", "UNKNOWN")
+        solved = props.get("solved", 0)
+        if solved == 1:
+            props["error"] = "plan-found"
+        elif result == "UNSATISFIABLE":
+            props["error"] = "unsolvable"
+        elif result == "SATISFIABLE" and solved == 0:
+            props["error"] = "wrong-plan"
         else:
-            props["error"] = "solved"
-    
-    def check_wrong_plan(content, props):
-        if props.get("result") == "SATISFIABLE" and props.get("solved") == 0:
-            props["clingo_wrong_plan"] = 1
-        else:
-            props["clingo_wrong_plan"] = 0 
+            props["error"] = "no-result"
         
   
     parser = Parser()
@@ -120,7 +119,6 @@ def make_parser():
     parser.add_pattern("clingo_guess_time", r"Guess Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_function(solved)
     parser.add_function(get_result_from_models)
-    parser.add_function(check_wrong_plan)
     parser.add_function(error)
     return parser
 
