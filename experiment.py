@@ -89,7 +89,7 @@ def make_parser():
     
     def get_result_from_models(content, props):
         models = props.get("models")
-        if models:
+        if models is not None:
             if models > 0 or ("Guess Time" in content and models == 0):
                 props["result"] = "SATISFIABLE"
             else:

@@ -28,7 +28,6 @@ def sum_stats(guess_stat, check_stat):
     guess_unsat = re.search(r'Unsat:\s*([\d.]+)s', guess_stat)
     guess_cpu = re.search(r'CPU Time\s*:\s*([\d.]+)s', guess_stat)
     
-    # Parse CHECK stats
     check_models = re.search(r'Models\s*:\s*(\d+)', check_stat)
     check_time = re.search(r'Time\s*:\s*([\d.]+)s', check_stat)
     check_solving = re.search(r'Solving:\s*([\d.]+)s', check_stat)
