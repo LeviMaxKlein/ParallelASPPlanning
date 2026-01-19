@@ -65,6 +65,7 @@ ATTRIBUTES = [
     "clingo_first_model_time",
     "clingo_unsat_time",
     "clingo_guess_time",
+    "failed_check",
     Attribute("solved", absolute=True)
 ]
 SUITES = args.domains if args.domains else [
@@ -107,7 +108,12 @@ def make_parser():
             props["error"] = "wrong-plan"
         else:
             props["error"] = "no-result"
-        
+    
+    def failed_check(content, props):
+        if "Check failed" in content:
+            props["failed_check"] = 1
+        else:
+            props["failed_check"] = 0
   
     parser = Parser()
     parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
@@ -119,6 +125,7 @@ def make_parser():
     parser.add_pattern("clingo_guess_time", r"Guess Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_function(solved)
     parser.add_function(get_result_from_models)
+    parser.add_function(failed_check)
     parser.add_function(error)
     return parser
 

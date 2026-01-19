@@ -7,12 +7,17 @@ from pathlib import Path
 
 def shorten_output(output):
     '''Omit *%Solving* message from clingo output'''
-    if "ANSWER" in output and "circle" not in output:
-        return output.split("ANSWER")[-1].strip()
+    if "ANSWER" in output:
+        if "cycle" in output:
+            print("Check failed")
+            return None
+        else:
+            return output.split("ANSWER")[-1].strip()
     elif "INCONSISTENT" in output:
         return output.split("INCONSISTENT")[-1].strip()
     else:
         return None
+
 
 def get_model(shorten_output):
     return shorten_output.split("\n")[0].strip()
@@ -20,6 +25,7 @@ def get_model(shorten_output):
 
 def get_times(shorten_output):
     return "\n".join(shorten_output.split("\n")[1:])
+
 
 def sum_stats(guess_stat, check_stat):
     guess_time = re.search(r'Time\s*:\s*([\d.]+)s', guess_stat)
