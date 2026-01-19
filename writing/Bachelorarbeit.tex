@@ -495,13 +495,67 @@ For the next theorems, let $I$ be the set of facts representing a planning task 
 \end{theorem}
 
 \begin{proof}
-  Let $P^s(n) = I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^s(t) \right) \cup \{query(n). \}$. \\
+  Let $P^s(n) := I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^s(t) \right) \cup \{query(n). \}$. \\
   ($\Rightarrow$) $\langle a_1, \dots, a_n \rangle$ is a sequential plan $\Rightarrow$ any stable model $M$ of $P^s(n)$ s.t. $\{\langle a, t \rangle | occurs(a,t) \in M \} = \{\langle a_t, t \rangle | 1 \le t \le n \}$
   the rule in B ($holds(X, V, 0) = s_0=(X)$), the choice rule in $S(t)$ (for given X and t, there is only one V for holds(X, V, t)) and both integrity constraints in $S(i)$ ($holds(X,V,t) = a^e(X)$ if $X \in dom(a^e)$, $s_{t-1}(X)$ otherwise) make sure that
   $holds(X, V, 0) = s_0(X)$ and $holds(X, V, t) = o(a_t, s_{t-1})(X)$, i.e.
   \[
-    \{\langle X,V,t\rangle | holds(X,V,t) \in M\} = \{\langle X,V,t\rangle | X \in \mathcal F, v = o(\langle a_1, \dots, a_t\rangle, s_0)\}.
+    \{\langle X,V,t\rangle ~|~ holds(X,V,t) \in M\} = \{\langle X,V,t\rangle ~| X \in \mathcal F, v = o(\langle a_1, \dots, a_t\rangle, s_0), 0 \le t \le n\}.
   \]
+  Therefore, the only stable model that $P^s(n)$ can have is
+  \begin{align*}
+        M = I &\cup \{occurs(a_t, t) ~|~ 1 \le t \le n \} \\
+              &\cup \{holds(X, V, t) ~|~ X \in \mathcal F, v = o(\langle a_1, \dots, a_t\rangle, s_0), 0 \le t \le n\} \cup \{query(n)\}.
+  \end{align*}
+  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a_t, t \rangle ~|~ 1 \le t \le n \}$.Since all rules and integrity constraints in $P^s(n)$ are satisfied, M is a stable model of $P^s(n)$.\\
+  ($\Leftarrow$) (TODO Induction) Let $M$ be a stable model of $P^s(n)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a_t, t \rangle ~|~ 1 \le t \le n \}$.
+  The Rule in B implies: 
+  \[
+    \{\langle X, V \rangle ~|~ holds(X, V, 0) \in M \} = \{\langle X, V \rangle ~|~ X \in \mathcal F, s_0(X) = V\}.
+  \]
+  Assume that for all $1 \le t \le n$:
+  \[
+    \{\langle X, V \rangle ~|~ holds(X,V,t-1)\in M \} = \{\langle X, V \rangle ~|~ X \in \mathcal F, V=o(\langle a_1, \dots, a_{t-1}\rangle, s_0)(X)\}.
+  \]
+  The integrity constraint in Line 1 of Listing \ref{seq} in $S^s(t)$ ensures that the successor state, i.e. $o(a_t, o(\langle a_1, \dots, a_{t-1}\rangle, s_0))$ is defined.
+  Additionally the choice rule in Line 6 of Listing \ref{core} and the integrity constaints in $S(t)$ guarentee that
+  \[
+    \{\langle X, V \rangle ~|~ holds(X,V,t) \in M\} = \{\langle X, V \rangle ~|~ X \in \mathcal F, V = o(\langle a_1, \dots, a_t \rangle, s_0)(X)\}.
+  \]
+  Finally, with the fact $query(n)$, the integrity constraint in $Q(n)$ yields that $o(\langle a_1, \dots, a_n \rangle, s_0)(X)$ $=$ $s_*(X)$ for all $X \in dom(s_*)$.
+  Thus, $\langle a_1, \dots, a_n \rangle$ is a sequential plan.
+\end{proof}
+
+\begin{theorem}[Correctness of parallel plans]
+  \phantom{} \\
+  $\langle A_,1, \dots, A_m \rangle$ is a $\forall-$/$exists-$/relaxed $exists-$-step plan iff
+  \[
+    I \cup B \cup Q(0) \cup \bigcup_{t=1}^{m} \left( Q(t) \cup S(t) \cup S^\square(t) \right) \cup \{query(m).\}
+  \]
+  with $p \in \{\forall, \exists, R \}$ has a stable model $M$, s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
+\end{theorem}
+
+\begin{proof}
+  Let $P^p(m) := I \cup B \cup Q(0) \cup \bigcup_{t=1}^{m} \left( Q(t) \cup S(t) \cup S^p(t) \right) \cup \{query(m). \}$ with $p \in \{\forall, \exists, R \}$. \\
+  ($\Rightarrow$) $\langle A_1, \dots, A_m \rangle$ is a $\forall-$/$exists-$/relaxed $exists-$-step plan.
+  For each $1 \le t \le m$, let $s_t$ be the state s.t. $s_t(X) = \begin{cases} a^e(X) & \forall a \in A_i \text{ and } X \in dom(a^e) \\ s_{t-1}(X) & \forall X \in \mathcal F \setminus \bigcup_{a \in A_i} dom(a^e) \end{cases}$.
+  Then, as in the proof above, for any stable model $M$ of $P^p(m)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a,t \rangle ~|~ a \in A_t, 1 \le t \le m \}$, 
+  the rule in $B$ together with the choice rule and the integrity constraints in $S(t)$ make sure that
+  \[
+    \{\langle X,V,t\rangle ~|~ holds(X,V,t) \in M\} = \{\langle X,V,t\rangle ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\}.
+  \]
+  We now split the proof into the different cases: \\
+  \textbf{Case 1: }$\langle A_1, \dots, A_m \rangle$ is a $\forall-$step plan. \\
+  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ iff $\exists a \in A_i$ s.t. $X \in dom(a^c) \cap dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$,
+  $P^\forall(m)$ cannot have any stable model $M$ apart from
+  \begin{align*}
+    M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m\} \\
+          &\cup \{holds(X,V,t) ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\} \\
+          &\cup \{single(X,t) ~|~ X \in dom(a^c) \cap dom(a^e), a^c(X) \ne a^e(X), a \in A_t, 1 \le t \le m \} \\
+          &\cup \{query(m)\}
+  \end{align*}
+  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m\}$.
+
 \end{proof}
 
 \printbibliography

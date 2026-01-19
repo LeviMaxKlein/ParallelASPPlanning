@@ -43,10 +43,10 @@ ARGPARSER.add_argument(
     "--heuristic", action="store_true", help="run with a heuristic"
 )
 ARGPARSER.add_argument(
-    "--strong-mutex", action="store_true", help="run with stronger mutexes"
+    "--strong-mutex", action="store_true", help="run with h2 search for mutexes"
 )
 ARGPARSER.add_argument(
-    "--algos", nargs="*", help="specify algorithm: sequential, forall, exists, exists_edge, relaxed" 
+    "--algos", nargs="*", help="specify algorithm" 
 )
 ARGPARSER.add_argument(
     "--domains", nargs="*", help="specify domains"
@@ -64,9 +64,8 @@ ATTRIBUTES = [
     "clingo_search_time",
     "clingo_first_model_time",
     "clingo_unsat_time",
-    "clingo_guess_time",
-    "clingo_check_time",
     "clingo_wrong_plan",
+    "clingo_guess_time",
     Attribute("solved", absolute=True)
 ]
 SUITES = args.domains if args.domains else [
@@ -91,7 +90,7 @@ def make_parser():
     def get_result_from_models(content, props):
         models = props.get("models")
         if models:
-            if models > 0:
+            if models > 0 or ("Guess Time" in content and models == 0):
                 props["result"] = "SATISFIABLE"
             else:
                 props["result"] = "UNSATISFIABLE"
@@ -110,11 +109,6 @@ def make_parser():
         else:
             props["clingo_wrong_plan"] = 0 
         
-    def sum_guess_and_check_times(content, props):
-        guess_time = props.get("clingo_guess_time")
-        check_time = props.get("clingo_check_time")
-        if guess_time is not None and check_time is not None:
-            props["clingo_total_time"] = guess_time + check_time
   
     parser = Parser()
     parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
@@ -123,12 +117,10 @@ def make_parser():
     parser.add_pattern("clingo_search_time", r"Solving:\s*([\d.]+)s", type=float,file="run.log")
     parser.add_pattern("clingo_first_model_time", r"1st Model:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_unsat_time", r"Unsat:\s*([\d.]+)s", type=float, file="run.log")
-    parser.add_pattern("clingo_guess_time", r"GUESS[\s\S]*?Time\s*:\s*([\d.]+)s", type=float, file="run.log")
-    parser.add_pattern("clingo_check_time", r"CHECK[\s\S]*?Time\s*:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_guess_time", r"Guess Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_function(solved)
     parser.add_function(get_result_from_models)
     parser.add_function(check_wrong_plan)
-    parser.add_function(sum_guess_and_check_times)
     parser.add_function(error)
     return parser
 
@@ -187,16 +179,7 @@ for algo in ALGORITHM:
         run_id = str(uuid.uuid4())
         temp_path = f"{TMPDIR}/run_{run_id}"
         run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
-        cpddl_command = [f"{SCRIPT_DIR}/../cpddl/bin/pddl"]
-        if args.strong_mutex:
-            cpddl_command.extend(["--h2", "--P-h2fwbw-time-limit", str(TIME_LIMIT)])
-        cpddl_command.extend(["--fdr-out", f"{temp_path}/output.sas", task.domain_file, task.problem_file])
-        run.add_command("cpddl_pddl_to_sas", cpddl_command)
-
-        run.add_command("plasp_sas_to_asp", [f"{SCRIPT_DIR}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"], shell=True)
-        
-        run.add_command("run_clingo", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, temp_path, f"{{{algo}}}" if "guess_and_check" not in algo else algo, str(TIME_LIMIT), str(args.heuristic)])
-
+        run.add_command("run_pipeline", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, TIME_LIMIT, temp_path, task.domain_file, task.problem_file, f"{{{algo}}}" if "guess_and_check" not in algo else algo, str(args.strong_mutex), str(args.heuristic)])
         run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, f"{temp_path}/sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
         cpddl_opts = "--h2 --P-h2fwbw-time-limit" if args.strong_mutex else ""

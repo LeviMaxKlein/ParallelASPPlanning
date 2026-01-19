@@ -5,30 +5,73 @@ import sys
 import re
 from pathlib import Path
 
-
 def shorten_output(output):
     '''Omit *%Solving* message from clingo output'''
-    if "ANSWER" in output:
+    if "ANSWER" in output and "circle" not in output:
         return output.split("ANSWER")[-1].strip()
     elif "INCONSISTENT" in output:
         return output.split("INCONSISTENT")[-1].strip()
     else:
         return None
 
+def get_model(shorten_output):
+    return shorten_output.split("\n")[0].strip()
 
-def get_model(output):
-    return output.split("\n")[0].strip()
 
+def get_times(shorten_output):
+    return "\n".join(shorten_output.split("\n")[1:])
 
-def get_times(output):
-    return "\n".join(output.split("\n")[1:])
+def sum_stats(guess_stat, check_stat):
+    guess_time = re.search(r'Time\s*:\s*([\d.]+)s', guess_stat)
+    guess_solving = re.search(r'Solving:\s*([\d.]+)s', guess_stat)
+    guess_first = re.search(r'1st Model:\s*([\d.]+)s', guess_stat)
+    guess_unsat = re.search(r'Unsat:\s*([\d.]+)s', guess_stat)
+    guess_cpu = re.search(r'CPU Time\s*:\s*([\d.]+)s', guess_stat)
+    
+    # Parse CHECK stats
+    check_models = re.search(r'Models\s*:\s*(\d+)', check_stat)
+    check_time = re.search(r'Time\s*:\s*([\d.]+)s', check_stat)
+    check_solving = re.search(r'Solving:\s*([\d.]+)s', check_stat)
+    check_first = re.search(r'1st Model:\s*([\d.]+)s', check_stat)
+    check_unsat = re.search(r'Unsat:\s*([\d.]+)s', check_stat)
+    check_cpu = re.search(r'CPU Time\s*:\s*([\d.]+)s', check_stat)
+    
+    total_time = float(guess_time.group(1)) + float(check_time.group(1))
+    total_solving = float(guess_solving.group(1)) + float(check_solving.group(1))
+    total_first = float(guess_first.group(1)) + float(check_first.group(1))
+    total_unsat = float(guess_unsat.group(1)) + float(check_unsat.group(1))
+    total_cpu = float(guess_cpu.group(1)) + float(check_cpu.group(1))
+    lines = [
+        f"% Models         : {check_models.group(1)}",
+        f"% Guess Time     : {float(guess_time.group(1)):.3f}s",
+        f"% Time           : {total_time:.3f}s (Solving: {total_solving:.2f}s 1st Model: {total_first:.2f}s Unsat: {total_unsat:.2f}s)",
+        f"% CPU Time       : {total_cpu:.3f}s"
+    ]
+    return "\n".join(lines)
 
 
 def get_plan_length(plan):
     return 0 if plan is None else int(plan[-3])
 
 
-def run_clingo(script_dir, temp_path, algo, time_limit, heuristic):
+def run_cpddl(script_dir, time_limit, temp_path, domain, problem, strong_mutex):
+    cpddl_command = [f"{script_dir}/../cpddl/bin/pddl"]
+    if strong_mutex:
+        cpddl_command.extend(["--h2", "--P-h2fwbw-time-limit", str(time_limit)])
+    cpddl_command.extend(["--fdr-out", f"{temp_path}/output.sas", domain, problem])
+
+    result = subprocess.run(cpddl_command, capture_output=True, text=True)
+    if result.stderr:
+        print(result.stderr, file=sys.stderr)
+
+def run_plasp(script_dir, temp_path):
+    if not Path(f"{temp_path}/output.sas").exists():
+        return None
+    subprocess.run([f"{script_dir}/../plasp translate {temp_path}/output.sas > {temp_path}/output.lp"],
+                    capture_output=True, text=True, shell=True)
+
+
+def run_clingo(script_dir, time_limit, temp_path, algo, heuristic):
     output = Path(f"{temp_path}/output.lp")
     if not output.exists() or output.stat().st_size == 0:
         return None
@@ -105,17 +148,23 @@ def occurs2sas(plan_path: str, temp_path: str):
 
 
 def main():
-    if len(sys.argv) < 5:
+    if len(sys.argv) < 7:
         sys.exit(1)
     
     script_dir = sys.argv[1]
-    temp_path = sys.argv[2]
-    algo = sys.argv[3]
-    time_limit = int(sys.argv[4])
-    heuristic = sys.argv[5].lower() == "true"
+    time_limit = sys.argv[2]
+    temp_path = sys.argv[3]
+    domain = sys.argv[4]
+    problem = sys.argv[5]
+    algo = sys.argv[6]
+    strong_mutex = sys.argv[7].lower() == "true"
+    heuristic = sys.argv[8].lower() == "true"
+
+    run_cpddl(script_dir, time_limit, temp_path, domain, problem, strong_mutex)
+    run_plasp(script_dir, temp_path)
     
     # Step 1: Solve/Guess
-    clingo_output = run_clingo(script_dir, temp_path, algo, time_limit, heuristic)
+    clingo_output = run_clingo(script_dir, time_limit, temp_path, algo, heuristic)
     
     if clingo_output is None:
         return
@@ -130,10 +179,7 @@ def main():
         plan_length = get_plan_length(plan_text)
         check_output = run_check(script_dir, temp_path, plan, plan_length)
         if check_output:
-            print("GUESS")
-            print(get_times(clingo_output))
-            print("CHECK")
-            print(get_times(check_output))
+            print(sum_stats(get_times(clingo_output), get_times(check_output)))
         else:
             return
     
