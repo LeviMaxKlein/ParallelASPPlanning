@@ -166,7 +166,7 @@ if args.algos:
 if args.heuristic:
     exp_name += "_with_heuristic"
 if args.strong_mutex:
-    exp_name += "_withstrong_mutex"
+    exp_name += "_with_strong_mutex"
 
 exp = Experiment(environment=ENV)
 exp.path = os.path.join(SCRIPT_DIR, "data", exp_name)
@@ -184,8 +184,11 @@ for algo in ALGORITHM:
         run_id = str(uuid.uuid4())
         temp_path = f"{TMPDIR}/run_{run_id}"
         run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
-        run.add_command("run_pipeline", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, TIME_LIMIT, temp_path, task.domain_file, task.problem_file, f"{{{algo}}}" if "guess_and_check" not in algo else algo, str(args.strong_mutex), str(args.heuristic)])
-        run.add_command("validate_plan", ["Validate", task.domain_file, task.problem_file, f"{temp_path}/sas_plan"])
+        run.add_command("copy_domain", ["cp", task.domain_file, f"{temp_path}/domain.pddl"])
+        run.add_command("copy_problem", ["cp", task.problem_file, f"{temp_path}/problem.pddl"])
+        
+        run.add_command("run_pipeline", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, TIME_LIMIT, temp_path, f"{temp_path}/domain.pddl", f"{temp_path}/problem.pddl", f"{{{algo}}}" if "guess_and_check" not in algo else algo, str(args.strong_mutex), str(args.heuristic)])
+        run.add_command("validate_plan", ["Validate", f"{temp_path}/domain.pddl", f"{temp_path}/problem.pddl", f"{temp_path}/sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
         cpddl_opts = "--h2 --P-h2fwbw-time-limit" if args.strong_mutex else ""
         clingo_opts = f"--outf=1 --time-limit={TIME_LIMIT}"
