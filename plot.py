@@ -133,6 +133,6 @@ def create_heat_map(exp_path):
                     text = ax2.text(j, i, f"{chunk_time[i,j]:.2f}s",
                                     ha="center", va="center", color="black")
         ax2.set_title(f"Average Solving Time (Part {chunk_idx//chunk_size + 1})")
-        fig2.tight_layout()f
+        fig2.tight_layout()
         plt.savefig(f"{exp_path}/avg_time_part{chunk_idx//chunk_size + 1}.png")
         plt.close()
