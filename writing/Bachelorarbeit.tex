@@ -189,19 +189,23 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 \begin{defi}[Multi-valued planning task]
     A STRIPS-like multivalued planning task according to \parencite{Helmert2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
     \begin{itemize}
-      \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ has a finite domain $x^d$ and in every state, $x$ takes exactly one value from its domain.
-      \item $s_0$, the \textbf{initial state}, is a total function, s.t. $s_0(x) \in x^d$ for each $x \in \mathcal{F}$
-      \item $s_*$, the \textbf{goal conditions}, is a partial function, s.t. $s_*(x) \in x^d$, for each $x \in dom(s_*)$
-      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action as $a = \langle a^c, a^e \rangle$, where $a^c$ is the precondition of $a$ and $a^e$ is the postcondition of $a$. 
-            Both $a^c$ and $a^e$ are partial variable assignments over $\mathcal{F}$.
-            %TODO: genauer pre und postcondition erklären
+      \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ has a finite domain and in every state, $x$ takes exactly one value from its domain.
+      \item $s_0$, the \textbf{initial state}, is a total function,, s.t. $s_0(x) \in dom(x)$ for each $x \in \mathcal{F}$, i.e. a function that maps each fluent to a value from its domain.
+      \item $s_*$, the \textbf{goal conditions}, is a partial function, s.t. $s_*(x) \in dom(x)$, for each $x \in dom(s_*)$ i.e. a function that specifies the desired values for a subset of fluents.
+      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action $a$ as $\langle a^c, a^e \rangle$, where $a^c$ is the precondition and $a^e$ is the postcondition of $a$. 
+            Both $a^c$ and $a^e$ are partial functions, s.t. $a^c(x) \in dom(x)$ for each $x \in dom(a^c)$ and $a^e(x) \in dom(x)$ for each $x \in dom(a^e)$.
     \end{itemize}
+\begin{remark}
+  An action $a$ also has a finite set of effects $eff$, where $eff = \langle cond, x, v \rangle$. 
+  $cond$, the effect condition, is a (possibly empty) partial function, s.t. $cond(x) \in dom(x)$ for each $x \in dom(cond)$. 
+  $x \in \mathcal F$ is the effected fluent and $v \in dom(x)$ is the value assigned to $x$ if $cond$ holds.
+\end{remark}
 \end{defi}
 
 \begin{example}
   Let us illustrate the definitions with a small example. The plan is to leave the house by opening the door, going outside, and finally closing the door.
   \begin{itemize}
-    \item $\mathcal{F} = \{door, location\}$ with $door^d = \{open, closed\}$, $location^d = \{inside, outside\}$
+    \item $\mathcal{F} = \{door, location\}$ with $dom(door) {=} \{open, closed\}$, $dom(location) {=} \{inside, outside\}$
     \item Initial state: $s_0 = \{door{=}closed, location{=}inside\}$
     \item Goal: $s_* = \{door{=}closed, location{=}outside\}$
     \item Actions: $\mathcal{O} = \{openDoor, closeDoor, goOut\}$, where
@@ -233,7 +237,7 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 \end{defi}
 
 \begin{example}
-  Consider the planning task from the previous example. A sequential plan would be $A = \langle openDoor, goOut, closeDoor \rangle$. Since
+  Consider the planning task from the previous example. One possible sequential plan is $A = \langle openDoor, goOut, closeDoor \rangle$. Since
   \begin{align*}
     o(A, s_0) &= o(\langle openDoor, goOut, closeDoor\rangle, \{door{=}closed, location{=}inside\})))\\
     &= o(\langle goOut, closeDoor \rangle, \{door{=}open, location{=}inside\}))\\
@@ -242,7 +246,8 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
   \end{align*}
 \end{example}
 \hspace{-1.5em}
-To get to parallel actions and plans, we need the definition of confluent actions.
+
+\noindent For parallel actions and plans, we first need the definition of a confluent set of actions.
 
 \begin{defi}[confluent]
   Let $A = \{a_1, \dots, a_n\} \subseteq \mathcal{O}$ be a set of actions.\\
@@ -255,16 +260,15 @@ To get to parallel actions and plans, we need the definition of confluent action
 
 \begin{example}
   In our example $\{openDoor, goOut\}$ and $\{closeDoor, goOut\}$ are confluent sets. \\
-  We extend our example with the fluents $light$ and $key$ with $light^d = key^d = \{0, 1\}$ and two actions $lightsOut$ and $getKey$:
+  We extend the example with the fluents $light$ and $key$ where $dom(light) = dom(key) = \{0, 1\}$ and two actions $lightsOut$ and $getKey$:
   \vspace{-1em}
-  \begin{flalign*}
-    lightsOut &= \langle\{location{=}inside, light{=}1\}, \{light{=}0\}\rangle& \\
-    getKey &= \langle\{location{=}inside, key{=}0\}, \{key{=}1\}\rangle&
-  \end{flalign*}
-  \noindent Additionally, we modify the precondition: $openDoor^c = \{door{=}closed, key{=}1\}$.
-  \noindent Our new goal is $s_* = \{location{=}outside, door{=}closed, light{=}0\}$. 
-  
-  \noindent Now for example $\{getKey, openDoor, goOut, lightsOut\}$ and $\{getKey,$ $closeDoor,$ $goOut,$ $lightsOut\}$ are also confluent sets.
+  \begin{align*}
+    lightsOut &= \langle\{location{=}inside, light{=}1\}, \{light{=}0\}\rangle \\
+    getKey &= \langle\{location{=}inside, key{=}0\}, \{key{=}1\}\rangle
+  \end{align*}
+  \noindent Additionally, we modify the precondition: $openDoor^c = \{door{=}closed, key{=}1\}$
+  and our new goal is $s_* = \{location{=}outside, door{=}closed, light{=}0\}$. \\
+  Now for example $\{getKey, openDoor, goOut, lightsOut\}$ and $\{getKey,$ $closeDoor,$ $goOut,$ $lightsOut\}$ are also confluent sets of actions.
 \end{example}
 
 \begin{defi}[Parallel representations]
@@ -296,7 +300,6 @@ To get to parallel actions and plans, we need the definition of confluent action
   \end{enumerate}
 \end{defi}
 
-
 \begin{remark}
   $A$ is $\forall$-step serializable $\Rightarrow$ $A$ is $\exists$-step serializable $\Rightarrow$ $A$ is relaxed $\exists$-step serializable.
 \end{remark}
@@ -323,8 +326,7 @@ To get to parallel actions and plans, we need the definition of confluent action
 
 \section{ASP}
 
-Idee: Alles mit den mathematische Formeln von oben beschreiben.
-In ASP we represent planning tasks by facts. A solution of an ASP encoding is called stable model.
+In ASP, planning tasks are represented by facts. A solution of an ASP encoding is called $stable$ $model$.
 
 \begin{listing}[H]
   \caption{ASP encoding of the example planning task}
@@ -332,7 +334,7 @@ In ASP we represent planning tasks by facts. A solution of an ASP encoding is ca
   \label{example}
 \end{listing}
 
-\noindent Combining these facts with the right encodings, stable models corresponds to the \textit{sequential, $\forall$-step, $\exists$-step} or \textit{relaxed $\exists$-step plan}.
+\noindent Combining these facts with the right encodings, stable models correspond to the \textit{sequential, $\forall$-step, $\exists$-step} or \textit{relaxed $\exists$-step plans}.
 
 \begin{listing}[H]
   \caption{Core for sequential and parallel encodings for planning}
@@ -340,9 +342,9 @@ In ASP we represent planning tasks by facts. A solution of an ASP encoding is ca
   \label{core}
 \end{listing}
 \noindent All planning algorithms share a common incremental encoding using the incmode for clingo as seen in Listing \ref{core} \parencite{clingo14}.
-The program is divided into three subprograms: \textit{base}, \textit{step(t)} and \textit{check(t)}.
-The \textit{base} subprogram contains the static part of the encoding, which is only grounded once. Line 2 defines the initial state $s_0$, 
-where the predicate $holds(X,V,t)$ is used to represent fluents $X \in \mathcal{F}$ that have value $V\in dom(X)$ at timestep $t$. \\
+The program is divided into three subprograms: \textit{base}, \textit{step(t)} and \textit{check(t)}. \\
+The \textit{base} subprogram contains the static part of the encoding, which is only grounded once. 
+Line 2 defines the initial state $s_0$, where the predicate $holds(X,V,t)$ is used to represent fluents $X \in \mathcal{F}$ that have value $V\in dom(X)$ at timestep $t$. \\
 \textit{check(t)} is a parametrized subprogram starting at $t=0$. The integrity constraint in Line 4 checks if $s_*(X)=s_t(X)$ $\forall X\in dom(s_*)$.
 $Query(t)$ is true only for the latest integer $t$. \\
 \textit{step(t)} is grounded after check fails for each timestep $t$ starting at $t=1$. Note that postconditions of applied actions in timestep $t$ are also set in $t$ and the preconditions have to hold in $t-1$.
@@ -528,9 +530,9 @@ For the next theorems, let $I$ be the set of facts representing a planning task 
 
 \begin{theorem}[Correctness of parallel plans]
   \phantom{} \\
-  $\langle A_,1, \dots, A_m \rangle$ is a $\forall-$/$exists-$/relaxed $exists-$-step plan iff
+  $\langle A_1, \dots, A_m \rangle$ is a $\forall-$/$exists-$/relaxed $exists-$-step plan iff
   \[
-    I \cup B \cup Q(0) \cup \bigcup_{t=1}^{m} \left( Q(t) \cup S(t) \cup S^\square(t) \right) \cup \{query(m).\}
+    I \cup B \cup Q(0) \cup \bigcup_{t=1}^{m} \left( Q(t) \cup S(t) \cup S^p(t) \right) \cup \{query(m).\}
   \]
   with $p \in \{\forall, \exists, R \}$ has a stable model $M$, s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
 \end{theorem}
@@ -545,18 +547,107 @@ For the next theorems, let $I$ be the set of facts representing a planning task 
     \{\langle X,V,t\rangle ~|~ holds(X,V,t) \in M\} = \{\langle X,V,t\rangle ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\}.
   \]
   We now split the proof into the different cases: \\
+
   \textbf{Case 1: }$\langle A_1, \dots, A_m \rangle$ is a $\forall-$step plan. \\
-  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ iff $\exists a \in A_i$ s.t. $X \in dom(a^c) \cap dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$,
-  $P^\forall(m)$ cannot have any stable model $M$ apart from
-  \begin{align*}
+  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ iff $\exists a \in A_i$ s.t. $X \in dom(a^c) \cap dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$.
+  Hence $P^\forall(m)$ cannot have any stable model $M$ apart from
+  \begin{align*}b
     M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m\} \\
           &\cup \{holds(X,V,t) ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\} \\
           &\cup \{single(X,t) ~|~ X \in dom(a^c) \cap dom(a^e), a^c(X) \ne a^e(X), a \in A_t, 1 \le t \le m \} \\
-          &\cup \{query(m)\}
+          &\cup \{query(m).\}
   \end{align*}
   s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m\}$.
+  Since for $t \in \{1, \dots, m \}$, the successor state $s_t= o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined for any sequence $\langle a_1, \dots, a_k \rangle$ s.t. $\{a_1, \dots, a_k\} = A_t$,
+  we have that M satisfies all integrity constraints in $S^\forall(t)$. One can easily check that all other rules and integrity constraints in $P^\forall(m)$ are satisfied as well.
+  Therefore M is a stable model of $P^\forall(m)$. \\
 
+  \textbf{Case 2: }$\langle A_1, \dots, A_m \rangle$ is a $\exists-$step plan. \\
 \end{proof}
+
+\chapter{Method}
+\section{Pipeline Overview}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Resources/pipeline.drawio.png}
+  \caption{Pipeline for testing the different planning encodings}
+  \label{pipeline}
+\end{figure}
+To test and compare t he different parallel planning encodings against each other and against the sequential planning encoding, we set up a python pipeline using the lab framework \parencite{seipp-et-al-zenodo2017}
+and the unofficial collection of (sequential) IPC benchmark instances from the downward project \footnote{\url{https://github.com/aibasel/downward-benchmarks}}. \\
+Starting at a planning task in the Planning Domain Definition Language (PDDL), we first preprocess it using cpddl \parencite{fiser_2025_16423302} that converts it into a finite domain representation (FDR).
+Plasp then takes the FDR as input and translates it into ASP facts representing the planning task. Further information of this step can be found in \parencite{DIMOPOULOS_2019}.
+Using clingo with a modified version of the incremental encodings presented above together with the facts from the output of plasp, we can then compute sequential, $\forall$-step, $\exists$-step or relaxed $\exists$-step plans as stable models.
+Finally, to validate the given plan, we postprocess the parallel representation back into a sequential plan, using the postprocess encoding provided by plasp and validate the plan with VAL \footnote{\url{https://github.com/KCL-Planning/VAL}}.
+Each step has some optimizations and configurations that will be explained in the following sections.
+
+\section{Optimizations}
+\subsection{Mutexes}
+\begin{defi}[mutex and mutex groups]
+  A set of facts $M \subseteq \mathcal F$ is called 
+  \begin{enumerate}[label=(\roman*)]
+    \item a \textit{mutex} $~~~~~~~\logeq$ for all reachable states $s: M \not\subseteq s$.
+    \item a \textit{mutex group} $\logeq$ for all reachable states $s: | M \cap s | \le 1$.
+  \end{enumerate}
+\end{defi}
+\noindent In other words, a mutex is a set of fluents that can never be true at the same time in any reachable state,
+while a mutex group is a set of fluents where at most one fluent can be true at the same time.
+Mutexes and mutex groups can be used to optimize the planning encodings by reducing the search space.
+For this, we extend our endcoding in Listing \ref{core} with the following rules:
+\begin{listing}[H]
+  \caption{Expansion for mutexes}
+  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}
+    #program base.
+    ...
+    mutex(G,X) :- mutexGroup(G), contains(G,X,V), fluent(X,V).
+    mutex(G)   :- mutexGroup(G), #count{X : mutex(G,X)} > 1.
+    :- mutex(G), #count{X,V : holds(X,V,0), contains(G,X,V)} > 1.^
+    ...
+    #program step(t).
+    ...
+    :- mutex(G), #count{X,V : holds(X,V,t), contains(G,X,V)} > 1.
+    ...
+  \end{minted}
+  \label{mutex}
+\end{listing}
+\noindent Here, the mutex group G is given by plasp as facts of the form $mutexGroup/1$ and $contains/3$.
+In the base program, we first define which fluents belong to a mutex group (Line 3), where a group must contain at least two fluents (Line 4).
+The integrity constraint in Line 5 ensures that no more than one fluent of each mutex group holds in the initial state and the integrity constraint in Line 9 ensures the same for each state in timestep t.
+
+\subsection{Guess and Check}
+An optimization specific to the (relaxed) $\exists$-step encodings is the guess and check approach. 
+The general idea is to first guess a solution without looking for actions that circularly invalidate each other and afterwards check if the guessed solution has a cycle.
+Formally, we encode the problem by a pair of programs $\langle G, C \rangle$ where $G$ is the guessing program and $C$ is the checking program. 
+Stable models $M$ of $G$ yields a solution if $C \cap M$ is $unsatisfiable$. 
+For making "systematic" guesses, \parencite{DIMOPOULOS_2019} proposes to use the core program ($S(t)$) in Listing \ref{core} 
+together with the integrity constraint in Line 1 of Listing \ref{seq}, \ref{forall} or \ref{exists} ($B$) and the facts representing a planning task.
+Thus, a stable model $M$ of $G$ is s.t. the pre- and postconditons hold for all actions applied in parallel (Line 8 of Listing \ref{core} and Line 1 of Listing \ref{seq}, \ref{forall} or \ref{exists}).
+and the integrity constraint in Line 8 of Listing \ref{core} also ensures confluence of applied actions. 
+The only thing remained to be checked is if actions circularly invalidate each other, i.e. $a^e(X) \ne \tilde a^c(X)$ and $\tilde a^e(\tilde X) \ne \tilde a^c(\tilde X)$.
+This can be accomplished by taking the atoms over $occurs/2$ from $M$ as facts together with a program $C$ containing the facts representing a planning task
+and the following encoding:
+\begin{listing}[H]
+  \caption{Encoding for checking circular invalidation}
+  \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}{encodings/EX_check.lp}
+  \label{check}
+\end{listing}
+\noindent Here, the maximum value for $t$ in subprogram $check$ and $step$ is $m = max \{t ~|~ occurs(a, t)\}$ and
+$C$ becomes $unsatisfiable$ if $t > m$.
+Like in Listing \ref{exists}, we check for each $t$ if all actions $A \in occurs(A,t)$ can be applied by the predicate $ready$ (Line 7-11).
+If actions in $A$ circularly invalidate each other, $ready(A,t)$ is underivable for these actions and thus $cycle(t)$ (Line 12) in step $t$ is derived.
+Hence, $C$ becomes satisfiable if there is a circular invalidation in step $t$, which means that there is no permutation of the actions A, s.t. the successor state is defined 
+and therefore not (relaxed) $\exists$-step serializable.
+
+
+\subsection{Heuristic}
+Clingo backward heuristic
+\section{Experiment}
+
+Setup + Configs
+
+\chapter{Results}
+\section{One to One Comparison}
+
 
 \printbibliography
 \end{document}

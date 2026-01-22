@@ -105,6 +105,163 @@
       \verb https://arxiv.org/abs/1405.3694v1
       \endverb
     \endentry
+    \entry{seipp-et-al-zenodo2017}{misc}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=8e270c372fba75bec8c1d14f544b357c}{%
+           family={Seipp},
+           familyi={S\bibinitperiod},
+           given={Jendrik},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=511a33abdf4ad24bdc505f327f9d5baf}{%
+           family={Pommerening},
+           familyi={P\bibinitperiod},
+           given={Florian},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7957f673b59c6b657b1647ce2e258cf0}{%
+           family={Sievers},
+           familyi={S\bibinitperiod},
+           given={Silvan},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=518daa5cb5c87e0f92aa342eb223eba3}{%
+           family={Helmert},
+           familyi={H\bibinitperiod},
+           given={Malte},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Zenodo}%
+      }
+      \strng{namehash}{cf09e90b24e2b47845b01ad6db958a81}
+      \strng{fullhash}{fe426c78822037d133bbd620120642ee}
+      \strng{fullhashraw}{fe426c78822037d133bbd620120642ee}
+      \strng{bibnamehash}{cf09e90b24e2b47845b01ad6db958a81}
+      \strng{authorbibnamehash}{cf09e90b24e2b47845b01ad6db958a81}
+      \strng{authornamehash}{cf09e90b24e2b47845b01ad6db958a81}
+      \strng{authorfullhash}{fe426c78822037d133bbd620120642ee}
+      \strng{authorfullhashraw}{fe426c78822037d133bbd620120642ee}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://doi.org/10.5281/zenodo.790461}}
+      \field{title}{{Downward} {Lab}}
+      \field{year}{2017}
+    \endentry
+    \entry{DIMOPOULOS_2019}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=0b64db481b94619c032005be48391455}{%
+           family={DIMOPOULOS},
+           familyi={D\bibinitperiod},
+           given={YANNIS},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c6ee737c8e3ec3483ee5c49678bc01c2}{%
+           family={GEBSER},
+           familyi={G\bibinitperiod},
+           given={MARTIN},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6be987905986d28ba54a5197e207efce}{%
+           family={LÜHNE},
+           familyi={L\bibinitperiod},
+           given={PATRICK},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5c0f26bc3f74b545a1df7a61e2a1222f}{%
+           family={ROMERO},
+           familyi={R\bibinitperiod},
+           given={JAVIER},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6e2901afd23ef7cbf7811353fcd49cb8}{%
+           family={SCHAUB},
+           familyi={S\bibinitperiod},
+           given={TORSTEN},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press (CUP)}%
+      }
+      \strng{namehash}{98b27f0d8941e422cdc1b9b7216d3546}
+      \strng{fullhash}{5054b72abd3920002935af5c5d537eb0}
+      \strng{fullhashraw}{5054b72abd3920002935af5c5d537eb0}
+      \strng{bibnamehash}{98b27f0d8941e422cdc1b9b7216d3546}
+      \strng{authorbibnamehash}{98b27f0d8941e422cdc1b9b7216d3546}
+      \strng{authornamehash}{98b27f0d8941e422cdc1b9b7216d3546}
+      \strng{authorfullhash}{5054b72abd3920002935af5c5d537eb0}
+      \strng{authorfullhashraw}{5054b72abd3920002935af5c5d537eb0}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{1475-3081}
+      \field{journaltitle}{Theory and Practice of Logic Programming}
+      \field{month}{1}
+      \field{number}{3}
+      \field{title}{plasp 3: Towards Effective ASP Planning}
+      \field{volume}{19}
+      \field{year}{2019}
+      \field{pages}{477\bibrangedash 504}
+      \range{pages}{28}
+      \verb{doi}
+      \verb 10.1017/s1471068418000583
+      \endverb
+      \verb{urlraw}
+      \verb http://dx.doi.org/10.1017/S1471068418000583
+      \endverb
+      \verb{url}
+      \verb http://dx.doi.org/10.1017/S1471068418000583
+      \endverb
+    \endentry
+    \entry{fiser_2025_16423302}{software}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=caf25281b3f590b6113f7bdcf57a8a43}{%
+           family={Fišer},
+           familyi={F\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Zenodo}%
+      }
+      \strng{namehash}{caf25281b3f590b6113f7bdcf57a8a43}
+      \strng{fullhash}{caf25281b3f590b6113f7bdcf57a8a43}
+      \strng{fullhashraw}{caf25281b3f590b6113f7bdcf57a8a43}
+      \strng{bibnamehash}{caf25281b3f590b6113f7bdcf57a8a43}
+      \strng{authorbibnamehash}{caf25281b3f590b6113f7bdcf57a8a43}
+      \strng{authornamehash}{caf25281b3f590b6113f7bdcf57a8a43}
+      \strng{authorfullhash}{caf25281b3f590b6113f7bdcf57a8a43}
+      \strng{authorfullhashraw}{caf25281b3f590b6113f7bdcf57a8a43}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{11}
+      \field{title}{cpddl}
+      \field{version}{1.5}
+      \field{year}{2025}
+      \verb{doi}
+      \verb 10.5281/zenodo.16423302
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.5281/zenodo.16423302
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.5281/zenodo.16423302
+      \endverb
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

@@ -23,7 +23,7 @@ def get_model(shorten_output):
     return shorten_output.split("\n")[0].strip()
 
 
-def get_times(shorten_output):
+def get_stats(shorten_output):
     return "\n".join(shorten_output.split("\n")[1:])
 
 
@@ -121,7 +121,7 @@ def run_check(script_dir, temp_path, plan, plan_length):
     return shorten_output(result.stdout)
 
 
-def run_to_parallel(script_dir, temp_path, plan):
+def run_parallel_to_seq(script_dir, temp_path, plan):
     if not plan:
         return None
     
@@ -139,7 +139,7 @@ def run_to_parallel(script_dir, temp_path, plan):
     return get_model(shorten_output(result.stdout))
 
 
-def occurs2sas(plan_path: str, temp_path: str):
+def convert_occurs_to_sas_plan(plan_path: str, temp_path: str):
     actions = plan_path.read_text() if plan_path.exists() else ""
     matches = re.findall(r'\(action\((.+?)\),(\d+)\)', actions)
     pairs = []
@@ -153,7 +153,7 @@ def occurs2sas(plan_path: str, temp_path: str):
 
 
 def main():
-    if len(sys.argv) < 7:
+    if len(sys.argv) < 9:
         sys.exit(1)
     
     script_dir = sys.argv[1]
@@ -165,10 +165,11 @@ def main():
     strong_mutex = sys.argv[7].lower() == "true"
     heuristic = sys.argv[8].lower() == "true"
 
+    # Step 1: Translate PDDL to ASP
     run_cpddl(script_dir, time_limit, temp_path, domain, problem, strong_mutex)
     run_plasp(script_dir, temp_path)
     
-    # Step 1: Solve/Guess
+    # Step 2: Solve/Guess
     clingo_output = run_clingo(script_dir, time_limit, temp_path, algo, heuristic)
     
     if clingo_output is None:
@@ -179,27 +180,27 @@ def main():
     with plan.open("w") as f:
             f.write(plan_text)
 
-    # Step 2: Check (only for guess)
+    # Step 3: Check (only for guess)
     if "guess_and_check" in algo:
         plan_length = get_plan_length(plan_text)
         check_output = run_check(script_dir, temp_path, plan, plan_length)
         if check_output:
-            print(sum_stats(get_times(clingo_output), get_times(check_output)))
+            print(sum_stats(get_stats(clingo_output), get_stats(check_output)))
         else:
             return
     
     else:
-        print(get_times(clingo_output))
-    # Step 3: convert to sequential plan
-    seq_plan = run_to_parallel(script_dir, temp_path, plan)
+        print(get_stats(clingo_output))
+    # Step 4: convert to sequential plan
+    seq_plan = run_parallel_to_seq(script_dir, temp_path, plan)
     if seq_plan:
         with open(f"{temp_path}/seq_plan.lp", "w") as f:
             f.write(seq_plan)
     else:
         return
     
-    # Step 4: convert to sas plan
-    occurs2sas(Path(f"{temp_path}/seq_plan.lp"), temp_path)
+    # Step 5: convert to sas plan
+    convert_occurs_to_sas_plan(Path(f"{temp_path}/seq_plan.lp"), temp_path)
 
 if __name__ == "__main__":
     main()

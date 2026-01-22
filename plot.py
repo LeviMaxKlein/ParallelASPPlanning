@@ -58,7 +58,7 @@ def filter_times(problem_solutions: dict, algos: list):
 def create_matrices(algo_stats, filtered_times, algos, domains, num_problems):
     result_matrix = np.zeros((len(algos), len(domains)), dtype=int)
     normalized_result_matrix = np.zeros((len(algos), len(domains)))
-    time_matrix = np.zeros((len(algos), len(domains)))
+    time_matrix = np.full((len(algos), len(domains)), np.nan)
     for row, algo in enumerate(algos):
         for col, domain in enumerate(domains):
             result_matrix[row,col] = algo_stats[algo][domain]
@@ -108,8 +108,8 @@ def create_heat_map(exp_path):
         plt.close()
 
         chunk_time = time_matrix[:, chunk_idx:chunk_idx+chunk_size]
-        non_zero_times = chunk_time[chunk_time > 0]
-        vmin = non_zero_times.min() if len(non_zero_times) > 0 else 0.001
+        non_zero_times = chunk_time[~np.isnan(chunk_time)]
+        vmin = non_zero_times.min() if len(non_zero_times) > 0 else 0.0001
         vmax = non_zero_times.max() if len(non_zero_times) > 0 else 1
         
         fig2, ax2 = plt.subplots(figsize=(12,6))
@@ -120,8 +120,11 @@ def create_heat_map(exp_path):
         ax2.set_yticks(range(len(algos)), labels=algos)
         for i in range(len(algos)):
             for j in range(len(chunk_domains)):
-                text = ax2.text(j, i, f"{chunk_time[i,j]:.2f}s",
-                            ha="center", va="center", color="black")
+                if np.isnan(chunk_time[i,j]):
+                    text = ax2.text(j, i, "None", ha="center", va="center", color="black")
+                else:
+                    text = ax2.text(j, i, f"{chunk_time[i,j]:.2f}s",
+                                    ha="center", va="center", color="black")
         ax2.set_title(f"Average Solving Time (Part {chunk_idx//chunk_size + 1})")
         fig2.tight_layout()
         plt.savefig(f"{exp_path}/avg_time_part{chunk_idx//chunk_size + 1}.png")
