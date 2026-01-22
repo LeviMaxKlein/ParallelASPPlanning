@@ -66,7 +66,7 @@ def create_matrices(algo_stats, filtered_times, algos, domains, num_problems):
             if domain in filtered_times[algo]:
                 time_matrix[row,col] = np.mean(filtered_times[algo][domain])
             else:
-                time_matrix[row,col] = 0
+                time_matrix[row,col] = np.nan
     return result_matrix, normalized_result_matrix, time_matrix
 
 
@@ -90,6 +90,7 @@ def create_heat_map(exp_path):
 
     chunk_size = 10
     for chunk_idx in range(0, len(domains), chunk_size):
+        # heatmap for solved instances
         chunk_domains = domains[chunk_idx:chunk_idx+chunk_size]
         chunk_result = result_matrix[:, chunk_idx:chunk_idx+chunk_size]
         chunk_normalized_result = normalized_result_matrix[:, chunk_idx:chunk_idx+chunk_size]
@@ -107,6 +108,7 @@ def create_heat_map(exp_path):
         plt.savefig(f"{exp_path}/solved_part{chunk_idx//chunk_size + 1}.png")
         plt.close()
 
+        # heatmap for average solving time
         chunk_time = time_matrix[:, chunk_idx:chunk_idx+chunk_size]
         non_zero_times = chunk_time[~np.isnan(chunk_time)]
         if len(non_zero_times) > 0:
@@ -131,6 +133,6 @@ def create_heat_map(exp_path):
                     text = ax2.text(j, i, f"{chunk_time[i,j]:.2f}s",
                                     ha="center", va="center", color="black")
         ax2.set_title(f"Average Solving Time (Part {chunk_idx//chunk_size + 1})")
-        fig2.tight_layout()
+        fig2.tight_layout()f
         plt.savefig(f"{exp_path}/avg_time_part{chunk_idx//chunk_size + 1}.png")
         plt.close()
