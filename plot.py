@@ -109,12 +109,17 @@ def create_heat_map(exp_path):
 
         chunk_time = time_matrix[:, chunk_idx:chunk_idx+chunk_size]
         non_zero_times = chunk_time[~np.isnan(chunk_time)]
-        vmin = non_zero_times.min() if len(non_zero_times) > 0 else 0.0001
-        vmax = non_zero_times.max() if len(non_zero_times) > 0 else 1
+        if len(non_zero_times) > 0:
+            vmin = non_zero_times.min()
+            vmax = non_zero_times.max()
+            norm = plt.matplotlib.colors.LogNorm(vmin=max(vmin, 0.0001), vmax=vmax)
+        else:
+            # If all values are NaN, use dummy values
+            norm = plt.matplotlib.colors.Normalize(vmin=0, vmax=1)
         
         fig2, ax2 = plt.subplots(figsize=(12,6))
         _ = ax2.imshow(chunk_time, cmap='YlOrRd', aspect='auto', 
-                       norm=plt.matplotlib.colors.LogNorm(vmin=vmin, vmax=vmax))
+                       norm=norm)
         ax2.set_xticks(range(len(chunk_domains)), labels=chunk_domains,
                     rotation=45, ha="right", rotation_mode="anchor")
         ax2.set_yticks(range(len(algos)), labels=algos)
