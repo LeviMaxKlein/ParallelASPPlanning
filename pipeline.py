@@ -8,16 +8,12 @@ from pathlib import Path
 def shorten_output(output):
     '''Omit *%Solving* message from clingo output'''
     if "ANSWER" in output:
-        if "cycle" in output:
-            print("Check failed")
-            return None
-        else:
-            return output.split("ANSWER")[-1].strip()
+        return True, output.split("ANSWER")[-1].strip()
     elif "INCONSISTENT" in output:
-        return output.split("INCONSISTENT")[-1].strip()
+        return False, output.split("INCONSISTENT")[-1].strip()
     else:
-        return None
-
+        return False, None
+        
 
 def get_model(shorten_output):
     return shorten_output.split("\n")[0].strip()
@@ -68,6 +64,10 @@ def run_cpddl(script_dir, time_limit, temp_path, domain, problem, strong_mutex):
     result = subprocess.run(cpddl_command, capture_output=True, text=True)
     if result.stderr:
         print(result.stderr, file=sys.stderr)
+    cpddl_time = re.search(r'Overall Elapsed Time: ([\d.]+)s', result.stdout)
+    if cpddl_time:
+        print(f"CPDDL TIME: {cpddl_time.group(1)}s")
+
 
 def run_plasp(script_dir, temp_path):
     if not Path(f"{temp_path}/output.sas").exists():
@@ -101,14 +101,14 @@ def run_clingo(script_dir, time_limit, temp_path, algo, heuristic):
     return shorten_output(result.stdout)
 
 
-def run_check(script_dir, temp_path, plan, plan_length):
+def run_check(script_dir, time_limit, temp_path, plan, plan_length):
     if "occurs" not in plan.read_text():
         return None
 
     cmd = [
         f"{script_dir}/../clingo/clingo",
         "--outf=1",
-        f"--time-limit=800",
+        f"--time-limit={time_limit}",
         plan,
         f"{script_dir}/algorithms/check.lp",
         f"{temp_path}/output.lp",
@@ -116,6 +116,23 @@ def run_check(script_dir, temp_path, plan, plan_length):
     ]
     
     result = subprocess.run(cmd, text=True, capture_output=True)
+    if result.stderr:
+        print(result.stderr, file=sys.stderr)
+    return shorten_output(result.stdout)
+
+
+def run_fallback(script_dir, time_limit, temp_path, heuristic):
+    forall_cmd = [
+        f"{script_dir}/../clingo/clingo",
+        "--outf=1",
+        f"--time-limit={time_limit}",
+        f"{script_dir}/algorithms/common.lp",
+        f"{script_dir}/algorithms/forall.lp",
+        f"{temp_path}/output.lp"
+    ]
+    if heuristic:
+        forall_cmd.append(f"{script_dir}/algorithms/heuristic.lp")
+    result = subprocess.run(forall_cmd, text=True, capture_output=True)
     if result.stderr:
         print(result.stderr, file=sys.stderr)
     return shorten_output(result.stdout)
@@ -136,7 +153,7 @@ def run_parallel_to_seq(script_dir, temp_path, plan):
     result = subprocess.run(cmd, text=True, capture_output=True)
     if result.stderr:
         print(result.stderr, file=sys.stderr)
-    return get_model(shorten_output(result.stdout))
+    return get_model(shorten_output(result.stdout)[1])
 
 
 def convert_occurs_to_sas_plan(plan_path: str, temp_path: str):
@@ -170,9 +187,9 @@ def main():
     run_plasp(script_dir, temp_path)
     
     # Step 2: Solve/Guess
-    clingo_output = run_clingo(script_dir, time_limit, temp_path, algo, heuristic)
+    solved, clingo_output = run_clingo(script_dir, time_limit, temp_path, algo, heuristic)
     
-    if clingo_output is None:
+    if not solved:
         return
     
     plan_text = get_model(clingo_output)
@@ -183,12 +200,21 @@ def main():
     # Step 3: Check (only for guess)
     if "guess_and_check" in algo:
         plan_length = get_plan_length(plan_text)
-        check_output = run_check(script_dir, temp_path, plan, plan_length)
-        if check_output:
+        cycle, check_output = run_check(script_dir, time_limit, temp_path, plan, plan_length)
+        forall_solved, forall_output = run_fallback(script_dir, time_limit, temp_path, heuristic)
+        if not cycle and check_output:
             print(sum_stats(get_stats(clingo_output), get_stats(check_output)))
-        else:
-            return
-    
+        elif forall_solved:
+            # Fallback
+            print("Check failed")
+            if check_output:
+                print(sum_stats(sum_stats(get_stats(clingo_output), get_stats(check_output)), forall_output))
+            else:
+                print(sum_stats(get_stats(clingo_output), forall_output))
+            plan_text = get_model(forall_output)
+            plan = Path(f"{temp_path}/plan.lp")
+            with plan.open("w") as f:
+                f.write(plan_text)
     else:
         print(get_stats(clingo_output))
     # Step 4: convert to sequential plan

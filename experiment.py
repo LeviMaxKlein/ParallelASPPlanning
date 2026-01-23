@@ -60,6 +60,7 @@ MEMORY_LIMIT = 31000 if REMOTE else 8192
 ATTRIBUTES = [
     "error",
     "result",
+    "cpddl_time",
     "clingo_total_time",
     "clingo_search_time",
     "clingo_first_model_time",
@@ -82,7 +83,7 @@ SUITES = args.domains if args.domains else [
 
 def make_parser():
     def solved(content, props):
-        if "successful plan" in content.lower():
+        if "successful plan" in content.lower() and props["clingo_total_time"] < TIME_LIMIT:
             props["solved"] = 1
         else:
             props["solved"] = 0
@@ -90,7 +91,7 @@ def make_parser():
     def get_result_from_models(content, props):
         models = props.get("models")
         if models is not None:
-            if models > 0 or ("Guess Time" in content and models == 0):
+            if models > 0 :
                 props["result"] = "SATISFIABLE"
             else:
                 props["result"] = "UNSATISFIABLE"
@@ -117,6 +118,7 @@ def make_parser():
   
     parser = Parser()
     parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
+    parser.add_pattern("cpddl_time", r"CPDDL TIME: ([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("models", r"Models\s*:\s*(\d+)", type=int, file="run.log")
     parser.add_pattern("clingo_total_time", r"Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_guess_time", r"Guess Time\s*:\s*([\d.]+)s", type=float, file="run.log")
