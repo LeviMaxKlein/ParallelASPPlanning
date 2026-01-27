@@ -39,6 +39,24 @@ def get_algo_stats(data):
     return results, problem_solutions, num_problems
 
 
+def filter_grouped_domains(results: dict, algos: list):
+    domains_to_keep = set()
+    all_domains = set()
+    for algo in algos:
+        if algo in results:
+            all_domains.update(results[algo].keys())
+    
+    for domain in all_domains:
+        has_solution = False
+        for algo in algos:
+            if algo in results and domain in results[algo] and results[algo][domain] > 0:
+                has_solution = True
+                break
+        if has_solution:
+            domains_to_keep.add(domain)
+    return domains_to_keep
+
+
 def filter_times(problem_solutions: dict, algos: list):
     """
     Filter times to include only problems solved by the algorithms given in ``algos``.
@@ -83,7 +101,7 @@ def create_heat_map(exp_path):
     
     results, problem_solutions, num_problems = get_algo_stats(data)
     algos = list(results.keys())
-    domains = list(results[algos[0]].keys())
+    domains = list(filter_grouped_domains(results, algos))
 
     filtered_times = filter_times(problem_solutions, algos)
     result_matrix, normalized_result_matrix, time_matrix = create_matrices(results, filtered_times, algos, domains, num_problems)
