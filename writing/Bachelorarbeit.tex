@@ -541,10 +541,11 @@ In order to prove the correctness of the presented encondings, we define the fol
   Then, as in the proof above, for any stable model $M$ of $P^p(m)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a,t \rangle ~|~ a \in A_t, 1 \le t \le m \}$, 
   the rule in $B$ together with the choice rule and the integrity constraints in $S(t)$ make sure that
   $\{\langle X,V,t\rangle ~|~ holds(X,V,t) \in M\} = \{\langle X,V,t\rangle ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\}$.
-  We now split the proof into the different cases: \\
+  We now split the proof into the different cases. \\
 
   \noindent \textbf{Case 1: }$\langle A_1, \dots, A_m \rangle$ is a $\forall-$step plan. \\
-  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ iff $\exists a \in A_i$ s.t. $X \in dom(a^c) \cap dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$.
+  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ $\iff$ $\exists a \in A_i$ s.t. $X \in dom(a^c) \cap dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$. 
+  In other words, if there is an action that invalidates its own precondition.
   Hence $P^\forall(m)$ cannot have any stable model $M$ apart from
   \begin{align*}
     M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m\} \\
@@ -553,11 +554,53 @@ In order to prove the correctness of the presented encondings, we define the fol
           &\cup \{query(m).\}
   \end{align*}
   s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m\}$.
-  Since for $t \in \{1, \dots, m \}$, the successor state $s_t= o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined for any sequence $\langle a_1, \dots, a_k \rangle$ s.t. $\{a_1, \dots, a_k\} = A_t$,
-  we have that M satisfies all integrity constraints in $S^\forall(t)$. One can easily check that all other rules and integrity constraints in $P^\forall(m)$ are satisfied as well.
+  Since for any $1 \le t \le m$, the successor state $s_t= o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined for any sequence $\langle a_1, \dots, a_k \rangle$ s.t. $\{a_1, \dots, a_k\} = A_t$,
+  we have that M satisfies all integrity constraints in $S^\forall(t)$. 
+  As above, one can easily check that all other rules and integrity constraints in $P^\forall(m)$ are satisfied as well.
   Therefore M is a stable model of $P^\forall(m)$. \\
 
-  \textbf{Case 2: }$\langle A_1, \dots, A_m \rangle$ is a $\exists-$step plan. \\
+  \noindent \textbf{Case 2: }$\langle A_1, \dots, A_m \rangle$ is a $\exists$-step plan. \\
+  Then for any $1 \le t \le m, \exists$ a sequence of actions $\langle a_1, \dots, a_k \rangle$, 
+  s.t. $\{a_1, \dots, a_k\} = A_t$ and $a_i^e(X) = \tilde a_j^c(X)$ if $X \in dom(a_i^e) \cap dom(\tilde a_j^c)$ for any $1 \le i < j \le m$.
+  That is the edges of the directed graph:
+  \[
+    G_t = (\mathcal O, \{\langle a, \tilde a \rangle ~|~ a \in A_t, \tilde a \in \mathcal O \setminus \{a\}, X \in dom(a^e) \cap dom(\tilde a^c), a^e(X) \ne \tilde a^c(X) \})
+  \]
+  can connect some $a_i$ for $1 \le i \le k$ to elements of $\mathcal O \setminus \{a_i, \dots, a_k\}$ only if $G_t$ remains acyclic.
+  The acyclicity of $G_t$ yields that the recursive derivation of $apply(a, t)$ and $ready(a, t)$ is successful, i.e. they both belong to the least fixpoint in $S^\exists(t)$ (Line 2-5 in \ref{exists}) for each $a \in mathcal O$ and $1 \le t \le m$ and thus,
+  $P^\exists(m)$ cannot have any stable model apart from
+  \[
+    M' = M \cup \{apply(a,t) ~|~ a \in \mathcal O, 1 \le t \le m\} \cup \{ready(a,t) ~|~ a \in \mathcal O, 1 \le t \le m \}
+  \]
+  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M'\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
+  As above, one can easily check that all other rules and integrity constraints in $P^\exists(m)$ are satisfied as well.
+  Therefore M is a stable model of $P^\exists(m)$. \\
+
+  \noindent \textbf{Case 3: } $\langle A_1, \dots A_m \rangle$ is a \textit{relaxed} $\exists$-step plan.
+  Then for any $1 \le t \le m, \exists$ sequence of actions $\langle a_1, \dots, a_k \rangle$
+  s.t. $\{a_1, \dots, a_k\}=A_t$ and $o(a_i, \langle a_1, \dots, a_{i-1} \rangle, s_{t-1})$ is defined for $1 \le i \le k$, 
+  which implies that $a^e_i(X) = a^c_j(X)$ if $X \in dom(a^e_i) \cap dom(a^c_j)$ for $i < j \le k$.
+  Given this, the least fixpoint of $S^R(t)$ (Lines 1-6 in Listing \ref{relaxed_exists}) contains:
+  \begin{enumerate}[label=(\roman*)]
+    \item $reach(X, V, t)$ for each $X \in \mathcal F$ and $V \in \{s_{t-1}(X), s_t(X)\}$
+    \item $apply(a, t)$ for each $a \in \mathcal O$ s.t. $a^c(X) \in \{s_{t-1}, s_t \} ~\forall X \in dom(a^c)$
+    \item $ready(a, t)$ for each $a \in \mathcal O$
+  \end{enumerate} 
+  Thus, the only stable model $P^R(m)$ can have is
+  \begin{align*}
+    M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m \} \\
+          &\cup \{holds(X,V,t) ~|~ X \in \mathcal F, s_t(X)=V, 0 \le t \le m \} \\
+          &\cup \{reach(X,V,t) ~|~ X \in \mathcal F, V \in \{s_{t-1}, s_t\}, 1 \le t \le m\} \\
+          &\cup \{apply(a,t) ~|~ a \in \mathcal O: a^c(X) \in \{s_{t-1}(X), s_t(X)\} ~\forall X \in dom(a^c)\} \\
+          &\cup \{ready(a,t) ~|~ a \in \mathcal O, 1 \le t \le m\} \\
+          &\cup \{query(m)\}
+  \end{align*}
+  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M'\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
+  As above, one can easily check that all other rules and integrity constraints in $P^R(m)$ are satisfied as well.
+  Therefore M is a stable model of $P^R(m)$. \\
+  ($\Leftarrow$) M is a stable model of $P^p(m)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M'\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
+  For any $1 \le t \le m$, the choice rule in Line 6 of Listing \ref{core} makes sure that $s_t$ s.t. $s_t(X)=V \iff holds(X,V,t) \in M$ is a state.  
+
 \end{proof}
 
 \chapter{Method}
@@ -635,7 +678,26 @@ and therefore not (relaxed) $\exists$-step serializable.
 
 
 \subsection{Heuristic}
-Clingo backward heuristic
+The general idea of heuristics in clingo described by \parencite{DIMOPOULOS_2019} is to extend the search heuristic by giving each atom a
+\begin{itemize}
+  \item \textit{level} ($\in \mathbb Z$, $0$ by default), allowing to modify the order of which atoms are selected first
+  \item \textit{sign} ($\in \mathbb Z$, $0$ by default, where values $>0$ corresponds to $true$, $<0$ to $false$ and $0$ to $undefined$), which allows for controlling the truth value assigned to atoms. 
+\end{itemize}
+During solving, these values get modified during the activation of \textbf{\#heuristic} directives.
+The search heuristic of clingo selects the atom with the highest level and sets it to its associated \textit{sign}, if \textit{sign} defined, else switching to the default \textit{sign} heuristic.
+
+\begin{listing}[H]
+  \caption{backward progpagating heuristic}
+  \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}{encodings/heuristic.lp}
+  \label{heuristic}
+\end{listing}
+
+\noindent The heuristic in Listing \ref{heuristic} aims starting at the goal of a planning task and then searching backwards.
+Here both lines have the level $l=2^{31}-1-t$ where $2^{31}-1$ is the largest integer supported by clingo, giving the starting steps the highest priority.
+The second line expresses that whenever clingo made $holds(X,V,t)$ true, $holds(X,V,t-1)$ should be made true at the level $l$ as well.
+Similarly, the directive in Line 3 is actived when an instance of $holds(X,V,t)$ becomes false, in which case $holds(X,V,t-1)$ should be made false at level $l$ as well.
+Both directives associates atoms over holds/3 with higher level the earlier the state is, i.e. the value for $t$ is smaller, 
+which intends to bias the search of \textit{clingo} to establish the goal conditions as early as possible. 
 \section{Experiment}
 
 Setup + Configs
