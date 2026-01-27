@@ -102,11 +102,6 @@ def create_heat_map(exp_path):
     results, problem_solutions, num_problems = get_algo_stats(data)
     algos = list(results.keys())
     domains = list(filter_grouped_domains(results, algos))
-    print("Results for visitall:")
-    for algo in algos:
-        if 'visitall' in results[algo]:
-            print(f"  {algo}: {results[algo]['visitall']}")
-    print(f"Filtered domains: {domains}")
 
     filtered_times = filter_times(problem_solutions, algos)
     result_matrix, normalized_result_matrix, time_matrix = create_matrices(results, filtered_times, algos, domains, num_problems)
