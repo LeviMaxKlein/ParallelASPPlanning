@@ -59,6 +59,7 @@
 
 \usepackage{colonequals}
 \newcommand*{\logeq}{\ratio\Longleftrightarrow}
+\newcommand{\dom}{\mathrm{dom}}
 
 \newtheoremstyle{bfnote}%
   {}{}
@@ -149,10 +150,6 @@ Quellen und Hilfsmittel verwendet habe.
 Heidelberg, dd.mm.yyyy
 \cleardoublepage
 
-\section*{Zusammenfassung}
-
-Dies ist eine Zusammenfassung der Arbeit.
-
 \section*{Abstract}
 
 This is the abstract.
@@ -172,7 +169,11 @@ This is the abstract.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Introduction}\label{intro}
-This chapter contains an overview of the topic as well as the goals and contributions of your work.
+Automated planning is a fundamental area of Artificial Intelligence that deals with finding a sequence of actions to transition a system from an initial state to a desired goal state. 
+Finding an efficient and effective plan is crucial in various applications and industries such as robotics and logistics. 
+In general, planning problems are computationally challenging, often falling into NP-hard or even PSPACE-complete complexity classes.
+Therefore, developing efficient algorithms and representations for planning tasks to reduce the search space and computation time is of great importance.
+
 
 \section{Motivation}
 
@@ -180,32 +181,33 @@ This chapter contains an overview of the topic as well as the goals and contribu
 
 \section{Structure of the Thesis}
 Here you describe the structure of the thesis. For example:
+In chapter \ref{definitions}, we formally define the notion of planning tasks, first describing sequential plans and afterwards three different kinds of parallel plans.
+We then present the ASP encodings for the different plans and proofing their soundness.
+In chapter \ref we show the pipeline from translating a pddl problem to validating the given plan and introduce different optimization strategies 
 
-In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorgestellt.
 
-
-\chapter{Theory}\label{background}
+\chapter{Theory}\label{definitions}
 \section{Definition}
 \begin{defi}[Multi-valued planning task]
     A STRIPS-like multivalued planning task according to \parencite{Helmert2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
     \begin{itemize}
       \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ has a finite domain and in every state, $x$ takes exactly one value from its domain.
-      \item $s_0$, the \textbf{initial state}, is a total function,, s.t. $s_0(x) \in dom(x)$ for each $x \in \mathcal{F}$, i.e. a function that maps each fluent to a value from its domain.
-      \item $s_*$, the \textbf{goal conditions}, is a partial function, s.t. $s_*(x) \in dom(x)$, for each $x \in dom(s_*)$ i.e. a function that specifies the desired values for a subset of fluents.
+      \item $s_0$, the \textbf{initial state}, is a total function,, s.t. $s_0(x) \in \dom(x)$ for each $x \in \mathcal{F}$, i.e. a function that maps each fluent to a value from its domain.
+      \item $s_*$, the \textbf{goal conditions}, is a partial function, s.t. $s_*(x) \in \dom(x)$, for each $x \in \dom(s_*)$ i.e. a function that specifies the desired values for a subset of fluents.
       \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. We define an action $a$ as $\langle a^c, a^e \rangle$, where $a^c$ is the precondition and $a^e$ is the postcondition of $a$. 
-            Both $a^c$ and $a^e$ are partial functions, s.t. $a^c(x) \in dom(x)$ for each $x \in dom(a^c)$ and $a^e(x) \in dom(x)$ for each $x \in dom(a^e)$.
+            Both $a^c$ and $a^e$ are partial functions, s.t. $a^c(x) \in \dom(x)$ for each $x \in \dom(a^c)$ and $a^e(x) \in \dom(x)$ for each $x \in \dom(a^e)$.
     \end{itemize}
 \begin{remark}
   An action $a$ also has a finite set of effects $eff$, where $eff = \langle cond, x, v \rangle$. 
-  $cond$, the effect condition, is a (possibly empty) partial function, s.t. $cond(x) \in dom(x)$ for each $x \in dom(cond)$. 
-  $x \in \mathcal F$ is the effected fluent and $v \in dom(x)$ is the value assigned to $x$ if $cond$ holds.
+  $cond$, the effect condition, is a (possibly empty) partial function, s.t. $cond(x) \in \dom(x)$ for each $x \in \dom(cond)$. 
+  $x \in \mathcal F$ is the effected fluent and $v \in \dom(x)$ is the value assigned to $x$ if $cond$ holds.
 \end{remark}
 \end{defi}
 
 \begin{example}
   Let us illustrate the definitions with a small example. The plan is to leave the house by opening the door, going outside, and finally closing the door.
   \begin{itemize}
-    \item $\mathcal{F} = \{door, location\}$ with $dom(door) {=} \{open, closed\}$, $dom(location) {=} \{inside, outside\}$
+    \item $\mathcal{F} = \{door, location\}$ with $\dom(door) {=} \{open, closed\}$, $\dom(location) {=} \{inside, outside\}$
     \item Initial state: $s_0 = \{door{=}closed, location{=}inside\}$
     \item Goal: $s_* = \{door{=}closed, location{=}outside\}$
     \item Actions: $\mathcal{O} = \{openDoor, closeDoor, goOut\}$, where
@@ -219,9 +221,9 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 \end{example}
 \begin{defi}[Successor state]
   Let $s$ be state and $a \in \mathcal{O}$ an action.\\
-  The \textit{successor state} $o(a,s)$, obtained by applying action $a$ in state $s$, is defined if the precondtion of $a$ holds, i.e., $a^c(x) = s(x)$ for all $x \in dom(a^c)$. Then
+  The \textit{successor state} $o(a,s)$, obtained by applying action $a$ in state $s$, is defined if the precondtion of $a$ holds, i.e., $a^c(x) = s(x)$ for all $x \in \dom(a^c)$. Then
   $$
-  s'(x) = o(a,s) = \begin{cases} a^e(x) & \text{if } x \in dom(a^e) \\ s(x) & \text{otherwise.} \end{cases}
+  s'(x) = o(a,s) = \begin{cases} a^e(x) & \text{if } x \in \dom(a^e) \\ s(x) & \text{otherwise.} \end{cases}
   $$ 
 \end{defi}
 \begin{remark}
@@ -233,7 +235,7 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 \end{remark}
 \begin{defi}[Sequential plan]
   A \textit{sequential plan} is a sequence of actions $A_n = \langle a_1, \dots, a_n \rangle$, s.t. 
-  $s' = o(A_n,s_0)$ is defined and $s'(x) = s_*(x)$ for all $x \in dom(s_*)$.
+  $s' = o(A_n,s_0)$ is defined and $s'(x) = s_*(x)$ for all $x \in \dom(s_*)$.
 \end{defi}
 
 \begin{example}
@@ -251,7 +253,7 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 
 \begin{defi}[confluent]
   Let $A = \{a_1, \dots, a_n\} \subseteq \mathcal{O}$ be a set of actions.\\
-  $A$ is \textit{confluent} $\logeq a_i^e(x) = a_j^e(x)$ for all $1 \le i < j \le n$ and each $x \in dom(a_i^e) \cap dom(a_j^e)$
+  $A$ is \textit{confluent} $\logeq a_i^e(x) = a_j^e(x)$ for all $1 \le i < j \le n$ and each $x \in \dom(a_i^e) \cap \dom(a_j^e)$
 \end{defi}
 
 \begin{remark}
@@ -260,7 +262,7 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 
 \begin{example}
   In our example $\{openDoor, goOut\}$ and $\{closeDoor, goOut\}$ are confluent sets. \\
-  We extend the example with the fluents $light$ and $key$ where $dom(light) = dom(key) = \{0, 1\}$ and two actions $lightsOut$ and $getKey$:
+  We extend the example with the fluents $light$ and $key$ where $\dom(light) = \dom(key) = \{0, 1\}$ and two actions $lightsOut$ and $getKey$:
   \vspace{-1em}
   \begin{align*}
     lightsOut &= \langle\{location{=}inside, light{=}1\}, \{light{=}0\}\rangle \\
@@ -286,7 +288,7 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
         \begin{aligned}[t]
           \text{\textit{$\exists$-step serializable} in $s$}
           &\logeq\; o(\langle a_{\pi(1)}, \dots, a_{\pi(n)} \rangle, s)\ \text{is defined for some permutation }\pi \\
-          &\phantom{\logeq}\; ~\text{ and } a^c(x) = s(x) \text{ for each } a \in A \text{ and } x \in dom(a^c)
+          &\phantom{\logeq}\; ~\text{ and } a^c(x) = s(x) \text{ for each } a \in A \text{ and } x \in \dom(a^c)
         \end{aligned}
       \)
     \item 
@@ -307,11 +309,13 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
 \begin{defi}[Parallel Plans]
   Let $A = \langle A_1, \dots, A_n \rangle$ be a sequence of confluent sets of actions. $A$ is a \textit{$\forall$-step, $\exists$-step or relaxed $\exists$-step plan} iff
   \begin{itemize}
-    \item $s_n(x) = s_*(x)$ for each $x \in dom(s_*)$
+    \item $s_n(x) = s_*(x)$ for each $x \in \dom(s_*)$
     \item $A_i$ is $\forall$-step, $\exists$-step or relaxed $\exists$-step serializable in $s_{i-1}$ for $1 \le i \le n$, where \\
-    $
-    s_i(x) = \begin{cases} a^e(x) & \text{if } x \in dom(a^e) \\ s_{i-1}(x) & \text{else} \end{cases} \text{ for each } a \in A_i
-    $
+    \[
+      s_i(x) = \begin{cases} a^e(x) & \text{if } x \in \dom(a^e) \\ s_{i-1}(x) & \text{else} \end{cases}
+    \]
+    for each $a \in A_i$.
+    
   \end{itemize}
 \end{defi}
 
@@ -324,9 +328,25 @@ In Kapitel~\ref{background} werden grundlegende Methoden für diese Arbeit vorge
   \end{itemize}
 \end{example}
 
-\section{ASP}
+\section{Introduction to ASP}
+Answer Set Programming (ASP) is a declarative problem-solving approach oriented towards difficult (primarily NP-hard) search problems. Unlike imperative programming, where the programmer specifies the control flow to compute a solution, ASP follows a declarative paradigm: the problem is described as a logic program such that its valid models—called answer sets—correspond to the solutions of the original problem. This methodology allows for a clean separation between the problem description (the logic program) and the solving algorithms (implemented by ASP solvers like clingo).
 
-In ASP, planning tasks are represented by facts. A solution of an ASP encoding is called $stable$ $model$.
+The theoretical foundation of ASP lies in the stable model semantics of logic programming (Gelfond and Lifschitz 1988). To formally define these programs, we first introduce their basic building blocks. The most fundamental units are atoms, which represent elementary propositions that can be either true or false. These atoms are combined to form literals. A literal is defined as either an atom A (a positive literal) or its default negation $not$ A (a negative literal). Here, the connective $not$ denotes negation as failure, meaning that not A is considered true if no proof for A can be derived from the program.
+
+\subsection*{Logic Programs}
+Based on these definitions, we can define the structure of the programs used to model planning tasks. A normal logic program consists of a finite set of rules, facts, and integrity constraints. Rules of a normal program have the following form:
+\begin{align}
+   \textbf{Fact:} &\quad A_0. \\
+   \textbf{Rule:} &\quad A_0 :\text{-} ~ L_1, \dots, L_n. \\
+   \textbf{Integrity Constraint:} &\quad \phantom{A_0}:\text{-} ~ L_1, \dots, L_n.
+  \end{align}
+The head of a rule or fact is an atom, which has the same syntatic form as a constant or a function, i.e. $prec(X,V,t)$.
+The body consists of a (possible empty) list of literals $L_1, \dots L_n$. Each $L_i$ is of the form $A$ or $not~A$, where $A$ is an atom and $not$ the default negation.
+The $:$- operator can be read as $\Leftarrow$, therefore a rule can be interpreted as "if all literals in the body are true, then the head is true".
+A fact is a rule without a body, meaning that the head atom is unconditionally true. An integrity constraint is a rule without a head, that filters solution candidates, meaning that all the literal in its body must not be satisfied, i.e. at least one literal in the body must be false.
+A set of atoms is called a $model$ of a logic program, if all facts, rules and integrity constraints are satisfied. 
+Atoms are considered true if they are in the model, otherwise they are considered false.
+In ASP, a model is called an $answer set$ or $stable model$, if every atom in the model has an acyclic derivation of the program.
 
 \begin{listing}[H]
   \caption{ASP encoding of the example planning task}
@@ -344,14 +364,14 @@ In ASP, planning tasks are represented by facts. A solution of an ASP encoding i
 \noindent All planning algorithms share a common incremental encoding using the incmode for clingo as seen in Listing \ref{core} \parencite{clingo14}.
 The program is divided into three subprograms: \textit{base}, \textit{step(t)} and \textit{check(t)}. \\
 The \textit{base} subprogram contains the static part of the encoding, which is only grounded once. 
-Line 2 defines the initial state $s_0$, where the predicate $holds(X,V,t)$ is used to represent fluents $X \in \mathcal{F}$ that have value $V\in dom(X)$ at timestep $t$. \\
-\textit{check(t)} is a parametrized subprogram starting at $t=0$. The integrity constraint in Line 4 checks if $s_*(X)=s_t(X)$ $\forall X\in dom(s_*)$.
+Line 2 defines the initial state $s_0$, where the predicate $holds(X,V,t)$ is used to represent fluents $X \in \mathcal{F}$ that have value $V\in \dom(X)$ at timestep $t$. \\
+\textit{check(t)} is a parametrized subprogram starting at $t=0$. The integrity constraint in Line 4 checks if $s_*(X)=s_t(X)$ for each $X\in \dom(s_*)$.
 $Query(t)$ is true only for the latest integer $t$. \\
-\textit{step(t)} is grounded after check fails for each timestep $t$ starting at $t=1$. Note that postconditions of applied actions in timestep $t$ are also set in $t$ and the preconditions have to hold in $t-1$.
+\textit{step(t)} is grounded after $check(t)$ fails for each timestep $t$ starting at $t=1$. Note that postconditions of applied actions in timestep $t$ are also set in $t$ and the preconditions have to hold in $t-1$.
 Lines 6 defines holds for times step $t$, giving fluent $X$ one value $V$ from its domain and $occurs(A,t)$ in Line 7 are all possible actions in timestep $t$ obeying rules 8 and 9.
 Line 8 ensures that the postcondition of an action is applied and also assert the confluence of any set of action applied in parallel since 
 if $V = a^e(X) \ne \tilde{a}(X) = \tilde{V}$ either $holds(X,V,t)$ or $holds(X,\tilde{V}, t)$ would be false.
-Line 9 makes sure that fluents not affected by any action keep their value from the previous timestep.
+Line 9 makes sure that fluents not affected by any action keep their value from the previous timestep. \\
 So far, the common core handles the transitions from one state to the next in regards of the postcondition of applied actions.
 
 \subsection{encoding for sequential plans}
@@ -390,12 +410,12 @@ Running this with our example, we get three possible sequential plans.
 \noindent Now for the extension for $\forall$-step plans as seen in Listing \ref{forall}, Line 1 is the same as in the sequential encoding.
 As mentioned before, the integrity constraint in Line 8 of the common core already ensures confluence of applied actions. 
 Since the sequence of the actions has to be valid for all permutations, we have to make sure that no action invalidates the precondition of any other action.
-Let $a$ be an action applied in parallel and $X \in dom(a^c)$. There are two cases to consider: 
+Let $a$ be an action applied in parallel and $X \in \dom(a^c)$. There are two cases to consider: 
 \begin{enumerate}
-  \item the fluent $X$ remains unchanged, i.e. $X \in dom(a^c) \cap dom(a^e)$ and $a^c(X) = a^e(X)$ or $X \in dom(a^c)$ and $X \notin dom(a^e)$ 
-  \item the postcondition of $a$ invalidates its precondition, i.e. $X \in dom(a^e) \cap a^c(X) \ne a^e(X)$ for an action a
+  \item the fluent $X$ remains unchanged, i.e. $X \in \dom(a^c) \cap \dom(a^e)$ and $a^c(X) = a^e(X)$ or $X \in \dom(a^c)$ and $X \notin \dom(a^e)$ 
+  \item the postcondition of $a$ invalidates its precondition, i.e. $X \in \dom(a^e) \cap a^c(X) \ne a^e(X)$ for an action a
 \end{enumerate}
-Line 2 handles the first case, while the second case is a little trickier. If there is such an action, there can not be another action $\tilde{a}$ with $X \in dom(\tilde{a}^e)$, 
+Line 2 handles the first case, while the second case is a little trickier. If there is such an action, there can not be another action $\tilde{a}$ with $X \in \dom(\tilde{a}^e)$, 
 since if $a^e(X)= \tilde{a}^e(X)$, the precondition of a is invalidatet and if $a^e(X) \ne \tilde{a^e}(X)$, the confluence is undermined. 
 For this, we define these actions described in (ii) as $single(X,t)$ in Line 3 and the integrity constraint in Line 4 ensures that there is at most one such action for each fluent $X$ in timestep $t$.
 
@@ -430,7 +450,7 @@ To ensure that there is at least one valid permutation, either an action $a_1$ t
 or action $a_2$ does not occur in this timestep.
 For this, all actions has to be marked as $ready$ (Line 6). An action is $ready$ if it either does not occur in this timestep (Line 4) or if it is captured by $apply$ (Line 2). 
 An action can be safely applied, if all other actions whose preconditions it invalidates are ready, i.e. are either applied beforehand or not occurring in this timestep.
-Line 6 also ensures that actions does not circularly invalidates each other.
+Finally, Line 6 ensures that actions does not circularly invalidates each other.
 %TODO explain alternative encoding
 
 \begin{example}
@@ -483,11 +503,11 @@ In order to prove the correctness of the presented encondings, we define the fol
   \item $S(t)$ are the rules and integrity constraint in the step program directive (Lines 6-9) of Listing \ref{core}.
   \item $S^p(t)$ is the extension for the specific plans,
         where $p = s$ for Listing \ref{seq}, $p=\forall$ for Listing \ref{forall}, $p=\exists$ for Listing \ref{exists},
-        and $p=R$ for Listing \ref{relaxed_exists}.
+        $p=E$ for Listing \ref{exists_alt} and $p=R$ for Listing \ref{relaxed_exists}.
   \item $I$ is the set of facts representing a planning task $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$.
   \item $\langle a_1, \dots, a_n \rangle$ is a sequence of actions.
   \item $\langle A_1, \dots, A_m \rangle$ is a a sequence of sets of actions.
-  \item $P^p(n) := I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^p(t) \right) \cup \{query(n). \}$, where $p \in \{s, \forall, \exists, R\}$.
+  \item $P^p(n) := I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^p(t) \right) \cup \{query(n). \}$, where $p \in \{s, \forall, \exists, E, R\}$.
 \end{itemize}
 
 \begin{theorem}[Correctness of sequential plans \parencite{DIMOPOULOS_2019}]
@@ -496,13 +516,15 @@ In order to prove the correctness of the presented encondings, we define the fol
   $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a_t, t \rangle ~|~ 1 \le t \le n \}$.
 \end{theorem}
 
+
+
 \begin{proof}
   ($\Rightarrow$): Let $\langle a_1, \dots, a_n \rangle$ be a sequential plan. \\
   First we show that for any stable model $M$ of $P^s(n)$ s.t. $\{\langle a, t \rangle | occurs(a,t) \in M \} = \{\langle a_t, t \rangle | 1 \le t \le n \}$, the rules and integrity constraints ensures that 
   $\{\langle X, V, t \rangle ~|~ holds(X, V, t) \in M \} = \{\langle X, V, t \rangle ~|~ X \in \mathcal{F}, V = o(\langle a_1, \dots, a_t\rangle, s_0), 0 \le t \le n \}$.
   \begin{enumerate}[label=(\roman*)]
-    \item the rule in B ensures that $holds(X, V, 0) = s_0(X)$ forall $X \in \mathcal F$
-    \item for any $1 \le t \le n$, both integrity constraints in S(t) ensure that $holds(X,V,t) = a_t^e(X)$ if $X \in dom(a_t^e)$ and $holds(X,V,t) = s_{t-1}(X)$ otherwise.
+    \item the rule in B ensures that $holds(X, V, 0) = s_0(X)$ for each $X \in \mathcal F$
+    \item for any $1 \le t \le n$, both integrity constraints in S(t) ensure that $holds(X,V,t) = a_t^e(X)$ if $X \in \dom(a_t^e)$ and $holds(X,V,t) = s_{t-1}(X)$ otherwise.
   \end{enumerate}
   Therefore, the only stable model $M$ that $P^s(n)$ can have is
   \begin{align*}
@@ -525,7 +547,7 @@ In order to prove the correctness of the presented encondings, we define the fol
   \[
     \{\langle X, V \rangle ~|~ holds(X,V,t+1) \in M\} = \{\langle X, V \rangle ~|~ X \in \mathcal F, V = o(\langle a_1, \dots, a_{t+1} \rangle, s_0)(X)\}.
   \]
-  Finally, with the fact $query(n)$, the integrity constraint in $Q(n)$ yields that $o(\langle a_1, \dots, a_n \rangle, s_0)(X)$ $=$ $s_*(X)$ for all $X \in dom(s_*)$.
+  Finally, with the fact $query(n)$, the integrity constraint in $Q(n)$ yields that $o(\langle a_1, \dots, a_n \rangle, s_0)(X)$ $=$ $s_*(X)$ for all $X \in \dom(s_*)$.
   Thus, $\langle a_1, \dots, a_n \rangle$ is a sequential plan.
 \end{proof}
 
@@ -537,20 +559,20 @@ In order to prove the correctness of the presented encondings, we define the fol
 
 \begin{proof}
   ($\Rightarrow$) $\langle A_1, \dots, A_m \rangle$ is a $\forall$-/$exists$-/\textit{relaxed} $exists$-step plan. \\
-  For each $1 \le t \le m$, let $s_t$ be the state s.t. $s_t(X) = \begin{cases} a^e(X) & \forall a \in A_t \text{ and } X \in dom(a^e) \\ s_{t-1}(X) & \forall X \in \mathcal F \setminus \bigcup_{a \in A_t} dom(a^e) \end{cases}$.
+  For each $1 \le t \le m$, let $s_t$ be the state s.t. $s_t(X) = \begin{cases} a^e(X) & \forall a \in A_t \text{ and } X \in \dom(a^e) \\ s_{t-1}(X) & \forall X \in \mathcal F \setminus \bigcup_{a \in A_t} \dom(a^e) \end{cases}$.
   Then, as in the proof above, for any stable model $M$ of $P^p(m)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a,t \rangle ~|~ a \in A_t, 1 \le t \le m \}$, 
   the rule in $B$ together with the choice rule and the integrity constraints in $S(t)$ make sure that
   $\{\langle X,V,t\rangle ~|~ holds(X,V,t) \in M\} = \{\langle X,V,t\rangle ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\}$.
   We now split the proof into the different cases. \\
 
   \noindent \textbf{Case 1: }$\langle A_1, \dots, A_m \rangle$ is a $\forall-$step plan. \\
-  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ $\iff$ $\exists a \in A_i$ s.t. $X \in dom(a^c) \cap dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$. 
+  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ iff there exists some action $a \in A_i$ s.t. $X \in \dom(a^c) \cap \dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$. 
   In other words, if there is an action that invalidates its own precondition.
   Hence $P^\forall(m)$ cannot have any stable model $M$ apart from
   \begin{align*}
     M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m\} \\
           &\cup \{holds(X,V,t) ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\} \\
-          &\cup \{single(X,t) ~|~ X \in dom(a^c) \cap dom(a^e), a^c(X) \ne a^e(X), a \in A_t, 1 \le t \le m \} \\
+          &\cup \{single(X,t) ~|~ X \in \dom(a^c) \cap \dom(a^e), a^c(X) \ne a^e(X), a \in A_t, 1 \le t \le m \} \\
           &\cup \{query(m).\}
   \end{align*}
   s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m\}$.
@@ -560,14 +582,14 @@ In order to prove the correctness of the presented encondings, we define the fol
   Therefore M is a stable model of $P^\forall(m)$. \\
 
   \noindent \textbf{Case 2: }$\langle A_1, \dots, A_m \rangle$ is a $\exists$-step plan. \\
-  Then for any $1 \le t \le m, \exists$ a sequence of actions $\langle a_1, \dots, a_k \rangle$, 
-  s.t. $\{a_1, \dots, a_k\} = A_t$ and $a_i^e(X) = \tilde a_j^c(X)$ if $X \in dom(a_i^e) \cap dom(\tilde a_j^c)$ for any $1 \le i < j \le m$.
+  Then for any $1 \le t \le m$, there is a sequence of actions $\langle a_1, \dots, a_k \rangle$, 
+  s.t. $\{a_1, \dots, a_k\} = A_t$ and $a_i^e(X) = \tilde a_j^c(X)$ if $X \in \dom(a_i^e) \cap \dom(\tilde a_j^c)$ for any $1 \le i < j \le m$.
   That is the edges of the directed graph:
   \[
-    G_t = (\mathcal O, \{\langle a, \tilde a \rangle ~|~ a \in A_t, \tilde a \in \mathcal O \setminus \{a\}, X \in dom(a^e) \cap dom(\tilde a^c), a^e(X) \ne \tilde a^c(X) \})
+    G_t = (\mathcal O, \{\langle a, \tilde a \rangle ~|~ a \in A_t, \tilde a \in \mathcal O \setminus \{a\}, X \in \dom(a^e) \cap \dom(\tilde a^c), a^e(X) \ne \tilde a^c(X) \})
   \]
   can connect some $a_i$ for $1 \le i \le k$ to elements of $\mathcal O \setminus \{a_i, \dots, a_k\}$ only if $G_t$ remains acyclic.
-  The acyclicity of $G_t$ yields that the recursive derivation of $apply(a, t)$ and $ready(a, t)$ is successful, i.e. they both belong to the least fixpoint in $S^\exists(t)$ (Line 2-5 in \ref{exists}) for each $a \in mathcal O$ and $1 \le t \le m$ and thus,
+  The acyclicity of $G_t$ yields that the recursive derivation of $apply(a, t)$ and $ready(a, t)$ is successful, i.e. they both belong to the least fixpoint in $S^\exists(t)$ (Line 2-5 in \ref{exists}) for each $a \in \mathcal O$ and $1 \le t \le m$ and thus,
   $P^\exists(m)$ cannot have any stable model apart from
   \[
     M' = M \cup \{apply(a,t) ~|~ a \in \mathcal O, 1 \le t \le m\} \cup \{ready(a,t) ~|~ a \in \mathcal O, 1 \le t \le m \}
@@ -577,13 +599,13 @@ In order to prove the correctness of the presented encondings, we define the fol
   Therefore M is a stable model of $P^\exists(m)$. \\
 
   \noindent \textbf{Case 3: } $\langle A_1, \dots A_m \rangle$ is a \textit{relaxed} $\exists$-step plan.
-  Then for any $1 \le t \le m, \exists$ sequence of actions $\langle a_1, \dots, a_k \rangle$
+  Then for any $1 \le t \le m$. there is a sequence of actions $\langle a_1, \dots, a_k \rangle$
   s.t. $\{a_1, \dots, a_k\}=A_t$ and $o(a_i, \langle a_1, \dots, a_{i-1} \rangle, s_{t-1})$ is defined for $1 \le i \le k$, 
-  which implies that $a^e_i(X) = a^c_j(X)$ if $X \in dom(a^e_i) \cap dom(a^c_j)$ for $i < j \le k$.
+  which implies that $a^e_i(X) = a^c_j(X)$ if $X \in \dom(a^e_i) \cap \dom(a^c_j)$ for $i < j \le k$.
   Given this, the least fixpoint of $S^R(t)$ (Lines 1-6 in Listing \ref{relaxed_exists}) contains:
   \begin{enumerate}[label=(\roman*)]
     \item $reach(X, V, t)$ for each $X \in \mathcal F$ and $V \in \{s_{t-1}(X), s_t(X)\}$
-    \item $apply(a, t)$ for each $a \in \mathcal O$ s.t. $a^c(X) \in \{s_{t-1}, s_t \} ~\forall X \in dom(a^c)$
+    \item $apply(a, t)$ for each $a \in \mathcal O$ s.t. $a^c(X) \in \{s_{t-1}, s_t \}$ and all $X \in \dom(a^c)$
     \item $ready(a, t)$ for each $a \in \mathcal O$
   \end{enumerate} 
   Thus, the only stable model $P^R(m)$ can have is
@@ -591,7 +613,7 @@ In order to prove the correctness of the presented encondings, we define the fol
     M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m \} \\
           &\cup \{holds(X,V,t) ~|~ X \in \mathcal F, s_t(X)=V, 0 \le t \le m \} \\
           &\cup \{reach(X,V,t) ~|~ X \in \mathcal F, V \in \{s_{t-1}, s_t\}, 1 \le t \le m\} \\
-          &\cup \{apply(a,t) ~|~ a \in \mathcal O: a^c(X) \in \{s_{t-1}(X), s_t(X)\} ~\forall X \in dom(a^c)\} \\
+          &\cup \{apply(a,t) ~|~ a \in \mathcal O: a^c(X) \in \{s_{t-1}(X), s_t(X)\} ~\forall X \in \dom(a^c)\} \\
           &\cup \{ready(a,t) ~|~ a \in \mathcal O, 1 \le t \le m\} \\
           &\cup \{query(m)\}
   \end{align*}
@@ -599,11 +621,45 @@ In order to prove the correctness of the presented encondings, we define the fol
   As above, one can easily check that all other rules and integrity constraints in $P^R(m)$ are satisfied as well.
   Therefore M is a stable model of $P^R(m)$. \\
   ($\Leftarrow$) M is a stable model of $P^p(m)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M'\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
-  For any $1 \le t \le m$, the choice rule in Line 6 of Listing \ref{core} makes sure that $s_t$ s.t. $s_t(X)=V \iff holds(X,V,t) \in M$ is a state.  
+  For any $1 \le t \le m$, the choice rule in Line 6 of Listing \ref{core} makes sure that $s_t$ s.t. $s_t(X)=V$ iff $holds(X,V,t) \in M$ is a state. Moreover, the rule in $B$ together with the integrity constraints in $S(t)$ yield that $s_t(x) = a^e(X)$ for each $a \in A_t$ and $X \in \dom(a^e)$, which also implies that $A_t$ is confluent, and $s_t(X) = s_{t-1}(X)$ for each $X \in \mathcal F \setminus \bigcup_{a \in A_t} \dom(a^e)$. With the fact $query(n)$, the integrity constraint in $Q(n)$ yields that $s_m(X) = s_*(X)$ for all $X \in \dom(s_*)$. 
+  We now split the proof into the different cases, to show that $A_t$ is $\forall$-/$\exists$-/\textit{relaxed} $\exists$-step serializable in $s_{t-1}$. \\
+  \noindent \textbf{Case 1: } To show: $A_t$ is $\forall$-step serializable. \\
+  Let $\langle a_1, \dots, a_k \rangle$ be a sequence of actions s.t. $\{a_1, \dots, a_k\}=A_t$.
+  We proof by induction, that for all $1 \le i \le k$: $o(\langle a_1, \dots, a_i \rangle, s_{t-1})$ is defined. \\
+  I-Start: $i=1$ \\
+  The integrity constraint in Line 1 of Listing \ref{forall} guarentees that o($a_i, s_{t-1})$ is defined for each $a_i \in A_t$. \\
+  I-Step: $i \mapsto i+1$ \\
+  For any $X \in \dom(a_{i+1}^c) \cap \bigcup_{1 \le j \le i+1} \dom(a_j^e)$, we have that $o(\langle a_1, \dots, a_i \rangle, s_{t-1})(X) = s_t(X)$.
+  We now look at two cases:
+  \begin{enumerate}[label=(\roman*)]
+    \item $X \notin \dom(a_{i+1}^e)$: The integrity constraint in Line 2 of Listing \ref{forall} yields that $s_t(X) = a_{i+1}^c(X) = s_{t-1}(X)$.
+    \item $X \in \dom(a_{i+1}^e)$: The integrity constraint in Line 5 of Listing \ref{forall} implies that $single(X, t) \notin M$,
+          which means that the rule of $single(X,t)$ is not satisfied and $s_t(X) = a_{i+1}^e(X) = a_{i+1}^c(X)=s_{t-1}(X)$ must be the case.
+  \end{enumerate} 
+  This shows that $o(\langle a_1, \dots, a_i \rangle, s_{t-1})(X) = a_{i+1}^c(X)$, so that $o(\langle a_1, \dots, a_{i+1} \rangle, s_{t-1})$ is defined.
+  Therefore $o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined.
 
+  \noindent \textbf{Case 2: } To show: $A_t$ is $\exists$-step serializable. \\
+  As in Case1, the integrity constraint in Line 1 of Listing \ref{exists} and \ref{exists_alt} ensures that for any $a \in A_t$, $o(a, s_{t-1})$ is defined.
+  The integrity constraint in Line 6 of Listing \ref{exists} implies that $ready(a, t) \in M$ for each $a \in \mathcal O$.
+  The rules in Line 5 and 6 further yield that $apply(a,t) \in M$ for each $a \in A_t$.
+  Given the rule in Lines 2-3, for any $1 \le i \le k$, there must be some $a_i \in A_t$, s.t. $\{a_j \in A_t ~|~ i < j \le k, X \in \dom(a_i^c) \cap \dom(a_j^e), a_i^e(X) \ne a_j^c(X)\} = \emptyset$.
+  In turn, we have that $a_j^e(X) = a_i^c(X) = s_{t-1}(X)$ if $X \in \dom(a_i^c) \cap \dom(a_j^e)$ for $1 \le j \le i$,
+  so that $o(\langle a_1, \dots, a_i \rangle, s_{t-1})$ and, in particular, $o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined.
+
+  \noindent \textbf{Case 3: } To show: $A_t$ is \textit{relaxed} $\exists$-step serializable. \\
+  In view of the rule in Line 1 of Listing \ref{relaxed_exists}, we have that $reach(X, V, t) \in M$ if $s_{t-1}(X)=V$.
+  The integrity constraint in Line 7 further implies that $ready(a, t) \in M$ for each $a \in \mathcal O$ 
+  and the rules in Line 5 and 6 yield that $apply(a,t) \in M$ for each $a \in A_t$. 
+  Given the rules in Lines 2 and 3-4, for any $1 \le i \le k$, there must be some $a_i \in A_t$, s.t.
+  $\{a_j \in A_t ~|~ i  <j \le k, X \in \dom(a_j^c) \cap \dom(a_i^e), a_i^e(X) \ne a_j^e(X)\} = \emptyset$ and 
+  $a_i^c(X) \in \{s_{t-1}\} \cup \{a_j^e(X) ~|~ 1 \le j \le i, X \in \dom(a_j^e)\}$ for all $X \in \dom(a_i^c)$.
+  Hence, for each $X \in \dom(a_i^c)$, we have that $a_i^c(X) = s_{t-1}(X)$ and $X \notin \bigcup_{1 \le j \le i} \dom(a_j^e)$ or $a_j^e(X) = a_i^c(X)$ if $X \in \dom(a_j^e)$,
+  for $1 \le j < i$, so that $o(\langle a_1, \dots, a_i \rangle, s_{t-1})$ and, in particular, $o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined.
 \end{proof}
 
-\chapter{Method}
+\chapter{Method} \label{method}
+
 \section{Pipeline Overview}
 \begin{figure}[H]
   \centering
@@ -611,13 +667,36 @@ In order to prove the correctness of the presented encondings, we define the fol
   \caption{Pipeline for testing the different planning encodings}
   \label{pipeline}
 \end{figure}
-To test and compare t he different parallel planning encodings against each other and against the sequential planning encoding, we set up a python pipeline using the lab framework \parencite{seipp-et-al-zenodo2017}
+To test and compare the different parallel planning encodings against each other and against the sequential planning encoding, we set up a python pipeline using the lab framework \parencite{seipp-et-al-zenodo2017}
 and the unofficial collection of (sequential) IPC benchmark instances from the downward project \footnote{\url{https://github.com/aibasel/downward-benchmarks}}. \\
 Starting at a planning task in the Planning Domain Definition Language (PDDL), we first preprocess it using cpddl \parencite{fiser_2025_16423302} that converts it into a finite domain representation (FDR).
 Plasp then takes the FDR as input and translates it into ASP facts representing the planning task. Further information of this step can be found in \parencite{DIMOPOULOS_2019}.
 Using clingo with a modified version of the incremental encodings presented above together with the facts from the output of plasp, we can then compute sequential, $\forall$-step, $\exists$-step or relaxed $\exists$-step plans as stable models.
 Finally, to validate the given plan, we postprocess the parallel representation back into a sequential plan, using the postprocess encoding provided by plasp and validate the plan with VAL \footnote{\url{https://github.com/KCL-Planning/VAL}}.
 Each step has some optimizations and configurations that will be explained in the following sections.
+
+\section{Changes in the ASP encodings}
+To use the presented encodings in our pipeline, we had to make some small changes to the original encodings from \parencite{DIMOPOULOS_2019}.
+\begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}
+  #include <incmode>.
+  #program base.
+  fluent(X) :- variable(X).
+  fluent(X,V) :- initialState(X,V), fluent(X).
+  value(X,V) :- contains(X, V).
+  prec(A, X, V) :- precondition(A, X, V).
+  post(A, X, V) :- postcondition(A, _, X, V).
+  ...
+  :- fluent(X), #count{V : holds(X,V,0)} > 1.
+  ...
+  #program step(t).
+  ...
+  #show.
+  #show occurs(A, t): occurs(A, t).
+\end{minted}
+Line 3-6 just renames the predicates from plasp's output to match the ones used in the encodings, 
+while Line 7 uses the wildcard \texttt{\_} to ignore the effect condition.
+This let clingo assume that all effects are fullfilled, which reduces the search space but might lead to not fully optimal plans.
+Line 9 ensures that each fluent has at most one value in the initial state and finally Line 13-14 specify which atoms should be shown in the output.  
 
 \section{Optimizations}
 \subsection{Mutexes}
@@ -699,10 +778,16 @@ Similarly, the directive in Line 3 is actived when an instance of $holds(X,V,t)$
 Both directives associates atoms over holds/3 with higher level the earlier the state is, i.e. the value for $t$ is smaller, 
 which intends to bias the search of \textit{clingo} to establish the goal conditions as early as possible. 
 \section{Experiment}
+To compare the different planning encodings and the effectiveness of the optimizations, we run four experiments with the pipeline described above.
+Each experiment run on the same set of benchmark instances with the sequential, $\forall$-step, \textit{relaxed} $\exists$, \textit{guess and check} and both versions of the $\exists$-step encodings.
+The Guess and Check algorithm and the fallback described above are started one after the other with the time limit of 30 minutes, where the times are added together if the check fails and the $\forall$-step encoding finds a solution. 
+If the summed up time is below the time limit, the problem is considered solved. \\
+Aborted runs are considered unsolved and assigned the time nan.
+\textit{Cpddl} is equipped with and without the h2 option that extends the seach for mutexes and the planning encodings with and without the backward propagating heuristic. 
+The experiments were run on the bwicluster3.0 server of the Karlsruhe Institute of Technology (KIT) using nodes with Intel Xeon Gold 6248R CPUs (3.0 GHz, 24 cores).
+Each run was limited to one CPU core, where \textit{clingo} and \textit{cpddl} were given a time limit of 30 minutes and a memory limit of 32 GiB each.
 
-Setup + Configs
-
-\chapter{Results}
+\chapter{Results} \label{result}
 \section{One to One Comparison}
 
 

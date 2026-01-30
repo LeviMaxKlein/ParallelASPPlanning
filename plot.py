@@ -57,14 +57,14 @@ def filter_grouped_domains(results: dict, algos: list):
     return domains_to_keep
 
 
-def filter_times(problem_solutions: dict, algos: list):
+def filter_times(problem_solutions: dict, algos: list, disable=False):
     """
     Filter times to include only problems solved by the algorithms given in ``algos``.
     """
     filtered_times = {algo: {} for algo in algos}
     for (domain, _), algos_and_times in problem_solutions.items():
         grouped_domain = domain.split("-")[0]
-        if len(algos_and_times) == len(algos):
+        if len(algos_and_times) == len(algos) or disable:
             for algo in algos:
                 if algo in algos_and_times:
                     if grouped_domain not in filtered_times[algo]:
@@ -101,10 +101,14 @@ def create_heat_map(exp_path):
     
     results, problem_solutions, num_problems = get_algo_stats(data)
     algos = list(results.keys())
-    domains = list(filter_grouped_domains(results, algos))
+    domains = sorted(list(filter_grouped_domains(results, algos)))
 
-    filtered_times = filter_times(problem_solutions, algos)
+    filtered_times = filter_times(problem_solutions, algos, disable=False)
     result_matrix, normalized_result_matrix, time_matrix = create_matrices(results, filtered_times, algos, domains, num_problems)
+
+    not_nan_cols = ~np.all(np.isnan(time_matrix), axis=0)
+    time_domains = [d for d, not_nan in zip(domains, not_nan_cols) if not_nan]
+    filtered_time_matrix = time_matrix[:, not_nan_cols]
 
     chunk_size = 10
     for chunk_idx in range(0, len(domains), chunk_size):
@@ -126,8 +130,10 @@ def create_heat_map(exp_path):
         plt.savefig(f"{exp_path}/solved_part{chunk_idx//chunk_size + 1}.png")
         plt.close()
 
+    for chunk_idx in range(0, len(time_domains), chunk_size):
         # heatmap for average solving time
-        chunk_time = time_matrix[:, chunk_idx:chunk_idx+chunk_size]
+        chunk_time_domains = time_domains[chunk_idx:chunk_idx+chunk_size]
+        chunk_time = filtered_time_matrix[:, chunk_idx:chunk_idx+chunk_size]
         non_zero_times = chunk_time[~np.isnan(chunk_time)]
         if len(non_zero_times) > 0:
             vmin = non_zero_times.min()
@@ -140,11 +146,11 @@ def create_heat_map(exp_path):
         fig2, ax2 = plt.subplots(figsize=(12,6))
         _ = ax2.imshow(chunk_time, cmap='YlOrRd', aspect='auto', 
                        norm=norm)
-        ax2.set_xticks(range(len(chunk_domains)), labels=chunk_domains,
+        ax2.set_xticks(range(len(chunk_time_domains)), labels=chunk_time_domains,
                     rotation=45, ha="right", rotation_mode="anchor")
         ax2.set_yticks(range(len(algos)), labels=algos)
         for i in range(len(algos)):
-            for j in range(len(chunk_domains)):
+            for j in range(len(chunk_time_domains)):
                 if np.isnan(chunk_time[i,j]):
                     text = ax2.text(j, i, "None", ha="center", va="center", color="black")
                 else:

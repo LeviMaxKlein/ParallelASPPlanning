@@ -198,7 +198,6 @@ for algo in ALGORITHM:
         run.add_command("setup_tempdir", ["mkdir", "-p" , temp_path])
         run.add_command("copy_domain", ["cp", task.domain_file, f"{temp_path}/domain.pddl"])
         run.add_command("copy_problem", ["cp", task.problem_file, f"{temp_path}/problem.pddl"])
-        
         run.add_command("run_pipeline", [sys.executable, f"{SCRIPT_DIR}/pipeline.py", SCRIPT_DIR, TIME_LIMIT, temp_path, f"{temp_path}/domain.pddl", f"{temp_path}/problem.pddl", f"{{{algo}}}" if "guess_and_check" not in algo else algo, str(args.strong_mutex), str(args.heuristic)])
         run.add_command("validate_plan", ["Validate", f"{temp_path}/domain.pddl", f"{temp_path}/problem.pddl", f"{temp_path}/sas_plan"])
         run.add_command("rm_tempdir", ["rm", "-rf", temp_path])
