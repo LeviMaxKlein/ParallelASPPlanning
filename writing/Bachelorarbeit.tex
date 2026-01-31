@@ -42,6 +42,12 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 
+\usepackage{mdframed}
+\counterwithout{equation}{chapter}
+
+
+\newmdtheoremenv{theo}{Theorem}
+
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \theoremstyle{definition}
@@ -496,9 +502,9 @@ Again Line 7 ensures that applied action do not circularly invalidate each other
 \end{example}
 
 \section{Proof of Correctness}
-In order to prove the correctness of the presented encondings, we define the following:
+In order to prove the correctness of the presented encondings, \cite{DIMOPOULOS_2019} defines the following:
 \begin{itemize}
-  \item $B$ is the rule in Line 1 of Listing \ref{seq}.
+  \item $B$ is the rule in Line 1 of Listing \ref{core}.
   \item $Q(t)$ is the integrity constraint in the check program directive (Line 5) of Listing \ref{core}.
   \item $S(t)$ are the rules and integrity constraint in the step program directive (Lines 6-9) of Listing \ref{core}.
   \item $S^p(t)$ is the extension for the specific plans,
@@ -507,120 +513,168 @@ In order to prove the correctness of the presented encondings, we define the fol
   \item $I$ is the set of facts representing a planning task $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$.
   \item $\langle a_1, \dots, a_n \rangle$ is a sequence of actions.
   \item $\langle A_1, \dots, A_m \rangle$ is a a sequence of sets of actions.
-  \item $P^p(n) := I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^p(t) \right) \cup \{query(n). \}$, where $p \in \{s, \forall, \exists, E, R\}$.
+  \item $P^p(n) := I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^p(t) \right) \cup \{\texttt{query}(n). \}$, where $p \in \{s, \forall, \exists, E, R\}$.
 \end{itemize}
 
-\begin{theorem}[Correctness of sequential plans \parencite{DIMOPOULOS_2019}]
+\begin{theo}[Correctness of sequential plans \parencite{DIMOPOULOS_2019}]
+  \label{theo:1}
   \phantom{}\\
   $\langle a_1, \dots, a_n \rangle$ is a sequential plan $\iff$ $P^s(n)$ has a stable model $M$, s.t. \\
-  $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a_t, t \rangle ~|~ 1 \le t \le n \}$.
-\end{theorem}
-
-
+  $\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M \} = \{\langle a_t, t \rangle \mid 1 \le t \le n \}$.
+\end{theo}
 
 \begin{proof}
-  ($\Rightarrow$): Let $\langle a_1, \dots, a_n \rangle$ be a sequential plan. \\
-  First we show that for any stable model $M$ of $P^s(n)$ s.t. $\{\langle a, t \rangle | occurs(a,t) \in M \} = \{\langle a_t, t \rangle | 1 \le t \le n \}$, the rules and integrity constraints ensures that 
-  $\{\langle X, V, t \rangle ~|~ holds(X, V, t) \in M \} = \{\langle X, V, t \rangle ~|~ X \in \mathcal{F}, V = o(\langle a_1, \dots, a_t\rangle, s_0), 0 \le t \le n \}$.
-  \begin{enumerate}[label=(\roman*)]
-    \item the rule in B ensures that $holds(X, V, 0) = s_0(X)$ for each $X \in \mathcal F$
-    \item for any $1 \le t \le n$, both integrity constraints in S(t) ensure that $holds(X,V,t) = a_t^e(X)$ if $X \in \dom(a_t^e)$ and $holds(X,V,t) = s_{t-1}(X)$ otherwise.
-  \end{enumerate}
-  Therefore, the only stable model $M$ that $P^s(n)$ can have is
-  \begin{align*}
-        M = I &\cup \{occurs(a_t, t) ~|~ 1 \le t \le n \} \\
-              &\cup \{holds(X, V, t) ~|~ X \in \mathcal F, v = o(\langle a_1, \dots, a_t\rangle, s_0), 0 \le t \le n\} \cup \{query(n)\}.
-  \end{align*}
-  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a_t, t \rangle ~|~ 1 \le t \le n \}$. \\
-  One can easily check that all rules and integrity constraints in $P^s(n)$ are satisfied and M is indeed a stable model of $P^s(n)$.\\
-  ($\Leftarrow$): Let $M$ be a stable model of $P^s(n)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a_t, t \rangle ~|~ 1 \le t \le n \}$.
-  We proof by induction over t, that for all $1 \le t \le n$:
-  \[
-      \{\langle X, V \rangle ~|~ holds(X,V,t-1)\in M \} = \{\langle X, V \rangle ~|~ X \in \mathcal F, V=o(\langle a_1, \dots, a_{t-1}\rangle, s_0)(X)\}.
-  \]
-  \textit{I-Start: t=0} \\
-  The Rule in B implies: 
-  $\{\langle X, V \rangle ~|~ holds(X, V, 0) \in M \} = \{\langle X, V \rangle ~|~ X \in \mathcal F, s_0(X) = V\}$. \\
-  \textit{I-Step:} $t \mapsto t+1$ \\
-  The integrity constraint in Line 1 of Listing \ref{seq} in $S^s(t)$ ensures that the successor state of $s(t)$, i.e. $o(a_{t+1}, o(\langle a_1, \dots, a_{t}\rangle, s_0))$ is defined.
-  Additionally the choice rule in Line 6 of Listing \ref{core} and the integrity constaints in $S(t)$ guarentee that
-  \[
-    \{\langle X, V \rangle ~|~ holds(X,V,t+1) \in M\} = \{\langle X, V \rangle ~|~ X \in \mathcal F, V = o(\langle a_1, \dots, a_{t+1} \rangle, s_0)(X)\}.
-  \]
-  Finally, with the fact $query(n)$, the integrity constraint in $Q(n)$ yields that $o(\langle a_1, \dots, a_n \rangle, s_0)(X)$ $=$ $s_*(X)$ for all $X \in \dom(s_*)$.
-  Thus, $\langle a_1, \dots, a_n \rangle$ is a sequential plan.
+  We prove both directions separately.
+  \begin{itemize}
+  \item[($\Rightarrow$):] 
+    Assume $A_n := \langle a_1, \dots, a_n \rangle$ is a sequential plan. \\
+    We construct a candidate set $M$ based on the plan execution and show it is indeed a stable model of $P^s(n)$.
+    The rule in B ensures that \texttt{holds}(X,V,0) $= s_0(X)$ for each $X \in \mathcal F$. The choice rule (Line 5 of Listing \ref{seq}) enforces that for any $0 \le t \le n$ and $X \in \mathcal F$, exactly one value $V$ is assigned, i.e., $|\{V \mid \texttt{holds}(X,V,t) \in M\}| = 1$. 
+    Moreover, the integrity constraints (Lines 8 and 9) in $S(t)$ dictate the transition logic between states. 
+    For any $1 \le t \le n$, the value $V$ of a fluent $X$ is determined by:
+    \[
+      \texttt{holds}(X,V,t) \leftrightarrow \begin{cases} V = a_t^e(X) & \text{if } X \in \text{dom}(a_t^e) \\ V = s_{t-1}(X) & \text{otherwise} \end{cases}
+    \]
+    Therefore, the set of \texttt{holds}-atoms in any stable model must satisfy:
+    \begin{equation}
+      \{ \langle X, V, t \rangle \mid \texttt{holds}(X, V, t) \in M \}  = \{ \langle X, V, t \rangle \mid X \in \mathcal{F}, V {=} o(A_n, s_0)(X), 0 \le t \le n \}
+      \label{eq:holds-equivalence}
+    \end{equation}
+    Since the action sequence is fixed by the plan assumption ($\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M \} = \{\langle a_t, t \rangle \mid 1 \le t \le n \}$), the only candidate for a stable model $P^s(n)$ is:
+    \begin{align*}
+      M = I &\cup \{ \texttt{occurs}(a_t, t) \mid 1 \le t \le n \} \\
+            &\cup \{\texttt{holds}(X, V, t) \mid (X, V, t) \text{ satisfies } \eqref{eq:holds-equivalence}\}    \cup \{\texttt{query}(n)\}.
+    \end{align*}
+     By the definition of a sequential plan, $o(a_t, s_{t-1})$ is defined for all $1 \le t \le n$, and the goal condition $s_n(X) = s_*$ for each $X \in \dom(s_*)$ is met. Thus, the integrity constraint regarding preconditions (Line 1, Listing \ref{seq}) and the goal check (Line 4, Listing \ref{core}) are satisfied. Since $M$ is a set satisfying all rules and constraints, it is indeed a stable model of $P^s(n)$.
+
+  \item[($\Leftarrow$):]
+    Assume that $M$ is a stable model of $P^s(n)$ s.t. $\{\langle a, t \rangle \mid \texttt{occurs(a,t)} \in M \} = \{\langle a_t, t \rangle \mid 1 \le t \le n \}$. \\
+    We prove by induction over $t$, that for each $1 \le t \le n$, the following holds:
+    \begin{equation}
+      \{\langle X, V \rangle \mid \texttt{holds(X,V,t)} \in M \} = \{\langle X, V \rangle \mid X \in \mathcal F, V=o(\langle a_1, \dots, a_{t}\rangle, s_0)(X)\}
+      \label{eq:holds-equivalence2}
+    \end{equation}
+    \textit{Base case }$t=0$: \\
+    The rule in B directly implies that $\{\langle X, V \rangle \mid \texttt{holds(X, V, 0)} \in M \} = \{\langle X, V \rangle \mid X \in \mathcal F, s_0(X) = V\}$,
+    satisfying the equation for $t=0$. \\
+    \textit{Induction step }$t-1 \mapsto t$: \\
+    Assume the hypothesis holds for $t-1$, i.e., the state at $t-1$ corresponds to $s_{t-1} = o(\langle a_1, \dots, a_{t-1} \rangle, s_0)$.. The integrity constraint in Line 1 of Listing \ref{seq} in $S^s(t)$ ensures that the successor state $s_t = o(a_{t}, o(\langle a_1, \dots, a_{t-1}\rangle, s_0))$ is defined and the choice rule in Line 6 of Listing \ref{core}, together with the integrity constraints in $S(t)$ guarantee that 
+    \[
+    \{\langle X, V \rangle \mid \texttt{holds(X,V,t)} \in M\} = \{\langle X, V \rangle \mid X \in \mathcal F, V = o(\langle a_1, \dots, a_{t} \rangle, s_0)(X)\}.
+    \]
+    Thus \eqref{eq:holds-equivalence2} holds for each $1 \le t \le n$.
+    Given \texttt{query(n)}, the integrity constraint in $Q(n)$ yields that $o(\langle a_1, \dots, a_n \rangle, s_0) = s_*(X)$ for each $X \in \dom(s_*)$ and therefore $\langle a_1, \dots a_n\rangle$ is a sequential plan. 
+\end{itemize}
 \end{proof}
 
-\begin{theorem}[Correctness of parallel plans \parencite{DIMOPOULOS_2019}]
+\begin{theo}[Correctness of parallel plans \parencite{DIMOPOULOS_2019}]
   \phantom{} \\
-  $\langle A_1, \dots, A_m \rangle$ is a $\forall$-/$exists$-/relaxed $exists$-step plan $\iff P^p(m)$ has a stable model M s.t., \\
-  $\{\langle a, t \rangle ~|~ occurs(a,t) \in M \} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$ with $p \in \{\forall, \exists, R\}$.
-\end{theorem}
+  $\langle A_1, \dots, A_m \rangle$ is a $\forall$-/$exists$-/relaxed $exists$-step plan $\iff P^p(m)$ has a stable model M s.t.,
+  $\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M \} = \{\langle a, t \rangle \mid a \in A_t, 1 \le t \le m \}$ with $p \in \{\forall, \exists, R\}$.
+\end{theo}
 
 \begin{proof}
-  ($\Rightarrow$) $\langle A_1, \dots, A_m \rangle$ is a $\forall$-/$exists$-/\textit{relaxed} $exists$-step plan. \\
-  For each $1 \le t \le m$, let $s_t$ be the state s.t. $s_t(X) = \begin{cases} a^e(X) & \forall a \in A_t \text{ and } X \in \dom(a^e) \\ s_{t-1}(X) & \forall X \in \mathcal F \setminus \bigcup_{a \in A_t} \dom(a^e) \end{cases}$.
-  Then, as in the proof above, for any stable model $M$ of $P^p(m)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a,t \rangle ~|~ a \in A_t, 1 \le t \le m \}$, 
-  the rule in $B$ together with the choice rule and the integrity constraints in $S(t)$ make sure that
-  $\{\langle X,V,t\rangle ~|~ holds(X,V,t) \in M\} = \{\langle X,V,t\rangle ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\}$.
-  We now split the proof into the different cases. \\
+  We prove both directions separately.
+  \begin{itemize}
+    \item[($\Rightarrow$):]
+      Assume $\mathcal A = \langle A_1, \dots, A_m \rangle$ is a $\forall$-/$\exists$-/\textit{relaxed} $\exists$-step plan.
+      For each $1 \le t \le m$, let $s_t$ be the state defined by applying the set $A_t$ to $s_{t-1}$. Due to the confluence of $A_t$, $s_t$ is well-defined as:
+      \[
+        s_t(X) = \begin{cases} 
+          a^e(X) & \text{for each } a \in A_t \text{ and } X \in \dom(a^e) \\ 
+          s_{t-1}(X) & \text{otherwise (inertia)}
+        \end{cases}
+      \]
+      Analogous to the proof of Theorem \ref{theo:1}, consider any stable model $M$ of $P^p(m)$ such that the action occurrences match the plan, i.e. $\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M\} = \{\langle a,t \rangle \mid a \in A_t, 1 \le t \le m \}$.
+      The fact rule in $B$, together with the choice rule and integrity constraints in $S(t)$, dictates the values of all fluents based on these actions. Thus, the set of \texttt{holds}-atoms in $M$ is determined as:
+      \[
+        \{\langle X,V,t\rangle \mid \texttt{holds}(X,V,t) \in M\} = \{\langle X,V,t\rangle \mid X \in \mathcal F, V = s_t(X), 0 \le t \le m\}.
+      \]
+      We now distinguish the different cases of parallel plans: \\
 
-  \noindent \textbf{Case 1: }$\langle A_1, \dots, A_m \rangle$ is a $\forall-$step plan. \\
-  The atom $single(X,t)$ is derived by the rule in $S^\forall(t)$ iff there exists some action $a \in A_i$ s.t. $X \in \dom(a^c) \cap \dom(a^e)$ and $a^c(X) \ne a^e(X)$ for $1 \le t \le m$. 
-  In other words, if there is an action that invalidates its own precondition.
-  Hence $P^\forall(m)$ cannot have any stable model $M$ apart from
-  \begin{align*}
-    M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m\} \\
-          &\cup \{holds(X,V,t) ~|~ X \in \mathcal F, V = s_t(X), 0 \le t \le m\} \\
-          &\cup \{single(X,t) ~|~ X \in \dom(a^c) \cap \dom(a^e), a^c(X) \ne a^e(X), a \in A_t, 1 \le t \le m \} \\
-          &\cup \{query(m).\}
-  \end{align*}
-  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m\}$.
-  Since for any $1 \le t \le m$, the successor state $s_t= o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined for any sequence $\langle a_1, \dots, a_k \rangle$ s.t. $\{a_1, \dots, a_k\} = A_t$,
-  we have that M satisfies all integrity constraints in $S^\forall(t)$. 
-  As above, one can easily check that all other rules and integrity constraints in $P^\forall(m)$ are satisfied as well.
-  Therefore M is a stable model of $P^\forall(m)$. \\
 
-  \noindent \textbf{Case 2: }$\langle A_1, \dots, A_m \rangle$ is a $\exists$-step plan. \\
-  Then for any $1 \le t \le m$, there is a sequence of actions $\langle a_1, \dots, a_k \rangle$, 
-  s.t. $\{a_1, \dots, a_k\} = A_t$ and $a_i^e(X) = \tilde a_j^c(X)$ if $X \in \dom(a_i^e) \cap \dom(\tilde a_j^c)$ for any $1 \le i < j \le m$.
-  That is the edges of the directed graph:
-  \[
-    G_t = (\mathcal O, \{\langle a, \tilde a \rangle ~|~ a \in A_t, \tilde a \in \mathcal O \setminus \{a\}, X \in \dom(a^e) \cap \dom(\tilde a^c), a^e(X) \ne \tilde a^c(X) \})
-  \]
-  can connect some $a_i$ for $1 \le i \le k$ to elements of $\mathcal O \setminus \{a_i, \dots, a_k\}$ only if $G_t$ remains acyclic.
-  The acyclicity of $G_t$ yields that the recursive derivation of $apply(a, t)$ and $ready(a, t)$ is successful, i.e. they both belong to the least fixpoint in $S^\exists(t)$ (Line 2-5 in \ref{exists}) for each $a \in \mathcal O$ and $1 \le t \le m$ and thus,
-  $P^\exists(m)$ cannot have any stable model apart from
-  \[
-    M' = M \cup \{apply(a,t) ~|~ a \in \mathcal O, 1 \le t \le m\} \cup \{ready(a,t) ~|~ a \in \mathcal O, 1 \le t \le m \}
-  \]
-  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M'\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
-  As above, one can easily check that all other rules and integrity constraints in $P^\exists(m)$ are satisfied as well.
-  Therefore M is a stable model of $P^\exists(m)$. \\
+      \textbf{Case 1:} $\mathcal A$ is a $\forall$-step plan. \\
+      For $1 \le t \le m$, the atom \texttt{single}$(X,t)$ defined in $S^\forall(t)$ (Line 2 of Listing \ref{forall}) is derived iff there exists some action $a \in A_t$ that invalidates its own precondition, i.e., $X \in \dom(a^c) \cap \dom(a^e)$ and $a^c(X) \ne a^e(X)$. 
+      Hence, $P^\forall(m)$ cannot have any stable model $M$ apart from
+      \begin{align*}
+        M = I &\cup \{\texttt{occurs}(a,t) \mid a \in A_t, 1 \le t \le m\} \\
+              &\cup \{\texttt{holds}(X,V,t) \mid X \in \mathcal F, V = s_t(X), 0 \le t \le m\} \\
+              &\cup \{\texttt{single}(X,t) \mid a \in A_t, X \in \dom(a^c) \cap \dom(a^e), a^c(X) \ne a^e(X), 1 \le t \le m \} \\
+              &\cup \{\texttt{query}(m).\}
+      \end{align*}
+      such that $\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M\} = \{\langle a, t \rangle \mid a \in A_t, 1 \le t \le m\}$.
+      
+      It remains to show that $M$ satisfies the integrity constraints in $S^\forall(t)$.
+      Since for any $1 \le t \le m$, the successor state $s_t= o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined for \textit{any} sequence $\langle a_1, \dots, a_k \rangle$ with $\{a_1, \dots, a_k\} = A_t$, no action can interfere with the precondition of another action.
+      Consequently, if \texttt{single}$(X,t)$ is derived (meaning an action invalidates its own precondition on $X$), no other action can modify $X$, as this would create a conflict in at least one permutation. Therefore, the integrity constraint restricting the count of actions affecting $X$ alongside \texttt{single}$(X,t)$ is satisfied.
+      Analogously, the constraint requiring preconditions to remain stable (Line 1 of Listing \ref{forall}) is satisfied since $s_{t-1}(X)=a^c(X)$ for each $a \in A_t$, $X \in dom(a^c)$ and $1\le t \le m$.
+      One can check that the remaining rules and integrity constraints in $S(t)$ are satisfied as well, so $M$ is a stable model of $P^\forall(m)$. \\
 
-  \noindent \textbf{Case 3: } $\langle A_1, \dots A_m \rangle$ is a \textit{relaxed} $\exists$-step plan.
-  Then for any $1 \le t \le m$. there is a sequence of actions $\langle a_1, \dots, a_k \rangle$
-  s.t. $\{a_1, \dots, a_k\}=A_t$ and $o(a_i, \langle a_1, \dots, a_{i-1} \rangle, s_{t-1})$ is defined for $1 \le i \le k$, 
-  which implies that $a^e_i(X) = a^c_j(X)$ if $X \in \dom(a^e_i) \cap \dom(a^c_j)$ for $i < j \le k$.
-  Given this, the least fixpoint of $S^R(t)$ (Lines 1-6 in Listing \ref{relaxed_exists}) contains:
-  \begin{enumerate}[label=(\roman*)]
-    \item $reach(X, V, t)$ for each $X \in \mathcal F$ and $V \in \{s_{t-1}(X), s_t(X)\}$
-    \item $apply(a, t)$ for each $a \in \mathcal O$ s.t. $a^c(X) \in \{s_{t-1}, s_t \}$ and all $X \in \dom(a^c)$
-    \item $ready(a, t)$ for each $a \in \mathcal O$
-  \end{enumerate} 
-  Thus, the only stable model $P^R(m)$ can have is
-  \begin{align*}
-    M = I &\cup \{occurs(a,t) ~|~ a \in A_t, 1 \le t \le m \} \\
-          &\cup \{holds(X,V,t) ~|~ X \in \mathcal F, s_t(X)=V, 0 \le t \le m \} \\
-          &\cup \{reach(X,V,t) ~|~ X \in \mathcal F, V \in \{s_{t-1}, s_t\}, 1 \le t \le m\} \\
-          &\cup \{apply(a,t) ~|~ a \in \mathcal O: a^c(X) \in \{s_{t-1}(X), s_t(X)\} ~\forall X \in \dom(a^c)\} \\
-          &\cup \{ready(a,t) ~|~ a \in \mathcal O, 1 \le t \le m\} \\
-          &\cup \{query(m)\}
-  \end{align*}
-  s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M'\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
-  As above, one can easily check that all other rules and integrity constraints in $P^R(m)$ are satisfied as well.
-  Therefore M is a stable model of $P^R(m)$. \\
-  ($\Leftarrow$) M is a stable model of $P^p(m)$ s.t. $\{\langle a, t \rangle ~|~ occurs(a,t) \in M'\} = \{\langle a, t \rangle ~|~ a \in A_t, 1 \le t \le m \}$.
+
+      \textbf{Case 2:} $\mathcal A$ is a $\exists$-step plan. \\
+      We analyze the encodings $P^\exists$ and $P^E$ separately, starting with the acyclicity-based encoding $P^E$.
+
+      \textit{Analysis of }$P^E$: \\
+      By definition of an $\exists$-step plan, for every timestep $1 \le t \le m$, there is a sequence of actions $\langle a_1, \dots a_k\rangle$ with $\{a_1, \dots, a_k\} = A_t$. A valid serialization requires that no action invalidates the precondition of a subsequent action.
+      Formally, let $G_t = (A_t, E_t)$ be the conflict graph for timestep $t$, where an edge represents a destroyed precondition:
+      \[
+        E_t = \{ (a, a') \in A_t \times A_t \mid a \ne a', \exists X \in \dom(a^e) \cap \dom(a'^c) : a^e(X) \ne a'^c(X) \}.
+      \]
+      Since a valid serialization exists, $\langle a_1, \dots, a_k \rangle$ constitutes a topological ordering of $G_t$, i.e. there exists a sequence of applied actions. A directed graph possesses a topological ordering iff it is a Directed Acyclic Graph (DAG). Thus, $G_t$ must be acyclic.
+
+      Now consider the candidate model $M$ constructed as in Case 1:
+      \begin{align*}
+        M = I &\cup \{\texttt{occurs}(a,t) \mid a \in A_t, 1 \le t \le m \} \\
+              &\cup \{\texttt{holds}(X,V,t) \mid X \in \mathcal F, V=s_t(X), 0 \le t \le m\} \cup \{\texttt{query}(m)\}.
+      \end{align*}
+      The \texttt{\#edge} directive in Listing \ref{exists_alt} (Lines 2-3) generates an edge between two occurring actions $(a,t)$ and $(a',t)$ exactly if the condition for $E_t$ is met. Consequently, the set of edges declared in the ASP model corresponds exactly to the union of all conflict graphs $\bigcup_{t=1}^m E_t$.
+      Since each $G_t$ is acyclic and the graphs for different timesteps $1 \le t < t' \le m$ are vertex-disjoint ($(a,t), \ne (a, t')$), the overall graph induced by $M$ is acyclic.
+      Therefore, the acyclicity constraint is satisfied, and $M$ is a stable model of $P^E(m)$. \\
+      \textit{Analysis of }$P^\exists$: \\
+      The rules defining \texttt{apply} and \texttt{ready} in $S^\exists(t)$ (Lines 2-5 in Listing \ref{exists}) effectively traverse the dependency graph $G_t$.
+      Since $G_t$ is acyclic, there exists a topological ordering of the actions. The derivation of atoms proceeds along this ordering: Actions with no dependencies (sinks in $G_t$) are derived as \texttt{apply} first, making them \texttt{ready}. This, in turn, satisfies the conditions for their predecessors. 
+      Because $G_t$ is finite and acyclic, this inductive process reaches a fixpoint where \texttt{apply}$(a,t)$ and \texttt{ready}$(a,t)$ hold for all $a \in \mathcal O$ and $1 \le t \le m$.
+      Consequently, the integrity constraint requiring all actions to be ready (Line 6 in Listing \ref{exists}) is satisfied.
+      Thus, $P^\exists(m)$ extends the base model $M$ to:
+      \[
+        M' = M \cup \{\texttt{apply}(a,t) \mid a \in \mathcal O, 1 \le t \le m\} \cup \{\texttt{ready}(a,t) \mid a \in \mathcal O, 1 \le t \le m \}
+      \]
+      such that $\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M'\} = \{\langle a, t \rangle \mid a \in A_t, 1 \le t \le m \}$.
+      As established previously, the state transition rules are satisfied by $M$ (and thus by $M'$). Since the additional constraints in $P^\exists$ regarding circularity are also satisfied by the completeness of the \texttt{ready} derivation, $M'$ is indeed a stable model of $P^\exists(m)$. \medskip
+
+      \textbf{Case 3:} $\mathcal A$ is a \textit{relaxed} $\exists$-step plan. \\
+      For each $1 \le t \le m$, by definition of a relaxed $\exists$-step plan, there exists a serialization $\langle a_1, \dots, a_k \rangle$ of $A_t$ such that the sequential execution is valid. This means $o(a_i, o(\langle a_1, \dots, a_{i-1} \rangle, s_{t-1}))$ is defined for all $1 \le i \le k$.
+      
+      Consequently, the preconditions of any action $a_i$ are satisfied by the state resulting from the application of its predecessors in $\langle a_1, \dots, a_n \rangle$.
+      The rules in $S^R(t)$ (Listing \ref{relaxed_exists}) simulate this reachability:
+      \begin{enumerate}[label=(\roman*)]
+        \item The atom \texttt{reach}>$(X, V, t)$ is derived for all values $V$ that are either present in $s_{t-1}$ or produced by an applied action.
+        \item The atom \texttt{apply}$(a, t)$ is derived for any action $a \in \mathcal O$ whose preconditions are satisfied by the reachable values.
+        \item The atom \texttt{ready}$(a, t)$ is derived for all $a \in \mathcal O$ (either because they are applied, or because they do not occur).
+      \end{enumerate} 
+      Since the serialization $\langle a_1, \dots, a_k \rangle$ is valid, the least fixpoint of these rules guarantees that \texttt{apply}$(a,t)$ is derived for all $a \in A_t$.
+      
+      Thus, the stable model $M$ of $P^R(m)$ is:
+      \begin{align*}
+        M = I &\cup \{\texttt{occurs}(a,t) \mid a \in A_t, 1 \le t \le m \} \\
+          &\cup \{\texttt{holds}(X,V,t) \mid X \in \mathcal F, V=s_t(X), 0 \le t \le m \} \\
+          &\cup \{\texttt{reach}(X,V,t) \mid X \in \mathcal F, V \in \{s_{t-1}, s_t\}, 1 \le t \le m\} \\
+          &\cup \{\texttt{apply}(a,t) \mid a \in \mathcal O: a^c(X) \in \{s_{t-1}(X), s_t(X)\} \text{ for each } X \in \dom(a^c)\} \\
+          &\cup \{\texttt{ready}(a,t) \mid a \in \mathcal O, 1 \le t \le m\} \\
+          &\cup \{\texttt{query}(m)\}
+      \end{align*}
+      Since $M$ contains $ready(a,t)$ for all actions, the integrity constraint in Line 7 of Listing \ref{relaxed_exists} is satisfied. Furthermore, all state transition constraints are met by the definition of $s_t$.
+      Therefore, $M$ is a stable model of $P^R(m)$.
+    \item[($\Leftarrow$):]
+      Bla
+
+
+      
+      \end{itemize}
+    \end{proof}
+
+\begin{proof}
+  ($\Leftarrow$) M is a stable model of $P^p(m)$ s.t. $\{\langle a, t \rangle \mid occurs(a,t) \in M'\} = \{\langle a, t \rangle \mid a \in A_t, 1 \le t \le m \}$.
   For any $1 \le t \le m$, the choice rule in Line 6 of Listing \ref{core} makes sure that $s_t$ s.t. $s_t(X)=V$ iff $holds(X,V,t) \in M$ is a state. Moreover, the rule in $B$ together with the integrity constraints in $S(t)$ yield that $s_t(x) = a^e(X)$ for each $a \in A_t$ and $X \in \dom(a^e)$, which also implies that $A_t$ is confluent, and $s_t(X) = s_{t-1}(X)$ for each $X \in \mathcal F \setminus \bigcup_{a \in A_t} \dom(a^e)$. With the fact $query(n)$, the integrity constraint in $Q(n)$ yields that $s_m(X) = s_*(X)$ for all $X \in \dom(s_*)$. 
   We now split the proof into the different cases, to show that $A_t$ is $\forall$-/$\exists$-/\textit{relaxed} $\exists$-step serializable in $s_{t-1}$. \\
   \noindent \textbf{Case 1: } To show: $A_t$ is $\forall$-step serializable. \\
@@ -640,10 +694,10 @@ In order to prove the correctness of the presented encondings, we define the fol
   Therefore $o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined.
 
   \noindent \textbf{Case 2: } To show: $A_t$ is $\exists$-step serializable. \\
-  As in Case1, the integrity constraint in Line 1 of Listing \ref{exists} and \ref{exists_alt} ensures that for any $a \in A_t$, $o(a, s_{t-1})$ is defined.
+  As in Case 1, the integrity constraint in Line 1 of Listing \ref{exists} and \ref{exists_alt} ensures that for any $a \in A_t$, $o(a, s_{t-1})$ is defined.
   The integrity constraint in Line 6 of Listing \ref{exists} implies that $ready(a, t) \in M$ for each $a \in \mathcal O$.
   The rules in Line 5 and 6 further yield that $apply(a,t) \in M$ for each $a \in A_t$.
-  Given the rule in Lines 2-3, for any $1 \le i \le k$, there must be some $a_i \in A_t$, s.t. $\{a_j \in A_t ~|~ i < j \le k, X \in \dom(a_i^c) \cap \dom(a_j^e), a_i^e(X) \ne a_j^c(X)\} = \emptyset$.
+  Given the rule in Lines 2-3, for any $1 \le i \le k$, there must be some $a_i \in A_t$, s.t. $\{a_j \in A_t \mid i < j \le k, X \in \dom(a_i^c) \cap \dom(a_j^e), a_i^e(X) \ne a_j^c(X)\} = \emptyset$.
   In turn, we have that $a_j^e(X) = a_i^c(X) = s_{t-1}(X)$ if $X \in \dom(a_i^c) \cap \dom(a_j^e)$ for $1 \le j \le i$,
   so that $o(\langle a_1, \dots, a_i \rangle, s_{t-1})$ and, in particular, $o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined.
 
@@ -652,8 +706,8 @@ In order to prove the correctness of the presented encondings, we define the fol
   The integrity constraint in Line 7 further implies that $ready(a, t) \in M$ for each $a \in \mathcal O$ 
   and the rules in Line 5 and 6 yield that $apply(a,t) \in M$ for each $a \in A_t$. 
   Given the rules in Lines 2 and 3-4, for any $1 \le i \le k$, there must be some $a_i \in A_t$, s.t.
-  $\{a_j \in A_t ~|~ i  <j \le k, X \in \dom(a_j^c) \cap \dom(a_i^e), a_i^e(X) \ne a_j^e(X)\} = \emptyset$ and 
-  $a_i^c(X) \in \{s_{t-1}\} \cup \{a_j^e(X) ~|~ 1 \le j \le i, X \in \dom(a_j^e)\}$ for all $X \in \dom(a_i^c)$.
+  $\{a_j \in A_t \mid i  <j \le k, X \in \dom(a_j^c) \cap \dom(a_i^e), a_i^e(X) \ne a_j^e(X)\} = \emptyset$ and 
+  $a_i^c(X) \in \{s_{t-1}\} \cup \{a_j^e(X) \mid 1 \le j \le i, X \in \dom(a_j^e)\}$ for all $X \in \dom(a_i^c)$.
   Hence, for each $X \in \dom(a_i^c)$, we have that $a_i^c(X) = s_{t-1}(X)$ and $X \notin \bigcup_{1 \le j \le i} \dom(a_j^e)$ or $a_j^e(X) = a_i^c(X)$ if $X \in \dom(a_j^e)$,
   for $1 \le j < i$, so that $o(\langle a_1, \dots, a_i \rangle, s_{t-1})$ and, in particular, $o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined.
 \end{proof}
@@ -718,7 +772,7 @@ For this, we extend our endcoding in Listing \ref{core} with the following rules
     ...
     mutex(G,X) :- mutexGroup(G), contains(G,X,V), fluent(X,V).
     mutex(G)   :- mutexGroup(G), #count{X : mutex(G,X)} > 1.
-    :- mutex(G), #count{X,V : holds(X,V,0), contains(G,X,V)} > 1.^
+    :- mutex(G), #count{X,V : holds(X,V,0), contains(G,X,V)} > 1.
     ...
     #program step(t).
     ...
@@ -748,7 +802,7 @@ and the following encoding:
   \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}{encodings/EX_check.lp}
   \label{check}
 \end{listing}
-\noindent Here, the maximum value for $t$ in subprogram $check$ and $step$ is $m = max \{t ~|~ occurs(a, t)\}$ and
+\noindent Here, the maximum value for $t$ in subprogram $check$ and $step$ is $m = max \{t \mid occurs(a, t)\}$ and
 $C$ becomes $unsatisfiable$ if $t > m$.
 Like in Listing \ref{exists}, we check for each $t$ if all actions $A \in occurs(A,t)$ can be applied by the predicate $ready$ (Line 7-11).
 If actions in $A$ circularly invalidate each other, $ready(A,t)$ is underivable for these actions and thus $cycle(t)$ (Line 12) in step $t$ is derived.

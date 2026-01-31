@@ -2377,12 +2377,13 @@
     <bcf:citekey order="2" intorder="1">clingo14</bcf:citekey>
     <bcf:citekey order="3" intorder="1">DIMOPOULOS_2019</bcf:citekey>
     <bcf:citekey order="4" intorder="1">DIMOPOULOS_2019</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">seipp-et-al-zenodo2017</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">fiser_2025_16423302</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">DIMOPOULOS_2019</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">DIMOPOULOS_2019</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">seipp-et-al-zenodo2017</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">fiser_2025_16423302</bcf:citekey>
     <bcf:citekey order="8" intorder="1">DIMOPOULOS_2019</bcf:citekey>
     <bcf:citekey order="9" intorder="1">DIMOPOULOS_2019</bcf:citekey>
     <bcf:citekey order="10" intorder="1">DIMOPOULOS_2019</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">DIMOPOULOS_2019</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="ynt">

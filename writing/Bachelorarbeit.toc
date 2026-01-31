@@ -12,15 +12,15 @@
 \contentsline {subsection}{\numberline {2.2.3}encoding for $\boldsymbol {\exists }$-step plans}{11}{subsection.41}%
 \contentsline {subsection}{\numberline {2.2.4}encoding for relaxed $\boldsymbol {\exists }$-step plans}{12}{subsection.46}%
 \contentsline {section}{\numberline {2.3}Proof of Correctness}{13}{section.50}%
-\contentsline {chapter}{\numberline {3}Method}{18}{chapter.60}%
-\contentsline {section}{\numberline {3.1}Pipeline Overview}{18}{section.61}%
-\contentsline {section}{\numberline {3.2}Changes in the ASP encodings}{18}{section.65}%
-\contentsline {section}{\numberline {3.3}Optimizations}{19}{section.66}%
-\contentsline {subsection}{\numberline {3.3.1}Mutexes}{19}{subsection.67}%
-\contentsline {subsection}{\numberline {3.3.2}Guess and Check}{20}{subsection.72}%
-\contentsline {subsection}{\numberline {3.3.3}Heuristic}{21}{subsection.74}%
-\contentsline {section}{\numberline {3.4}Experiment}{22}{section.76}%
-\contentsline {chapter}{\numberline {4}Results}{23}{chapter.77}%
-\contentsline {section}{\numberline {4.1}One to One Comparison}{23}{section.78}%
-\contentsline {chapter}{\nonumberline Bibliography}{24}{chapter*.79}%
+\contentsline {chapter}{\numberline {3}Method}{20}{chapter.60}%
+\contentsline {section}{\numberline {3.1}Pipeline Overview}{20}{section.61}%
+\contentsline {section}{\numberline {3.2}Changes in the ASP encodings}{20}{section.65}%
+\contentsline {section}{\numberline {3.3}Optimizations}{21}{section.66}%
+\contentsline {subsection}{\numberline {3.3.1}Mutexes}{21}{subsection.67}%
+\contentsline {subsection}{\numberline {3.3.2}Guess and Check}{22}{subsection.72}%
+\contentsline {subsection}{\numberline {3.3.3}Heuristic}{23}{subsection.74}%
+\contentsline {section}{\numberline {3.4}Experiment}{24}{section.76}%
+\contentsline {chapter}{\numberline {4}Results}{25}{chapter.77}%
+\contentsline {section}{\numberline {4.1}One to One Comparison}{25}{section.78}%
+\contentsline {chapter}{\nonumberline Bibliography}{26}{chapter*.79}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
