@@ -1,7 +1,9 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Pipeline for testing the different planning encodings\relax }}{20}{figure.caption.62}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Pipeline for testing the different planning encodings\relax }}{24}{figure.caption.59}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Coverage analysis: Number of solved instances per algorithm across benchmark domains. The heatmap indicates the absolute number of solved instances (left) out of the total available instances (right).\relax }}{30}{figure.caption.76}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime analysis: Average solving time (in seconds) for successfully solved instances. Red cells indicate higher runtimes, while light yellow cells indicate faster performance.\relax }}{31}{figure.caption.77}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

@@ -100,8 +100,19 @@ def create_heat_map(exp_path):
             print(f"Error reading properties file: {e}")
     
     results, problem_solutions, num_problems = get_algo_stats(data)
-    algos = list(results.keys())
+    algo_order = ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess_and_check"]
+    algos = [algo for algo in algo_order if algo in results]
     domains = sorted(list(filter_grouped_domains(results, algos)))
+
+    algo_labels = {
+        "forall": r"$\forall$",
+        "exists": r"$\exists$",
+        "exists_edge": "E",
+        "relaxed": "R",
+        "sequential": "S",
+        "guess_and_check": "G&C"
+    }
+    display_algos = [algo_labels.get(algo, algo) for algo in algos]
 
     filtered_times = filter_times(problem_solutions, algos, disable=False)
     result_matrix, normalized_result_matrix, time_matrix = create_matrices(results, filtered_times, algos, domains, num_problems)
@@ -110,22 +121,22 @@ def create_heat_map(exp_path):
     time_domains = [d for d, not_nan in zip(domains, not_nan_cols) if not_nan]
     filtered_time_matrix = time_matrix[:, not_nan_cols]
 
-    chunk_size = 10
+    chunk_size = 20
     for chunk_idx in range(0, len(domains), chunk_size):
         # heatmap for solved instances
         chunk_domains = domains[chunk_idx:chunk_idx+chunk_size]
         chunk_result = result_matrix[:, chunk_idx:chunk_idx+chunk_size]
         chunk_normalized_result = normalized_result_matrix[:, chunk_idx:chunk_idx+chunk_size]
-        fig, ax = plt.subplots(figsize=(12,6))
+        fig, ax = plt.subplots(figsize=(16,5))
         _ = ax.imshow(chunk_normalized_result, cmap='YlGn', aspect='auto')
         ax.set_xticks(range(len(chunk_domains)), labels=chunk_domains,
                     rotation=45, ha="right", rotation_mode="anchor")
-        ax.set_yticks(range(len(algos)), labels=algos)
+        ax.set_yticks(range(len(algos)), labels=display_algos)
         for i in range(len(algos)):
             for j, d in enumerate(chunk_domains):
                 _ = ax.text(j, i, f"{chunk_result[i,j]} / {num_problems[d]}",
-                            ha="center", va="center", color="black")
-        ax.set_title(f"Solved instances (Part {chunk_idx//chunk_size + 1})")
+                            ha="center", va="center", color="black", fontsize=9)
+        #ax.set_title(f"Solved instances (Part {chunk_idx//chunk_size + 1})")
         fig.tight_layout()
         plt.savefig(f"{exp_path}/solved_part{chunk_idx//chunk_size + 1}.png")
         plt.close()
@@ -143,12 +154,12 @@ def create_heat_map(exp_path):
             # If all values are NaN, use dummy values
             norm = plt.matplotlib.colors.Normalize(vmin=0, vmax=1)
         
-        fig2, ax2 = plt.subplots(figsize=(12,6))
+        fig2, ax2 = plt.subplots(figsize=(16,5))
         _ = ax2.imshow(chunk_time, cmap='YlOrRd', aspect='auto', 
                        norm=norm)
         ax2.set_xticks(range(len(chunk_time_domains)), labels=chunk_time_domains,
                     rotation=45, ha="right", rotation_mode="anchor")
-        ax2.set_yticks(range(len(algos)), labels=algos)
+        ax2.set_yticks(range(len(algos)), labels=display_algos)
         for i in range(len(algos)):
             for j in range(len(chunk_time_domains)):
                 if np.isnan(chunk_time[i,j]):

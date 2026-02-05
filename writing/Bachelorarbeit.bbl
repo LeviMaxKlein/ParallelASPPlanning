@@ -19,6 +19,111 @@
 
 \refsection{0}
   \datalist[entry]{ynt/global//global/global/global}
+    \entry{gel88}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=9ddf8a4d782a7a6f34c25fbc4ca822b1}{%
+           family={Gelfond},
+           familyi={G\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3f9f7c9937297077325233d345cf9c91}{%
+           family={Lifschitz},
+           familyi={L\bibinitperiod},
+           given={Vladimir},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{3}{}{%
+        {{hash=ddca879cfd269e5b2fffa9fd692d4a9a}{%
+           family={Kowalski},
+           familyi={K\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod}}}%
+        {{hash=4972ef9d396557b8cf4009b3f91e5995}{%
+           family={Bowen},
+           familyi={B\bibinitperiod}}}%
+        {{hash=b680c26b4ebbd087104c20cca189af59}{%
+           family={Kenneth},
+           familyi={K\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {MIT Press}%
+      }
+      \strng{namehash}{701aac313c79e95b5099346df9bba24a}
+      \strng{fullhash}{701aac313c79e95b5099346df9bba24a}
+      \strng{fullhashraw}{701aac313c79e95b5099346df9bba24a}
+      \strng{bibnamehash}{701aac313c79e95b5099346df9bba24a}
+      \strng{authorbibnamehash}{701aac313c79e95b5099346df9bba24a}
+      \strng{authornamehash}{701aac313c79e95b5099346df9bba24a}
+      \strng{authorfullhash}{701aac313c79e95b5099346df9bba24a}
+      \strng{authorfullhashraw}{701aac313c79e95b5099346df9bba24a}
+      \strng{editorbibnamehash}{47777b3bb9bf793f3438d6dee9e09b91}
+      \strng{editornamehash}{47777b3bb9bf793f3438d6dee9e09b91}
+      \strng{editorfullhash}{47777b3bb9bf793f3438d6dee9e09b91}
+      \strng{editorfullhashraw}{47777b3bb9bf793f3438d6dee9e09b91}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of International Logic Programming Conference and Symposium}
+      \field{title}{The Stable Model Semantics for Logic Programming}
+      \field{year}{1988}
+      \field{pages}{1070\bibrangedash 1080}
+      \range{pages}{11}
+      \verb{urlraw}
+      \verb http://www.cs.utexas.edu/users/ai-lab?gel88
+      \endverb
+      \verb{url}
+      \verb http://www.cs.utexas.edu/users/ai-lab?gel88
+      \endverb
+    \endentry
+    \entry{Dimopoulos1997}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=f225e6f3a40a85dfe2477e613cdd91d6}{%
+           family={Dimopoulos},
+           familyi={D\bibinitperiod},
+           given={Yannis},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ea3c99f847e19974acae14650e2c41f0}{%
+           family={Nebel},
+           familyi={N\bibinitperiod},
+           given={Bernhard},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=46ba2e918706134f01f89f44e12e58bc}{%
+           family={Koehler},
+           familyi={K\bibinitperiod},
+           given={Jana},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \strng{fullhash}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \strng{fullhashraw}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \strng{bibnamehash}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \strng{authorbibnamehash}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \strng{authornamehash}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \strng{authorfullhash}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \strng{authorfullhashraw}{d7c4f5b48e44b006c096dc16b07d1a2f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-3-540-63912-1}
+      \field{journaltitle}{Proceedings of the Fourth European Conference on Planning}
+      \field{month}{10}
+      \field{title}{Encoding Planning Problems in Nonmonotonic Logic Programs}
+      \field{year}{1997}
+      \verb{doi}
+      \verb 10.1007/3-540-63912-8_84
+      \endverb
+    \endentry
     \entry{Helmert2006}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e76d7a9be5601c1bb9c96f087b8d55df}{%
@@ -48,6 +153,99 @@
       \field{year}{2006}
       \field{pages}{191\bibrangedash 246}
       \range{pages}{56}
+    \endentry
+    \entry{RINTANEN20061031}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=515fda71c651bb7137be05148412399a}{%
+           family={Rintanen},
+           familyi={R\bibinitperiod},
+           given={Jussi},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7be93973d90f1e608fa847c44ad98c54}{%
+           family={Heljanko},
+           familyi={H\bibinitperiod},
+           given={Keijo},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e92901947a7da887056e10cf30824296}{%
+           family={Niemelä},
+           familyi={N\bibinitperiod},
+           given={Ilkka},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{77e94a0669018cec415163d2b4c6d610}
+      \strng{fullhash}{77e94a0669018cec415163d2b4c6d610}
+      \strng{fullhashraw}{77e94a0669018cec415163d2b4c6d610}
+      \strng{bibnamehash}{77e94a0669018cec415163d2b4c6d610}
+      \strng{authorbibnamehash}{77e94a0669018cec415163d2b4c6d610}
+      \strng{authornamehash}{77e94a0669018cec415163d2b4c6d610}
+      \strng{authorfullhash}{77e94a0669018cec415163d2b4c6d610}
+      \strng{authorfullhashraw}{77e94a0669018cec415163d2b4c6d610}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0004-3702}
+      \field{journaltitle}{Artificial Intelligence}
+      \field{number}{12}
+      \field{title}{Planning as satisfiability: parallel plans and algorithms for plan search}
+      \field{volume}{170}
+      \field{year}{2006}
+      \field{pages}{1031\bibrangedash 1080}
+      \range{pages}{50}
+      \verb{doi}
+      \verb 10.1016/j.artint.2006.08.002
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S0004370206000774
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S0004370206000774
+      \endverb
+    \endentry
+    \entry{Wehrle2007}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=993c450d1acd0f34914895c419bc8642}{%
+           family={Wehrle},
+           familyi={W\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=515fda71c651bb7137be05148412399a}{%
+           family={Rintanen},
+           familyi={R\bibinitperiod},
+           given={Jussi},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7205eef5e620096a0e66cd46aa440085}
+      \strng{fullhash}{7205eef5e620096a0e66cd46aa440085}
+      \strng{fullhashraw}{7205eef5e620096a0e66cd46aa440085}
+      \strng{bibnamehash}{7205eef5e620096a0e66cd46aa440085}
+      \strng{authorbibnamehash}{7205eef5e620096a0e66cd46aa440085}
+      \strng{authornamehash}{7205eef5e620096a0e66cd46aa440085}
+      \strng{authorfullhash}{7205eef5e620096a0e66cd46aa440085}
+      \strng{authorfullhashraw}{7205eef5e620096a0e66cd46aa440085}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-3-540-76926-2}
+      \field{month}{12}
+      \field{title}{Planning as Satisfiability with Relaxed $\exists$-Step Plans.}
+      \field{volume}{4830}
+      \field{year}{2007}
+      \field{pages}{244\bibrangedash 253}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1007/978-3-540-76928-6_26
+      \endverb
     \endentry
     \entry{clingo14}{report}{}{}
       \name{author}{4}{}{%

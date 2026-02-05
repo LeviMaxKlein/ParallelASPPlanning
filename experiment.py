@@ -158,15 +158,6 @@ def create_plots():
     create_heat_map(Path(exp.path + "-eval"))
 
 
-def domain_as_category(run1, run2):
-    return run1["domain"]
-
-
-def aggregate_domain_variants(run1, run2):
-    run1["domain"] = run1["domain"].split("-")[0]
-    run2["domain"] = run2["domain"].split("-")[0]
-    return run1["domain"]
-
 exp_name = "ParallelASPPlanning"
 if args.domains:
     for domain in sorted(args.domains):
@@ -218,9 +209,5 @@ exp.add_step("start", exp.start_runs)
 exp.add_step("parse", exp.parse)
 exp.add_fetcher(name="fetch", filter=remove_explained_errors)
 exp.add_report(BaseReport(attributes=ATTRIBUTES, filter = remove_unsat_times), outfile="report.html")
-for i, algo1 in enumerate(ALGORITHM):
-    for algo2 in ALGORITHM[i+1:]:
-        if algo1 != algo2:
-            exp.add_report(ScatterPlotReport(get_category=aggregate_domain_variants, attributes=["clingo_total_time"], filter_algorithm=[algo1, algo2]), outfile=f"scatter_{algo1}_vs_{algo2}.png")
 exp.add_step("plots", lambda: create_plots())
 exp.run_steps()
