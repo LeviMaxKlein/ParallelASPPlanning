@@ -29,6 +29,7 @@ def get_algo_stats(data):
         if result == 1:
             problem_solutions[key][algo] = time
 
+
     # Count number of problems per grouped domain
     for (domain, _) in problem_solutions.keys():
         grouped_domain = domain.split("-")[0]
@@ -116,7 +117,6 @@ def create_heat_map(exp_path):
 
     filtered_times = filter_times(problem_solutions, algos, disable=False)
     result_matrix, normalized_result_matrix, time_matrix = create_matrices(results, filtered_times, algos, domains, num_problems)
-
     not_nan_cols = ~np.all(np.isnan(time_matrix), axis=0)
     time_domains = [d for d, not_nan in zip(domains, not_nan_cols) if not_nan]
     filtered_time_matrix = time_matrix[:, not_nan_cols]

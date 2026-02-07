@@ -248,7 +248,7 @@
       \endverb
     \endentry
     \entry{clingo14}{report}{}{}
-      \name{author}{4}{}{%
+      \name{author}{4}{ul=4}{%
         {{un=0,uniquepart=base,hash=a296fbe902a96f2ceebb7398463f3e13}{%
            family={Gebser},
            familyi={G\bibinitperiod},
@@ -277,12 +277,12 @@
       \list{institution}{1}{%
         {arXiv}%
       }
-      \strng{namehash}{980252df49c9c725a120aee1519288fc}
+      \strng{namehash}{6ff2ecbb0dace9a796d510f578f069a3}
       \strng{fullhash}{6ff2ecbb0dace9a796d510f578f069a3}
       \strng{fullhashraw}{6ff2ecbb0dace9a796d510f578f069a3}
-      \strng{bibnamehash}{980252df49c9c725a120aee1519288fc}
-      \strng{authorbibnamehash}{980252df49c9c725a120aee1519288fc}
-      \strng{authornamehash}{980252df49c9c725a120aee1519288fc}
+      \strng{bibnamehash}{6ff2ecbb0dace9a796d510f578f069a3}
+      \strng{authorbibnamehash}{6ff2ecbb0dace9a796d510f578f069a3}
+      \strng{authornamehash}{6ff2ecbb0dace9a796d510f578f069a3}
       \strng{authorfullhash}{6ff2ecbb0dace9a796d510f578f069a3}
       \strng{authorfullhashraw}{6ff2ecbb0dace9a796d510f578f069a3}
       \field{sortinit}{2}
@@ -301,6 +301,163 @@
       \endverb
       \verb{url}
       \verb https://arxiv.org/abs/1405.3694v1
+      \endverb
+    \endentry
+    \entry{bomanson2016}{article}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=dc36094f0fb0db2971bf418eb5a0e297}{%
+           family={Bomanson},
+           familyi={B\bibinitperiod},
+           given={Jori},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=a296fbe902a96f2ceebb7398463f3e13}{%
+           family={Gebser},
+           familyi={G\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ed6a24604d923493e91425fbb35ac736}{%
+           family={Janhunen},
+           familyi={J\bibinitperiod},
+           given={Tomi},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3fe0253f0b3212a4109e50143a91fede}{%
+           family={Kaufmann},
+           familyi={K\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{eba0f35735c496e866dafb1f9e03eb93}
+      \strng{fullhash}{7daabc35b3c6399dd0250d9d8e9558c1}
+      \strng{fullhashraw}{7daabc35b3c6399dd0250d9d8e9558c1}
+      \strng{bibnamehash}{eba0f35735c496e866dafb1f9e03eb93}
+      \strng{authorbibnamehash}{eba0f35735c496e866dafb1f9e03eb93}
+      \strng{authornamehash}{eba0f35735c496e866dafb1f9e03eb93}
+      \strng{authorfullhash}{7daabc35b3c6399dd0250d9d8e9558c1}
+      \strng{authorfullhashraw}{7daabc35b3c6399dd0250d9d8e9558c1}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Fundamenta Informaticae}
+      \field{month}{11}
+      \field{title}{Answer Set Programming Modulo Acyclicity*}
+      \field{volume}{147}
+      \field{year}{2016}
+      \field{pages}{63\bibrangedash 91}
+      \range{pages}{29}
+      \verb{doi}
+      \verb 10.3233/FI-2016-1398
+      \endverb
+    \endentry
+    \entry{gebser_et_al:OASIcs.ICLP.2016.2}{inproceedings}{}{}
+      \name{author}{6}{ul=4}{%
+        {{un=0,uniquepart=base,hash=a296fbe902a96f2ceebb7398463f3e13}{%
+           family={Gebser},
+           familyi={G\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=75758236531a52ffc97ef10f8b482f05}{%
+           family={Kaminski},
+           familyi={K\bibinitperiod},
+           given={Roland},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3fe0253f0b3212a4109e50143a91fede}{%
+           family={Kaufmann},
+           familyi={K\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=121398acde74ccd9e0d29d065c9c45eb}{%
+           family={Ostrowski},
+           familyi={O\bibinitperiod},
+           given={Max},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3c55d70c19bd5f5a654a6ad7ae64450c}{%
+           family={Schaub},
+           familyi={S\bibinitperiod},
+           given={Torsten},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5a28f806bf3518aaa98d2cdef7416984}{%
+           family={Wanko},
+           familyi={W\bibinitperiod},
+           given={Philipp},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{4}{}{%
+        {{hash=2f544e49b5c235e9f223d60a309d458d}{%
+           family={Carro},
+           familyi={C\bibinitperiod},
+           given={Manuel},
+           giveni={M\bibinitperiod}}}%
+        {{hash=27a427c35bc84c7b100ac2fb06479d6b}{%
+           family={King},
+           familyi={K\bibinitperiod},
+           given={Andy},
+           giveni={A\bibinitperiod}}}%
+        {{hash=54c24632c402d4ee028acbad004e09c1}{%
+           family={Saeedloei},
+           familyi={S\bibinitperiod},
+           given={Neda},
+           giveni={N\bibinitperiod}}}%
+        {{hash=fbca98380a72ecfc1d09f31a9dd645b4}{%
+           family={De\bibnamedelima Vos},
+           familyi={D\bibinitperiod\bibinitdelim V\bibinitperiod},
+           given={Marina},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Dagstuhl, Germany}%
+      }
+      \list{publisher}{1}{%
+        {Schloss Dagstuhl -- Leibniz-Zentrum für Informatik}%
+      }
+      \strng{namehash}{7674b857c4a422ce8c9f1de8b2a97bf6}
+      \strng{fullhash}{20ec61f8a8be834812019bad4bc7fa30}
+      \strng{fullhashraw}{20ec61f8a8be834812019bad4bc7fa30}
+      \strng{bibnamehash}{7674b857c4a422ce8c9f1de8b2a97bf6}
+      \strng{authorbibnamehash}{7674b857c4a422ce8c9f1de8b2a97bf6}
+      \strng{authornamehash}{7674b857c4a422ce8c9f1de8b2a97bf6}
+      \strng{authorfullhash}{20ec61f8a8be834812019bad4bc7fa30}
+      \strng{authorfullhashraw}{20ec61f8a8be834812019bad4bc7fa30}
+      \strng{editorbibnamehash}{ce662def6ff1c45c4cc4854c767b1201}
+      \strng{editornamehash}{ce662def6ff1c45c4cc4854c767b1201}
+      \strng{editorfullhash}{09a5709d5e4d70a11347fd76cf6cfecc}
+      \strng{editorfullhashraw}{09a5709d5e4d70a11347fd76cf6cfecc}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{annotation}{Keywords: Answer Set Programming, Theory Language, Theory Propagation}
+      \field{booktitle}{Technical Communications of the 32nd International Conference on Logic Programming (ICLP 2016)}
+      \field{isbn}{978-3-95977-007-1}
+      \field{issn}{2190-6807}
+      \field{series}{Open Access Series in Informatics (OASIcs)}
+      \field{title}{{Theory Solving Made Easy with Clingo 5}}
+      \field{volume}{52}
+      \field{year}{2016}
+      \field{pages}{2:1\bibrangedash 2:15}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.4230/OASIcs.ICLP.2016.2
+      \endverb
+      \verb{urlraw}
+      \verb https://drops.dagstuhl.de/entities/document/10.4230/OASIcs.ICLP.2016.2
+      \endverb
+      \verb{url}
+      \verb https://drops.dagstuhl.de/entities/document/10.4230/OASIcs.ICLP.2016.2
       \endverb
     \endentry
     \entry{seipp-et-al-zenodo2017}{misc}{}{}
@@ -352,49 +509,49 @@
       \field{year}{2017}
     \endentry
     \entry{DIMOPOULOS_2019}{article}{}{}
-      \name{author}{5}{}{%
-        {{un=0,uniquepart=base,hash=0b64db481b94619c032005be48391455}{%
-           family={DIMOPOULOS},
+      \name{author}{5}{ul=2}{%
+        {{un=0,uniquepart=base,hash=f225e6f3a40a85dfe2477e613cdd91d6}{%
+           family={Dimopoulos},
            familyi={D\bibinitperiod},
-           given={YANNIS},
+           given={Yannis},
            giveni={Y\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=c6ee737c8e3ec3483ee5c49678bc01c2}{%
-           family={GEBSER},
+        {{un=0,uniquepart=base,hash=a296fbe902a96f2ceebb7398463f3e13}{%
+           family={Gebser},
            familyi={G\bibinitperiod},
-           given={MARTIN},
+           given={Martin},
            giveni={M\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=6be987905986d28ba54a5197e207efce}{%
-           family={LÜHNE},
+        {{un=0,uniquepart=base,hash=e49a2cf8fd2d203107f8209236a4f9d4}{%
+           family={Lühne},
            familyi={L\bibinitperiod},
-           given={PATRICK},
+           given={Patrick},
            giveni={P\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=5c0f26bc3f74b545a1df7a61e2a1222f}{%
-           family={ROMERO},
+        {{un=0,uniquepart=base,hash=586007140096e6d78832f56de1edf859}{%
+           family={Romero},
            familyi={R\bibinitperiod},
-           given={JAVIER},
+           given={Javier},
            giveni={J\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=6e2901afd23ef7cbf7811353fcd49cb8}{%
-           family={SCHAUB},
+        {{un=0,uniquepart=base,hash=3c55d70c19bd5f5a654a6ad7ae64450c}{%
+           family={Schaub},
            familyi={S\bibinitperiod},
-           given={TORSTEN},
+           given={Torsten},
            giveni={T\bibinitperiod},
            givenun=0}}%
       }
       \list{publisher}{1}{%
         {Cambridge University Press (CUP)}%
       }
-      \strng{namehash}{98b27f0d8941e422cdc1b9b7216d3546}
-      \strng{fullhash}{5054b72abd3920002935af5c5d537eb0}
-      \strng{fullhashraw}{5054b72abd3920002935af5c5d537eb0}
-      \strng{bibnamehash}{98b27f0d8941e422cdc1b9b7216d3546}
-      \strng{authorbibnamehash}{98b27f0d8941e422cdc1b9b7216d3546}
-      \strng{authornamehash}{98b27f0d8941e422cdc1b9b7216d3546}
-      \strng{authorfullhash}{5054b72abd3920002935af5c5d537eb0}
-      \strng{authorfullhashraw}{5054b72abd3920002935af5c5d537eb0}
+      \strng{namehash}{03022d4d8d25f6535fbc759bd0e4c3e0}
+      \strng{fullhash}{83509b25921ea6bb6f36fde4d884a724}
+      \strng{fullhashraw}{83509b25921ea6bb6f36fde4d884a724}
+      \strng{bibnamehash}{03022d4d8d25f6535fbc759bd0e4c3e0}
+      \strng{authorbibnamehash}{03022d4d8d25f6535fbc759bd0e4c3e0}
+      \strng{authornamehash}{03022d4d8d25f6535fbc759bd0e4c3e0}
+      \strng{authorfullhash}{83509b25921ea6bb6f36fde4d884a724}
+      \strng{authorfullhashraw}{83509b25921ea6bb6f36fde4d884a724}
       \field{sortinit}{2}
       \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{extradatescope}{labelyear}

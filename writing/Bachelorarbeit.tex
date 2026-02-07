@@ -19,56 +19,70 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% PACKAGES:
-
-% Use German :
-% Input encoding
+% ============================================================
+% ENCODING & FONTS
+% ============================================================
 \usepackage[utf8]{inputenc}
-% Font encoding
 \usepackage[T1]{fontenc}
-% Index-generation
-\usepackage{makeidx}
-% Einbinden von URLs:
-\usepackage{url}
-% Special \LaTex symbols (e.g. \BibTeX):
-\usepackage{doc}
-% Include Graphic-files:
-\usepackage{graphicx}
 \usepackage{microtype}
+
+% ============================================================
+% LANGUAGE & BIBLIOGRAPHY
+% ============================================================
+\usepackage[backend=biber, style=authoryear, sorting=ynt]{biblatex}
+\addbibresource{references.bib}
+
+% ============================================================
+% LAYOUT & SPACING
+% ============================================================
 \usepackage{setspace}
+\usepackage{adjustbox}
+
+% ============================================================
+% LISTS & ENUMERATIONS
+% ============================================================
 \usepackage{enumitem}
 \setlist{itemsep=1pt, parsep=0pt, topsep=2pt}
+
+% ============================================================
+% MATHEMATICS
+% ============================================================
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
-\usepackage{adjustbox}
-
-\usepackage{mdframed}
+\usepackage{colonequals}
 \counterwithout{equation}{chapter}
 
-
-\newmdtheoremenv{theo}{Theorem}
-
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}
-\theoremstyle{definition}
-\newtheorem*{definition}{Definition}
-\theoremstyle{remark}
-\newtheorem{example}{\textit{Example}}
-\theoremstyle{remark}
-\newtheorem*{remark}{Remark}
-\theoremstyle{remark}
-\newtheorem*{notation}{Notation}
-
-\usepackage[bookmarks=true,colorlinks,pdfpagelabels,pdfstartview = FitH,bookmarksopen = true,bookmarksnumbered = true,linkcolor = blue,plainpages = false,hypertexnames = false,citecolor = blue,urlcolor=blue]{hyperref}
-
-\usepackage{minted}
-\usepackage{scrhack}
+% ============================================================
+% GRAPHICS & FIGURES
+% ============================================================
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+\usepackage{subcaption}
 \usepackage{caption}
 
-\usepackage{colonequals}
-\newcommand*{\logeq}{\ratio\Longleftrightarrow}
-\newcommand{\dom}{\mathrm{dom}}
+% ============================================================
+% CODE LISTINGS
+% ============================================================
+\usepackage{minted}
+\usepackage{scrhack}
+
+% ============================================================
+% THEOREMS & DEFINITIONS
+% ============================================================
+\usepackage{mdframed}
+
+\theoremstyle{definition}
+\newmdtheoremenv{theo}{Theorem}
+
+\theoremstyle{definition}
+\newtheorem*{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem{example}{\textit{Example}}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
 
 \newtheoremstyle{bfnote}
   {}{}
@@ -77,9 +91,37 @@
   { }{\thmname{#1}\thmnumber{ #2}\thmnote{ \textit{#3}}}
 \theoremstyle{bfnote}
 \newtheorem{defi}{Definition}
-% hyperrefs in the documents
-\usepackage[backend=biber, style=authoryear, sorting=ynt]{biblatex}
-\addbibresource{references.bib}
+
+% ============================================================
+% HYPERLINKS & REFERENCES
+% ============================================================
+\usepackage[
+  bookmarks=true,
+  colorlinks,
+  pdfpagelabels,
+  pdfstartview=FitH,
+  bookmarksopen=true,
+  bookmarksnumbered=true,
+  linkcolor=blue,
+  plainpages=false,
+  hypertexnames=false,
+  citecolor=blue,
+  urlcolor=blue
+]{hyperref}
+
+% ============================================================
+% UTILITIES
+% ============================================================
+\usepackage{makeidx}
+\usepackage{url}
+\usepackage{doc}
+
+% ============================================================
+% CUSTOM COMMANDS
+% ============================================================
+\newcommand*{\logeq}{\ratio\Longleftrightarrow}
+\newcommand{\dom}{\mathrm{dom}}
+
 \renewcommand*{\nameyeardelim}{\addspace}
 
 \DeclareCiteCommand{\parencite}
@@ -203,6 +245,7 @@ In chapter \ref{pipeline} we show the pipeline from translating a pddl problem t
 Before discussing the specific encodings and optimizations for parallel planning, we establish a precise mathematical model of the planning problem.
 
 \begin{defi}[Multi-valued planning task]
+    \label{def:MVPlan}
     A STRIPS-like multivalued planning task according to \parencite{Helmert2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
     \begin{itemize}
       \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ is associated with a finite domain $\dom(x)$. In any given state, a fluent $x$ is assigned exactly one value $v \in \dom(x)$.
@@ -346,7 +389,7 @@ Each parallel representation has different restrictions on how the preconditions
 \begin{itemize}
     \item \textbf{$\forall$-step serialization} requires strong independence: Since the set must be executable in \textit{any} order, no action is allowed to invalidate the preconditions of another action in the same set and since any action $a \in A$ must be executable at the start, all preconditions have to be satisfied in the current state $s$.
     
-    \item \textbf{$\exists$-step serialization} relaxes the independence. Preconditions must still be satisfied in $s$ (i.e., actions cannot enable each other). However, conflicts are allowed: One action $a \in A$ may destroy the precondition of another action $a' \in A$, provided that there exists \textit{some} valid execution order where $a$ comes after $a'$.
+    \item \textbf{$\exists$-step serialization} relaxes the independence. Preconditions must still be satisfied in $s$ (i.e., actions cannot enable each other). However, conflicts are allowed: One action $a \in A$ may invalidate the precondition of another action $a' \in A$, provided that there exists \textit{some} valid execution order where $a$ comes after $a'$.
     
     \item \textbf{Relaxed $\exists$-step serialization} is the least restrictive. It drops the requirement that preconditions must hold in $s$. An action $a \in A$ can establish the preconditions required by another action $a' \in A$, as long as they can be ordered such that the $a$ comes before $a'$.
 \end{itemize}
@@ -354,6 +397,7 @@ Each parallel representation has different restrictions on how the preconditions
 Based on these definitions of valid parallel steps, we can now define the corresponding parallel plans.
 
 \begin{defi}[Parallel Plans]
+  \label{def:PPlan}
   Let $A = \langle A_1, \dots, A_m \rangle$ be a sequence of confluent sets of actions. $A$ is a \textit{$\forall$-step, $\exists$-step or relaxed $\exists$-step plan} iff
   \begin{itemize}
     \item $s_m(x) = s_*(x)$ for each $x \in \dom(s_*)$
@@ -384,7 +428,7 @@ In this section, we have established the formal framework for multi-valued plann
 We defined the static components of the world (fluents and states), the dynamic transition logic (applying actions), and the conditions under which sets of actions can be executed in parallel.
 With these formal definitions in place, the next chapter will demonstrate how to translate this theoretical framework into concrete Answer Set Programming encodings to solve planning tasks efficiently.
 
-\section{Introduction to ASP}
+\section{Introduction to ASP} \label{asp encoding}
 Answer Set Programming (ASP) is a declarative problem-solving approach oriented towards difficult (primarily NP-hard) search problems. Unlike imperative programming, where the programmer specifies the control flow to compute a solution, ASP follows a declarative paradigm: the problem is described as a logic program such that its valid models—called \textit{answer sets}—correspond to the solutions of the original problem. This methodology allows for a clean separation between the problem description (the logic program) and the solving algorithms (implemented by ASP systems like \textit{clingo}).
 
 The theoretical foundation of ASP lies in the stable model semantics of logic programming \parencite{gel88}. To formally define these programs, we first introduce their basic building blocks. The most fundamental units are \textit{atoms} of the form $p(t_1, \dots, t_n)$ or $p$, which can either be true or false. 
@@ -447,12 +491,11 @@ The \textbf{\textit{check(t)}} subprogram (Line 4) is a parametrized subprogram 
 
 The \textbf{\textit{step(t)}} subprogram (Line 6-9) is grounded for each timestep $t$ starting at $t=1$. 
 Note that postconditions of applied actions in timestep $t$ become effective in $t$, while their preconditions have to hold in $t-1$.
-\begin{itemize}
-    \item Line 6 generates the state candidates for timestep $t$, assigning every fluent $X$ exactly one value $V$ from its domain.
-    \item Line 7 generates arbitrary sets of actions $occurs(A,t)$ for the current timestep. These actions and the generated state must obey the constraints in Lines 8 and 9.
-    \item Line 8 ensures that the postcondition of an occurring action is actually applied in the state. This also asserts the confluence of the set of actions: if the postconditions of two actions have different values for the same fluent ($V = a^e(X) \ne a'^e(X) = V'$), the uniqueness of the value in the choice rule (Line 6) would be violated.
-    \item Line 9 guarantees that fluents not affected by any action keep their value from the previous timestep. It rejects any change in a fluent's value that is not explained by an action.
-\end{itemize}
+Line 6 generates the state candidates for timestep $t$, assigning every fluent $X$ exactly one value $V$ from its domain.
+Line 7 generates arbitrary sets of actions $occurs(A,t)$ for the current timestep. These actions and the generated state must obey the constraints in Lines 8 and 9.
+Line 8 ensures that the postcondition of an occurring action is actually applied in the state. This also asserts the confluence of the set of actions: if the postconditions of two actions have different values for the same fluent ($V = a^e(X) \ne a'^e(X) = V'$), the uniqueness of the value in the choice rule (Line 6) would be violated.
+Finally, Line 9 guarantees that fluents not affected by any action keep their value from the previous timestep. It rejects any change in a fluent's value that is not explained by an action.
+
 In summary, Listing \ref{core} establishes the state transitions consistent with the postcondition of the chosen actions. 
 However, it does not yet verify the \textit{applicability} of these actions regarding their preconditions, nor does it enforce the specific serializability requirements (e.g., acyclicity) of the parallel semantics. 
 
@@ -473,15 +516,15 @@ Line 3 ensures that only one action can occur in each timestep $t$.
 \begin{example}
 Running this with our example, we get three possible sequential plans.
 \begin{listing}[H]
-  \caption{Output from clingo for sequential encoding}
-  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
-    Answer: 1
-    occurs(getKey,1) occurs(lightOut,2) occurs(openDoor,3) occurs(goOut,4) occurs(closeDoor,5)
-    Answer: 2
-    occurs(getKey,1) occurs(openDoor,2) occurs(lightOut,3) occurs(goOut,4) occurs(closeDoor,5)
-    Answer: 3
-    occurs(lightOut,1) occurs(getKey,2) occurs(openDoor,3) occurs(goOut,4) occurs(closeDoor,5)
-  \end{minted}
+\caption{Output from clingo for sequential encoding}
+\begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
+Answer: 1
+occurs(getKey,1) occurs(lightOut,2) occurs(openDoor,3) occurs(goOut,4) occurs(closeDoor,5)
+Answer: 2
+occurs(getKey,1) occurs(openDoor,2) occurs(lightOut,3) occurs(goOut,4) occurs(closeDoor,5)
+Answer: 3
+occurs(lightOut,1) occurs(getKey,2) occurs(openDoor,3) occurs(goOut,4) occurs(closeDoor,5)
+\end{minted}
 \end{listing}
 \end{example}
 
@@ -512,20 +555,20 @@ The integrity constraint in Line 4 then ensures that for any fluent $X$, at most
 \begin{example}
   Running this with our example, we get two possible $\forall$-step plans.
 \begin{listing}[H]
-  \caption{Output from clingo for $\forall$-step encoding}
-  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
-    Answer: 1
-    occurs(getKey,1) occurs(openDoor,2) occurs(lightOut,2) occurs(goOut,3) occurs(closeDoor,4)
-    Answer: 2
-    occurs(lightOut,1) occurs(getKey,1) occurs(openDoor,2) occurs(goOut,3) occurs(closeDoor,4)
-  \end{minted}
+\caption{Output from clingo for $\forall$-step encoding}
+\begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
+Answer: 1
+occurs(getKey,1) occurs(openDoor,2) occurs(lightOut,2) occurs(goOut,3) occurs(closeDoor,4)
+Answer: 2
+occurs(lightOut,1) occurs(getKey,1) occurs(openDoor,2) occurs(goOut,3) occurs(closeDoor,4)
+\end{minted}
 \end{listing}
 \end{example}
 
-\subsection{encoding for \texorpdfstring{$\boldsymbol{\exists}$}{exists}-step plans}
+\subsection{Extension for \texorpdfstring{$\boldsymbol{\exists}$}{exists}-step plans}
 
 \begin{listing}[H]
-  \caption{Extension for $\exists$-step plans}
+  \caption{Extension of Listing \ref{core} for encoding $\exists$-step plans}
   \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos, firstline=2, firstnumber=1]{prolog}{encodings/EX_exists.lp}
   \label{exists}
 \end{listing}
@@ -543,45 +586,80 @@ An action can be safely applied, if all other actions whose preconditions it inv
 Finally, Line 6 ensures that actions does not circularly invalidates each other.
 %TODO explain alternative encoding
 
+
+\textcite{DIMOPOULOS_2019} presents two different approaches to encode the extension for $\exists$-step plans, shown in Listings \ref{exists} and \ref{exists_alt}.
+As before, Line 1 in both listings enforces the standard precondition check.
+The difference lies in how they enforce the serializability requirement: the set of parallel actions must allow for at least one valid permutation where no action invalidates the precondition of a subsequent action.
+
+Listing \ref{exists_alt} implements a graph-based approach.
+Since the common core (Listing \ref{core}) already establishes confluence, the only remaining requirement is the existence of a valid execution order. This effectively means excluding circular interference among the chosen actions.
+
+This lends itself to an implementation using the \texttt{\#edge} directive \parencite{gebser_et_al:OASIcs.ICLP.2016.2} of \textit{clingo}, where built-in acyclicity checking \parencite{bomanson2016} is utilized.
+
+The underlying structure corresponds to the \textit{conflict graph}. Following the definition in \textcite{DIMOPOULOS_2019}, we define the graph over all possible actions, with edges originating from the currently active set.
+\begin{defi}[Conflict Graph]
+  Let $A_t$ be the set of actions occurring at time $t$. The conflict graph $G_t = (\mathcal{O}, E)$ for timestep $t$ is a directed graph where
+  \[
+    E = \{\langle a, a' \rangle \mid \{a, a'\} \in A_t \times \mathcal{O} \setminus \{a\}, \exists X \in \dom(a^e) \cap \dom(a'^c): a^e(X) \ne a'^c(X)\}
+  \]
+\end{defi}
+Intuitively, an edge $(a, a') \in E$ exists if action $a$ invalidates a precondition of action $a'$.
+Line 2 of Listing \ref{exists_alt} directly translates these edges into the \texttt{\#edge} syntax. 
+A valid serialization of the actions corresponds to a reversed topological ordering of the subgraph induced by $A_t$.
+Consequently, any answer set containing a cycle within the set of occurring actions is automatically rejected by the solver's cycle-checking logic.
+
+Listing \ref{exists}, on the other hand, implements this acyclicity checking by a recursive derivation of the predicates \texttt{apply} and \texttt{ready}. 
+Line 4 defines the base case: Any action that does not occur is considered $ready$ (since it does not interfere with the execution order).
+Line 5 marks applied actions: If an action is successfully applied, it is also \texttt{ready}.
+Line 2-3 implements the ordering logic. An action $a_1$ can only be applied (\texttt{apply}) if all other actions $a_2$ whose preconditions it invalidates are already applied or do not occur (\texttt{ready}). 
+Line 6 is the final constraint: It requires that every occurring action must eventually become $ready$.
+If the subgraph induced by $A_t$ contains a cycle (e.g., $a_1$ invalidates $a_2$ and $a_2$ invalidates $a_1$), neither action can ever be derived as \texttt{apply}, because each would wait for the other to be ready first. Consequently, the constraint in Line 6 would be violated, causing the solver to reject the model.
+
 \begin{example}
   Running this with our example, we get three possible $\exists$-step plans.
 \begin{listing}[H]
-  \caption{Output from clingo for $\exists$-step encoding}
-  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
-    Answer: 1
-    occurs(getKey,1) occurs(openDoor,2) occurs(closeDoor,3) occurs(goOut,3) occurs(lightOut,3)
-    Answer: 2
-    occurs(getKey,1) occurs(openDoor,2) occurs(lightOut,2) occurs(closeDoor,3) occurs(goOut,3)
-    Answer: 3
-    occurs(lightOut,1) occurs(getKey,1) occurs(openDoor,2) occurs(closeDoor,3) occurs(goOut,3)
-  \end{minted}
+\caption{Output from clingo for $\exists$-step encoding}
+\begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
+Answer: 1
+occurs(getKey,1) occurs(openDoor,2) occurs(closeDoor,3) occurs(goOut,3) occurs(lightOut,3)
+Answer: 2
+occurs(getKey,1) occurs(openDoor,2) occurs(lightOut,2) occurs(closeDoor,3) occurs(goOut,3)
+Answer: 3
+occurs(lightOut,1) occurs(getKey,1) occurs(openDoor,2) occurs(closeDoor,3) occurs(goOut,3)
+\end{minted}
 \end{listing}
 \end{example}
 
-\subsection{encoding for relaxed \texorpdfstring{$\boldsymbol{\exists}$}{exists}-step plans}
+\subsection{Extension for relaxed \texorpdfstring{$\boldsymbol{\exists}$}{exists}-step plans}
 \begin{listing}[H]
-  \caption{Extension for relaxed $\exists$-step plans}
+  \caption{Extension of Listing \ref{core} for encoding relaxed $\exists$-step plans}
   \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos, firstline=2, firstnumber=1]{prolog}{encodings/EX_relaxed.lp}
   \label{relaxed_exists}
 \end{listing}
 
-\noindent Finally, the extension for relaxed $\exists$-step plans as seen in Listing \ref{relaxed_exists} is quite similar to the $\exists$-step encoding. 
-The difference between those two is that the precondition of all actions do not have to hold simultaneous but they can "help" each other out.
-This is done by defining the predicate reach/3 in Line 1 and 2 as all fluents that can be reached by the step before or applied action in this timestep. 
-An action can then be safely applied, if its precondition is reachable and as before, all actions that it invalidates are ready (Line 4).
-Again Line 7 ensures that applied action do not circularly invalidate each other.
+Finally, we present the extension from \cite{DIMOPOULOS_2019} for relaxed $\exists$-step plans in Listing \ref{relaxed_exists}.
+Structurally, it shares the same derivation approach with the standard $\exists$-step encoding, but it relaxes the applicability check.
+Previously, preconditions strictly had to hold in the previous state $s_{t-1}$. 
+Here, actions within the same parallel set can provide "internal support" for each other. 
+This means an action is applicable if its preconditions are established either by the previous state or by another action occurring earlier in the valid execution sequence of the current step.
+
+This logic is implemented as follows:
+The predicate \texttt{reach}$(X,V,t)$ is introduced to represent the values of fluents that are currently available. A value is reachable if it holds in the previous state (Line 1) or if it is obtained by an action that has already been applied in the current internal sequence (Line 2).
+The \texttt{apply} rule now checks against this \texttt{reach} predicate instead of the static state. An action can be safely applied if its preconditions are reachable.
+As in the standard $\exists$-step encoding, we must still check acyclicity. The integrity constraint in Line 7 ensures that no circular dependencies exist, guaranteeing a valid serialization exists.
+
 \begin{example}
-  Running this with our example, we get three possible relaxed $\exists$-step plans.
+  Running this with our example, we get three possible \textit{relaxed} $\exists$-step plans.
 \begin{listing}[H]
-  \caption{Output from clingo for relaxed $\exists$-step encoding}
-  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
-  Answer: 1
-  occurs(openDoor,1) occurs(getKey,1) occurs(closeDoor,2) occurs(goOut,2) occurs(lightOut,2)
-  Answer: 2
-  occurs(openDoor,1) occurs(lightOut,1) occurs(getKey,1) occurs(closeDoor,2) occurs(goOut,2)
-  Answer: 3
-  occurs(openDoor,1) occurs(goOut,1) occurs(lightOut,1) occurs(getKey,1) occurs(closeDoor,2)
-  \end{minted}
+\caption{Output from clingo for relaxed $\exists$-step encoding}
+\begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,fontsize=\footnotesize]{console}
+Answer: 1
+occurs(openDoor,1) occurs(getKey,1) occurs(closeDoor,2) occurs(goOut,2) occurs(lightOut,2)
+Answer: 2
+occurs(openDoor,1) occurs(lightOut,1) occurs(getKey,1) occurs(closeDoor,2) occurs(goOut,2)
+Answer: 3
+occurs(openDoor,1) occurs(goOut,1) occurs(lightOut,1) occurs(getKey,1) occurs(closeDoor,2)
+\end{minted}
 \end{listing}
 \end{example}
 
@@ -600,18 +678,47 @@ In order to prove the correctness of the presented encondings, \cite{DIMOPOULOS_
   \item $P^p(n) := I \cup B \cup Q(0) \cup \bigcup_{t=1}^{n} \left( Q(t) \cup S(t) \cup S^p(t) \right) \cup \{\texttt{query}(n). \}$, where $p \in \{s, \forall, \exists, E, R\}$.
 \end{itemize}
 
+
+Having presented the ASP encodings for sequential and the different parallel semantics, we now proceed to formally verify their correctness.
+The goal is to establish a one-to-one correspondence between the stable models of our logic programs and the valid plans as defined in Definition \ref{def:PPlan}.
+We adopt the notation for the proof from \textcite{DIMOPOULOS_2019} and decompose the logic programs into their constituent parts.
+
+\begin{itemize}
+  \item $I$ denotes the set of facts representing the specific planning task instance $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$ (as in Definition \ref{def:MVPlan}).
+  \item $B$ corresponds to the rules in the \texttt{base} subprogram (Listing \ref{core}, Line 2).
+  \item $Q(t)$ represents the goal verification rules defined in the \texttt{check(t)} subprogram (Listing \ref{core}, Line 4).
+  \item $S(t)$ denotes the transition rules (generator and core constraints) defined in the \texttt{step(t)} subprogram (Listing \ref{core}, Lines 6--9).
+  \item $S^p(t)$ is the specific extension for timestep $t$, where:
+    \begin{itemize}
+        \item $p = \text{s}$ for the sequential extension (Listing \ref{seq}),
+        \item $p = \forall$ for the $\forall$-step extension (Listing \ref{forall}),
+        \item $p = \exists$ for the constructive $\exists$-step extension (Listing \ref{exists}),
+        \item $p = \text{E}$ for the graph-based $\exists$-step extension (Listing \ref{exists_alt}),
+        \item $p = \text{R}$ for the relaxed $\exists$-step extension (Listing \ref{relaxed_exists}).
+    \end{itemize}
+\end{itemize}
+
+Using these components, the complete logic program for a horizon $n$ is defined as:
+\[
+  P^p(n) := I \cup B \cup \bigcup_{t=1}^{n} \left( S(t) \cup S^p(t) \cup Q(t) \right) \cup \{ \texttt{query}(n). \}
+\]
+
+
 \begin{theo}[Correctness of sequential plans \parencite{DIMOPOULOS_2019}]
   \label{theo:1}
-  \phantom{}\\
-  $\langle a_1, \dots, a_n \rangle$ is a sequential plan $\iff$ $P^s(n)$ has a stable model $M$, s.t. \\
-  $\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M \} = \{\langle a_t, t \rangle \mid 1 \le t \le n \}$.
+  Let $A_n := \langle a_1, \dots, a_n \rangle$, $a_t \in \mathcal{O}$ for $1 \le t \le n$, be a sequence of actions. Then,
+  \begin{align*}
+      A_n \text{ is a sequential plan} \iff &P^s(n) \text{ has a stable model } M \text{ such that} \\
+        &\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M \} = \{\langle a_t, t \rangle \mid 1 \le t \le n \}.
+  \end{align*}
 \end{theo}
+
 
 \begin{proof}
   We prove both directions separately.
   \begin{itemize}
   \item[($\Rightarrow$):] 
-    Assume $A_n := \langle a_1, \dots, a_n \rangle$ is a sequential plan. \\
+    Assume $A_n = \langle a_1, \dots, a_n \rangle$ is a sequential plan. \\
     We construct a candidate set $M$ based on the plan execution and show it is indeed a stable model of $P^s(n)$.
     The rule in B ensures that \texttt{holds}(X,V,0) $= s_0(X)$ for each $X \in \mathcal F$. The choice rule (Line 5 of Listing \ref{seq}) enforces that for any $0 \le t \le n$ and $X \in \mathcal F$, exactly one value $V$ is assigned, i.e., $|\{V \mid \texttt{holds}(X,V,t) \in M\}| = 1$. 
     Moreover, the integrity constraints (Lines 8 and 9) in $S(t)$ dictate the transition logic between states. 
@@ -652,9 +759,11 @@ In order to prove the correctness of the presented encondings, \cite{DIMOPOULOS_
 \end{proof}
 
 \begin{theo}[Correctness of parallel plans \parencite{DIMOPOULOS_2019}]
-  \phantom{} \\
-  $\langle A_1, \dots, A_m \rangle$ is a $\forall$-/$exists$-/relaxed $exists$-step plan $\iff P^p(m)$ has a stable model M s.t.,
-  $\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M \} = \{\langle a, t \rangle \mid a \in A_t, 1 \le t \le m \}$ with $p \in \{\forall, \exists, R\}$.
+  Let $\mathcal A = \langle A_1, \dots, A_m \rangle$ be a sequence of sets of actions, $A_t \subseteq \mathcal{O}$ for $1 \le t \le m$. Then,
+  \begin{align*}
+      \mathcal A \text{ is a $\forall$-/$\exists$-/R-step plan} \iff &P^p(m) \text{ has a stable model } M \text{ such that} \\
+        &\{\langle a, t \rangle \mid \texttt{occurs}(a,t) \in M \} = \{\langle a, t \rangle \mid a \in A_t, 1 \le t \le m \}
+  \end{align*}
 \end{theo}
 
 \begin{proof}
@@ -826,39 +935,66 @@ In order to prove the correctness of the presented encondings, \cite{DIMOPOULOS_
   \caption{Pipeline for testing the different planning encodings}
   \label{pipeline}
 \end{figure}
-To test and compare the different parallel planning encodings against each other and against the sequential planning encoding, we set up a python pipeline using the lab framework \parencite{seipp-et-al-zenodo2017}
-and the unofficial collection of (sequential) IPC benchmark instances from the downward project \footnote{\url{https://github.com/aibasel/downward-benchmarks}}. \\
-Starting at a planning task in the Planning Domain Definition Language (PDDL), we first preprocess it using cpddl \parencite{fiser_2025_16423302} that converts it into a finite domain representation (FDR).
-Plasp then takes the FDR as input and translates it into ASP facts representing the planning task. Further information of this step can be found in \parencite{DIMOPOULOS_2019}.
-Using clingo with a modified version of the incremental encodings presented above together with the facts from the output of plasp, we can then compute sequential, $\forall$-step, $\exists$-step or relaxed $\exists$-step plans as stable models.
-Finally, to validate the given plan, we postprocess the parallel representation back into a sequential plan, using the postprocess encoding provided by plasp and validate the plan with VAL \footnote{\url{https://github.com/KCL-Planning/VAL}}.
-Each step has some optimizations and configurations that will be explained in the following sections.
 
-\section{Changes in the ASP encodings}
-To use the presented encodings in our pipeline, we had to make some small changes to the original encodings from \parencite{DIMOPOULOS_2019}.
+
+To systematically evaluate and compare the performance of the proposed parallel planning encodings against each other and the sequential baseline, we implemented an automated pipeline using the \texttt{lab} framework \parencite{seipp-et-al-zenodo2017}.
+The benchmark\footnote{\url{https://github.com/aibasel/downward-benchmarks}} set consists of the unofficial collection of IPC instances provided by the Fast Downward project.
+
+As illustrated in Figure \ref{pipeline}, the workflow proceeds in four main stages:
+\begin{enumerate}
+    \item \textbf{Preprocessing:} Starting with a planning task defined in PDDL (Planning Domain Definition Language), we use \texttt{cpddl} \parencite{fiser_2025_16423302} to convert the problem into a Finite Domain Representation (FDR).
+    \item \textbf{Translation:} The \texttt{plasp} tool translates this FDR specification into a set of ASP facts. A detailed description of this translation process can be found in \textcite{DIMOPOULOS_2019}.
+    \item \textbf{Solving:} In the core step, \textit{clingo} combines these facts with our modified incremental encodings (sequential, $\forall$-step, $\exists$-step, or \textit{relaxed} $\exists$-step). The solver then searches for stable models corresponding to valid plans.
+    \item \textbf{Validation:} Finally, to ensure correctness, the resulting ASP-based plan (represented by the \texttt{occurs} atoms) is converted back into a sequential plan format. We employ the post-processing encoding provided by \textit{plasp} for serialization and subsequently format the output to be readable by the plan validator VAL\footnote{\url{https://github.com/KCL-Planning/VAL}}.
+\end{enumerate}
+
+Each component of this pipeline involves specific configurations and optimizations, which will be detailed in the following sections.
+
+
+\section{Encoding Adaptation}
+To integrate the theoretical encodings from \textcite{DIMOPOULOS_2019} presented in Section \ref{asp encoding} into the automated pipeline, small changes are required to bridge the gap between the \texttt{plasp} output format and the internal predicates used by our logic programs.
+The necessary adaptations are shown in Listing \ref{core_mod}.
+\begin{listing}[H]
+\caption{Modifications to the core encoding}
+\label{core_mod}
 \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}
-  #include <incmode>.
-  #program base.
-  fluent(X) :- variable(X).
-  fluent(X,V) :- initialState(X,V), fluent(X).
-  value(X,V) :- contains(X, V).
-  prec(A, X, V) :- precondition(A, X, V).
-  post(A, X, V) :- postcondition(A, _, X, V).
-  ...
-  :- fluent(X), #count{V : holds(X,V,0)} > 1.
-  ...
-  #program step(t).
-  ...
-  #show.
-  #show occurs(A, t): occurs(A, t).
+#include <incmode>.
+#program base.
+fluent(X) :- variable(X).
+fluent(X,V) :- initialState(X,V), fluent(X).
+value(X,V) :- contains(X, V).
+prec(A, X, V) :- precondition(A, X, V).
+post(A, X, V) :- postcondition(A, _, X, V).
+...
+:- fluent(X), #count{V : holds(X,V,0)} > 1.
+...
+#program step(t).
+...
+#show.
+#show occurs(A, t): occurs(A, t).
 \end{minted}
-Line 3-6 just renames the predicates from plasp's output to match the ones used in the encodings, 
-while Line 7 uses the wildcard \texttt{\_} to ignore the effect condition.
-This let clingo assume that all effects are fullfilled, which reduces the search space but might lead to not fully optimal plans.
-Line 9 ensures that each fluent has at most one value in the initial state and finally Line 13-14 specify which atoms should be shown in the output.  
+\end{listing}
+
+Lines 3-6 map the predicates generated by \textit{plasp} (e.g., \texttt{initialState}, \texttt{contains}) to the predicates used in our encodings.
+Line 7 handles the action effects. 
+By using the wildcard \texttt{\_} for the second argument, we discard the specific effect identifiers. This simplification is chosen to reduce the complexity for the solver: explicitly tracking every effect could inflate the ground program and force \textit{clingo} to manage a significantly larger set of atoms, which could degrade performance without necessarily improving the quality of the resulting plans.
+Line 9 performs a sanity check to ensure that the initial state is consistent (each fluent has at most one value).
+Finally, Lines 13-14 act as an output filter, ensuring that only the relevant \texttt{occurs} atoms are displayed in the final answer sets.
+
+\subsection{Post-Processing and Serialization}
+The stable models computed by \textit{clingo} are output as sets of atoms (e.g., \texttt{occurs(action("move","a","b"), 1)}). 
+Standard plan validators like \textit{VAL}, however, require plans in a specific text-based format (often referred to as SAS plan or IPC format) structured as \texttt{time: (action args)}.
+To bridge this gap, we implemented a lightweight post-processing module in Python.
+Briefly, the script iterates through the output string to identify all \texttt{occurs} atoms using regular expressions. 
+For each match, it extracts the time step $t$ and the action arguments, stripping internal quotes and formatting delimiters. 
+Finally, the extracted pairs are written to a file in a line-by-line format compatible with the validator.
+This conversion ensures that the parallel plans found by our encodings can be verified against the original PDDL domain and problem specification.
 
 \section{Optimizations}
 \subsection{Mutexes}
+To further optimize the solving process, we utilize invariant constraints derived during the translation process. 
+Specifically, we incorporate \textit{mutex groups} (mutually exclusive sets of facts) provided by the \textit{cpddl} preprocessor.
+
 \begin{defi}[mutex and mutex groups]
   A set of facts $M \subseteq \mathcal F$ is called 
   \begin{enumerate}[label=(\roman*)]
@@ -866,92 +1002,145 @@ Line 9 ensures that each fluent has at most one value in the initial state and f
     \item a \textit{mutex group} $\logeq$ for all reachable states $s: | M \cap s | \le 1$.
   \end{enumerate}
 \end{defi}
-\noindent In other words, a mutex is a set of fluents that can never be true at the same time in any reachable state,
-while a mutex group is a set of fluents where at most one fluent can be true at the same time.
-Mutexes and mutex groups can be used to optimize the planning encodings by reducing the search space.
-For this, we extend our endcoding in Listing \ref{core} with the following rules:
-\begin{listing}[H]
-  \caption{Expansion for mutexes}
-  \begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}
-    #program base.
-    ...
-    mutex(G,X) :- mutexGroup(G), contains(G,X,V), fluent(X,V).
-    mutex(G)   :- mutexGroup(G), #count{X : mutex(G,X)} > 1.
-    :- mutex(G), #count{X,V : holds(X,V,0), contains(G,X,V)} > 1.
-    ...
-    #program step(t).
-    ...
-    :- mutex(G), #count{X,V : holds(X,V,t), contains(G,X,V)} > 1.
-    ...
-  \end{minted}
-  \label{mutex}
-\end{listing}
-\noindent Here, the mutex group G is given by plasp as facts of the form $mutexGroup/1$ and $contains/3$.
-In the base program, we first define which fluents belong to a mutex group (Line 3), where a group must contain at least two fluents (Line 4).
-The integrity constraint in Line 5 ensures that no more than one fluent of each mutex group holds in the initial state and the integrity constraint in Line 9 ensures the same for each state in timestep t.
 
-\subsection{Guess and Check}
-An optimization specific to the (relaxed) $\exists$-step encodings is the guess and check approach. 
-The general idea is to first guess a solution without looking for actions that circularly invalidate each other and afterwards check if the guessed solution has a cycle.
-Formally, we encode the problem by a pair of programs $\langle G, C \rangle$ where $G$ is the guessing program and $C$ is the checking program. 
-Stable models $M$ of $G$ yields a solution if $C \cap M$ is $unsatisfiable$. 
-For making "systematic" guesses, \parencite{DIMOPOULOS_2019} proposes to use the core program ($S(t)$) in Listing \ref{core} 
-together with the integrity constraint in Line 1 of Listing \ref{seq}, \ref{forall} or \ref{exists} ($B$) and the facts representing a planning task.
-Thus, a stable model $M$ of $G$ is s.t. the pre- and postconditons hold for all actions applied in parallel (Line 8 of Listing \ref{core} and Line 1 of Listing \ref{seq}, \ref{forall} or \ref{exists}).
-and the integrity constraint in Line 8 of Listing \ref{core} also ensures confluence of applied actions. 
-The only thing remained to be checked is if actions circularly invalidate each other, i.e. $a^e(X) \ne \tilde a^c(X)$ and $\tilde a^e(\tilde X) \ne \tilde a^c(\tilde X)$.
-This can be accomplished by taking the atoms over $occurs/2$ from $M$ as facts together with a program $C$ containing the facts representing a planning task
-and the following encoding:
+Intuitively, a mutex group represents a set of facts where no two facts can be true simultaneously. Enforcing these invariants as integrity constraints can significantly prune the search space by detecting invalid partial states early.
+We extend our encoding with the rules shown in Listing \ref{mutex}.
+
 \begin{listing}[H]
-  \caption{Encoding for checking circular invalidation}
+\caption{Expansion for mutexes}
+\begin{minted}[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}
+#program base.
+...
+mutex(G,X) :- mutexGroup(G), contains(G,X,V), fluent(X,V).
+mutex(G)   :- mutexGroup(G), #count{X : mutex(G,X)} > 1.
+:- mutex(G), #count{X,V : holds(X,V,0), contains(G,X,V)} > 1.
+...
+#program step(t).
+...
+:- mutex(G), #count{X,V : holds(X,V,t), contains(G,X,V)} > 1.
+...
+\end{minted}
+\label{mutex}
+\end{listing}
+
+The mutex information is provided by \textit{plasp} via the predicates \texttt{mutexGroup/1} and \texttt{contains/3}.
+In the base program, we first define which fluents belong to a mutex group (Line 3), where a group must contain at least two fluents (Line 4).
+The integrity constraint in Line 5 ensures that no more than one fluent of each mutex group holds in the initial state and the integrity constraint in Line 9 ensures the same for each state in timestep $t$.
+
+
+\subsection{Guess and Check Optimization}
+A crucial optimization for the $\exists$-step encodings is the \textit{Guess and Check} approach. 
+The core idea is to decouple the search for action sets from the computationally expensive verification of acyclicity.
+Instead of enforcing serializability directly during the search, we first "guess" a candidate solution that satisfies all local constraints (preconditions, effects, confluence) but ignores potential cycles. In a second step, we "check" this candidate for circular invalidations.
+
+Formally, we decompose the problem into a pair of logic programs $\langle G, C \rangle$, where $G$ is the \textit{generator} or \textit{guesser} and $C$ is the \textit{checker}.
+A stable model $M$ of $G$ represents a valid plan if and only if the checker program, when grounded with the actions from $M$, is \textbf{unsatisfiable} (i.e., no cycle can be derived).
+
+To implement the generator $G$, \textcite{DIMOPOULOS_2019} proposes using the core program ($S(t)$ from Listing \ref{core}) combined with the precondition checks (Line 1 of Listing \ref{seq}, \ref{forall}, or \ref{exists}) and the problem instance facts.
+Consequently, a stable model $M$ of $G$ guarantees that:
+\begin{enumerate}
+    \item Preconditions hold at $t-1$ for all chosen actions.
+    \item Postconditions are applied and confluent (via Line 8 of Listing \ref{core}).
+\end{enumerate}
+The only property remaining to be verified is the absence of circular invalidations (cycles in the conflict graph), where actions invalidates each other's preconditions (e.g., $a^e(X) \neq a'^c(X)$ and $a'^e(X') \neq a'^c(X')$).
+
+This verification is performed by the program $C$, shown in Listing \ref{check}. 
+The inputs to $C$ are the action occurrences (\texttt{occurs/2}) from the candidate model $M$, along with the problem instance facts.
+
+\begin{listing}[H]
+  \caption{Encoding for detecting circular invalidation (Checker)}
   \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}{encodings/EX_check.lp}
   \label{check}
 \end{listing}
-\noindent Here, the maximum value for $t$ in subprogram $check$ and $step$ is $m = max \{t \mid occurs(a, t)\}$ and
-$C$ becomes $unsatisfiable$ if $t > m$.
-Like in Listing \ref{exists}, we check for each $t$ if all actions $A \in occurs(A,t)$ can be applied by the predicate $ready$ (Line 7-11).
-If actions in $A$ circularly invalidate each other, $ready(A,t)$ is underivable for these actions and thus $cycle(t)$ (Line 12) in step $t$ is derived.
-Hence, $C$ becomes satisfiable if there is a circular invalidation in step $t$, which means that there is no permutation of the actions A, s.t. the successor state is defined 
-and therefore not (relaxed) $\exists$-step serializable.
+The checker works by attempting to construct a valid serialization order using the predicate \texttt{ready}:
+\begin{itemize}
+    \item Like in the encoding of Listing \ref{exists}, Lines 7-11 try to derive \texttt{ready}$(A,t)$ for all actions that can be safely applied.
+    \item Line 12 derives the atom \texttt{cycle}$(t)$ if there exists any occurring action $A$ that never becomes \texttt{ready}. This indicates that $A$ is part of a invalidation cycle.
+    \item Crucially, the program is designed to be \textbf{satisfiable} only if a cycle exists (Line 3).
+\end{itemize}
+
+Thus, if $C \cup M$ is satisfiable, a circular invalidation exists at some step $t$, meaning no valid permutation of the actions $A_t$ exists. This implies the candidate is not serializable under the $\exists$-step semantics and must be rejected.
+Conversely, if $C \cup M$ is unsatisfiable, no cycle was found, and the candidate $M$ is a valid plan.
 
 
 \subsection{Heuristic}
-The general idea of heuristics in clingo described by \parencite{DIMOPOULOS_2019} is to extend the search heuristic by giving each atom a
+To further optimize the solving process, we employ domain-independent heuristics using the \texttt{\#heuristic} directive of \textit{clingo}.
+Following the approach described by \textcite{DIMOPOULOS_2019}, we modify the solver's search strategy by assigning specific attributes to atoms:
 \begin{itemize}
-  \item \textit{level} ($\in \mathbb Z$, $0$ by default), allowing to modify the order of which atoms are selected first
-  \item \textit{sign} ($\in \mathbb Z$, $0$ by default, where values $>0$ corresponds to $true$, $<0$ to $false$ and $0$ to $undefined$), which allows for controlling the truth value assigned to atoms. 
+  \item \textit{level} ($\in \mathbb{Z}$, default $0$): Determines the decision priority. The solver selects atoms with higher levels before those with lower levels.
+  \item \textit{sign} ($\in \mathbb{Z}$, default $0$): Determines the preferred truth value. A positive value ($>0$) biases the solver to assign \textit{true}, a negative value ($<0$) to assign \textit{false}. If the value is $0$, the solver falls back to its default \textit{sign} heuristic (e.g., VSIDS).
 \end{itemize}
-During solving, these values get modified during the activation of \textbf{\#heuristic} directives.
-The search heuristic of clingo selects the atom with the highest level and sets it to its associated \textit{sign}, if \textit{sign} defined, else switching to the default \textit{sign} heuristic.
 
+Listing \ref{heuristic} implements a \textit{backward propagating} heuristic.
+The core idea is to leverage the goal condition and bias the search towards establishing the goal fluents as early as possible in the plan.
 \begin{listing}[H]
-  \caption{backward progpagating heuristic}
+  \caption{Backward propagating heuristic}
   \inputminted[frame=single,framesep=2mm,baselinestretch=1.2,linenos]{prolog}{encodings/heuristic.lp}
   \label{heuristic}
 \end{listing}
 
-\noindent The heuristic in Listing \ref{heuristic} aims starting at the goal of a planning task and then searching backwards.
-Here both lines have the level $l=2^{31}-1-t$ where $2^{31}-1$ is the largest integer supported by clingo, giving the starting steps the highest priority.
-The second line expresses that whenever clingo made $holds(X,V,t)$ true, $holds(X,V,t-1)$ should be made true at the level $l$ as well.
-Similarly, the directive in Line 3 is actived when an instance of $holds(X,V,t)$ becomes false, in which case $holds(X,V,t-1)$ should be made false at level $l$ as well.
-Both directives associates atoms over holds/3 with higher level the earlier the state is, i.e. the value for $t$ is smaller, 
-which intends to bias the search of \textit{clingo} to establish the goal conditions as early as possible. 
-\section{Experiment}
-To compare the different planning encodings and the effectiveness of the optimizations, we run four experiments with the pipeline described above.
-Each experiment run on the same set of benchmark instances with the sequential, $\forall$-step, \textit{relaxed} $\exists$-step, \textit{guess and check} and both versions of the $\exists$-step encodings.
-The Guess and Check algorithm and the fallback described above are started one after the other with the time limit of 30 minutes, where the times are added together if the check fails and the $\forall$-step encoding finds a solution. 
-If the summed up time is below the time limit, the problem is considered solved. \\
-Aborted runs are considered unsolved and assigned the time nan.
-\textit{Cpddl} is equipped with and without the h2 option that extends the seach for mutexes and the planning encodings with and without the backward propagating heuristic. 
-The experiments were run on the bwicluster3.0 server of the Karlsruhe Institute of Technology (KIT) using nodes with Intel Xeon Gold 6248R CPUs (3.0 GHz, 24 cores).
-Each run was limited to one CPU core, where \textit{clingo} and \textit{cpddl} were given a time limit of 30 minutes and a memory limit of 32 GiB each.
+The priority level is defined as $l = 2^{31}-1-t$ (the largest integer supported by \textit{clingo}), assigning the highest priority to the earliest time steps (since smaller $t$ yields a larger $l$).
+The logic in Lines 2 and 3 effectively projects state information backwards from $t$ to $t-1$:
+\begin{itemize}
+    \item \textbf{Positive Bias} (Line 2): If \textit{clingo} determines that $holds(X,V,t)$ is true, the heuristic activates and suggests setting $holds(X,V,t-1)$ to true as well.
+    \item \textbf{Negative Bias} (Line 3): Conversely, if $holds(X,V,t)$ becomes false, the heuristic biases $holds(X,V,t-1)$ to be false.
+\end{itemize}
+Intuitively, this encourages the solver to satisfy the goal state $s_*$ by assuming (unless forced otherwise by actions) that the desired fluents already held in the previous step $t-1$. This creates a "pull" effect from the goal backwards to the initial state $s_0$.
+
+
+\section{Experimental Setup}
+To evaluate the performance of the different planning encodings and the effectiveness of the proposed optimizations, we performed a systematic comparison across four distinct experimental configurations.
+
+\subsection{Configurations and Encodings}
+We tested the sequential encoding alongside the $\forall$-step, both $\exists$-step and \textit{relaxed} $\exists$-step encodings. 
+Additionally, we evaluated the \textit{Guess and Check} strategy with a fallback mechanism: if the Guess and Check approach fails to find a valid serializable plan (or implies a cycle), the system automatically falls back to a safe encoding (e.g. $\forall$-step). In such cases, the reported runtime is the sum of the time spent on the failed check and the time required by the fallback strategy. If this cumulative time exceeds the time limit, the instance is considered unsolved.
+
+To isolate the impact of our optimizations, we ran the complete benchmark set in four configurations, varying the usage of mutexes and heuristics:
+\begin{enumerate}
+    \item \textbf{Baseline:} No extra mutex detection, default solver heuristics.
+    \item \textbf{Mutexes (h2):} \textit{cpddl} enabled with the $h^2$ option to compute additional mutex groups.
+    \item \textbf{Heuristics:} Using the backward propagating heuristic (Listing \ref{heuristic}).
+    \item \textbf{Combined:} Both $h^2$ mutexes and backward heuristics enabled.
+\end{enumerate}
+
+\subsection{Benchmark Selection and Validation Criteria}
+\textbf{Validation Criteria:}
+For a planning task to be considered reliably \textit{solved}, finding a candidate solution via \textit{clingo} is necessary but not sufficient. 
+We enforce a strict validation protocol: A run counts as solved if and only if:
+\begin{enumerate}
+    \item The solver produces an answer set within the 30-minute time limit.
+    \item The extracted plan is successfully validated by the external validator \textit{VAL}.
+\end{enumerate}
+Any run where \textit{clingo} reports a solution that \textit{VAL} subsequently rejects is treated as an error and classified as unsolved.
+
+\textbf{Benchmark Domains:}
+We evaluated our approach on a suite of benchmarks from the International Planning Competitions (IPC). 
+The test set comprises domains used in previous competitions (e.g., IPC 1998-2018), specifically selected in their STRIPS formulations to ensure compatibility with our encodings.
+The selection covers a wide spectrum of planning complexity:
+\begin{itemize}
+    \item \textit{Classical Domains:} Standard benchmarks such as \textit{Blocks}, \textit{Logistics}, \textit{Gripper}, and \textit{Driverlog}.
+    \item \textit{Constraint-Heavy Domains:} Complex puzzles like \textit{Sokoban}, \textit{Freecell}, and \textit{Parking}.
+    \item \textit{Recent Competitions:} Modern domains including \textit{Agricola} (IPC 2018), \textit{Snake} (IPC 2018), and \textit{Quantum Layout} (IPC 2023).
+\end{itemize}
+This diverse set allows us to analyze the performance of parallel encodings across different problem structures (e.g., transportation, manipulation, construction).
+
+\subsection{Computational Environment}
+The experiments were executed on the \textit{bwUniCluster 3.0} at the Karlsruhe Institute of Technology (KIT). 
+We utilized compute nodes equipped with Intel Xeon Gold 6248R CPUs (3.0 GHz, 24 cores).
+To ensure comparability, each run was restricted to a single CPU core.
+We imposed a strict time limit of 30 minutes (1800 seconds) and a memory limit of 32 GiB for the execution of \textit{clingo} and \textit{cpddl} each.
+Runs exceeding these limits were aborted and recorded as unsolved (time-out).
+
 
 \chapter{Results} \label{result}
 \section{Overall Performance}
-To obtain a comprehensive overview of the performance of the proposed parallel encodings compared to the sequential baseline, we analyze the aggregated results across all benchmark domains. In this section, we focus on the baseline configurations without additional optimizations (such as mutex groups or heuristics) to establish a clear ground truth.
-We compare the Sequential encoding (S) against the $\forall$-step ($\forall$), $\exists$-step ($\exists$), the alternative $\exists$-step (E), the \textit{relaxed} $\exists$-step (R), and the Guess-and-Check strategy (G\&C).
+To get an overview of the performance of the different encodings, we first analyze the aggregated results across all benchmark domains.
+In this section, we focus exclusively on the \textit{baseline} configurations to establish a fundamental comparison. 
+We compare the Sequential encoding ($S$) against the $\forall$-step ($\forall$), the $\exists$-step ($\exists$), the graph-based $\exists$-step ($E$), the \textit{relaxed} $\exists$-step ($R$), and the Guess-and-Check strategy ($G\&C$).
 
-Figure  illustrates the coverage (number of solved instances) for each domain, split into two parts for readability. Figure  displays the average runtime for instances that were successfully solved by all algorithm.
+Figure \ref{fig:solved} illustrates the coverage (total number of solved instances) for each domain. For better readability, the data is split into two charts. Domains where no instances were solved by any algorithm are omitted.
+Figure \ref{fig:time} displays the average runtime. To ensure a fair comparison, this metric is calculated only on the intersection of instances that were successfully solved by \textit{all} algorithms. Consequently, domains where no common set of solved instances exists are excluded from the runtime analysis.
+
 
 \begin{figure}[t]
   \centering
@@ -976,29 +1165,199 @@ Figure  illustrates the coverage (number of solved instances) for each domain, s
 \end{figure}
 
 \subsection{Coverage Analysis}
-The coverage results in Figure reveal several distinct trends regarding the effectiveness of parallel planning.
+The coverage results in Figure \ref{fig:solved} reveal several trends regarding the effectiveness of parallel planning.
 
-\paragraph{Sequential vs. Parallel:}
-In domains that inherently allow for a high degree of concurrency, parallel encodings significantly outperform the sequential approach. 
-Notable examples include \textit{airport} and \textit{elevators}. In \textit{airport}, the sequential encoding (S) solves only 11 out of 50 instances, whereas the $\forall$-step encoding (V) solves 49/50 and the $\exists$-step variants solve 48/50. 
-Similarly, in \textit{floortile}, the sequential approach fails to solve any instance (0/40), while the standard $\exists$-step encoding solves 37/40. This confirms that the reduced time horizon $T$ of parallel plans effectively mitigates the search depth explosion found in sequential planning.
+\paragraph{Sequential vs. Parallel Performance:}
+In domains that allow for a high degree of concurrency, parallel encodings significantly outperform the sequential approach.
+Notable examples include \textit{airport}, \textit{woodworking}, and both \textit{logistics} variants. 
+For instance, in \textit{woodworking}, the sequential encoding ($S$) solves only 7 out of 50 instances, whereas all parallel encodings (with the exception of Guess-and-Check) solve the entire set.
+Similarly, in \textit{floortile}, the sequential encoding fails to solve any instance (0/40), while the \textit{relaxed} $\exists$-step encoding achieves a coverage of 38/40. 
+This confirms that the reduced time horizon $T$ enabled by parallel semantics can effectively mitigate the search depth explosion inherent to sequential planning.
+However, in more complex or inherently sequential domains like \textit{agricola} or \textit{snake}, this performance advantage is not observed.
 
-\paragraph{Comparison of Parallel Semantics:}
-Comparing the different parallel semantics yields interesting insights into the trade-off between plan flexibility and encoding complexity:
+\paragraph{Comparison of Parallel Encodings:}
+Comparing the different parallel semantics reveals a trade-off between \textit{plan flexibility} (allowing shorter horizons) and \textit{encoding complexity} (grounding and solving overhead):
 \begin{itemize}
-    \item \textbf{$\forall$-step (V):} Despite being the most restrictive parallel semantic, the $\forall$-step encoding performs surprisingly well in many domains (e.g., \textit{parcprinter}, \textit{woodworking}). This suggests that many IPC domains do not require complex interleaved actions, and the simpler encoding of $\forall$-step (avoiding quadratic constraints) puts less burden on the grounder and solver.
-    \item \textbf{$\exists$-step ($\exists$ / E):} The $\exists$-step semantics show their strength in domains with complex dependencies. A prime example is \textit{floortile}, where $\forall$-step only solves 18/40 instances, but $\exists$-step solves 37/40. This indicates that the flexibility of $\exists$-step allows for finding plans in restricted environments where $\forall$-step fails. The alternative encoding (E) generally performs on par with the standard $\exists$-step, showing no significant deviation in coverage.
-    \item \textbf{Relaxed $\exists$-step (R):} The relaxed encoding typically solves fewer instances than the standard $\exists$-step (e.g., \textit{freecell}: 9 vs. 14). While theoretically allowing shorter plans, the relaxed encoding likely increases the search space or grounding size, leading to resource exhaustion on harder instances.
+    \item \textbf{$\forall$-step ($\forall$):} Although it enforces the strictest requirements for parallel execution, the $\forall$-step encoding shows better performance in several domains (e.g., \textit{tetris}, \textit{parcprinter}), often outperforming even the more flexible variants in domains like \textit{hiking} or \textit{scanalyzer}.
+    This suggests that for many IPC domains, the capability to interleave dependent actions is not critical. Consequently, the advantage of the $\forall$-step semantics lies in its compactness: it requires fewer constraints and auxiliary atoms than the $\exists$-step variants, thereby significantly reducing the burden on the grounder and solver \parencite{DIMOPOULOS_2019}.
+
+    \item \textbf{$\exists$-step ($\exists$ /E):} The strength of the $\exists$-step semantics is seen in domains with complex dependencies. A prime example is \textit{floortile}, where the strict $\forall$-step encoding solves only 18 out of 40 instances, whereas the $\exists$-step encoding achieves a coverage of 37/40. 
+    This demonstrates that the increased flexibility of the $\exists$-step semantics enables the discovery of plans in constrained environments where the conservative $\forall$-step approach fails. 
+    Regarding the implementation variants, the graph-based alternative ($E$) generally performs on par with or marginally better than the standard constructive encoding ($\exists$), showing no significant deviation in total coverage.
+
+    \item \textbf{\textit{Relaxed} $\exists$-step (R):} The relaxed encoding typically yields lower coverage compared to the standard $\exists$-step variants, as observed in domains like \textit{quantum-layout}. Although the \textit{relaxed} $\exists$-step encoding theoretically enables the shortest plan horizons by allowing actions to support each other within the same step, the computational cost is significant.
+    The recursive definition of the reachability predicates (\texttt{reach/3}) probably increases the complexity of the ground program.
+    Consequently, the overhead of solving these dense constraints often outweighs the benefits gained from a reduced time horizon.
+    
+    \item \textbf{Guess-and-Check ($G\&C$):} The performance of the Guess-and-Check strategy is generally inferior to the direct encodings ($\exists$ and $E$). 
+    Although separating the cycle check from the plan generation reduces the complexity of the generator, the overhead of invoking the solver twice significantly impacts runtime.
+    Crucially, when the validity check fails (i.e., the guessed plan contains a cycle), the pipeline must trigger the fallback mechanism. 
+    In these cases, the runtime accumulates (time for failed G\&C + time for fallback), often leading to timeouts on instances that the pure $\forall$-step or $\exists$-step encodings could solve directly within the time limit.
+    Consequently, this strategy proves less robust for general-purpose planning compared to the integrated approaches.
 \end{itemize}
+
 
 \subsection{Runtime Analysis}
-The runtime heatmaps in Figure  corroborate the coverage findings. 
 
+\subsubsection{Overview across Domains}
+Figure \ref{fig:time} provides an overview of the average runtimes across the evaluated domains.
+The sequential encoding ($S$) generally exhibits significantly higher runtimes compared to the parallel approaches. This discrepancy is particularly pronounced in domains with high concurrency potential, such as \textit{Gripper}, where the average runtime for $S$ is approximately 430 seconds, whereas the $\forall$-step encoding requires less than 3 seconds. This confirms that the reduced plan horizon in parallel planning typically translates to reduced solving time.
+
+Among the parallel variants, the $\forall$-step encoding consistently achieves the lowest runtimes, rarely exceeding 100 seconds even on harder instances. 
+This performance advantage can be attributed to the compactness of the encoding, which imposes the least burden on the grounder and solver.
+
+The $\exists$-step encodings ($\exists$ and $E$) display higher variability. While they allow for shorter plan lengths, the increased complexity of the compatibility checks often leads to longer solving times compared to $\forall$-step, particularly in dependency-heavy domains like \textit{Freecell}. 
+
+\subsubsection{Detailed Pairwise Comparison}
+To investigate these performance characteristics and implementation differences in greater detail, Figure \ref{fig:scatter_matrix} provides pairwise scatter plots on common solved instances.
+
+\paragraph{$\exists$-step Implementation Variants (Fig. \ref{fig:exist_vs_exist_edge}):}
+Comparing the two implementation variants reveals a distinct advantage for the graph-based approach. 
+As illustrated in Figure \ref{fig:exist_vs_exist_edge}, the alternative $\exists$-step encoding ($E$) outperforms the standard constructive encoding ($\exists$) in the majority of instances. 
+Notably, in the \textit{Nomystery} domain, $E$ achieves a runtime reduction of over 200 seconds compared to $\exists$ on the largest instances, validating the efficiency of the \texttt{\#edge} constraints.
+
+\paragraph{$\forall$-step vs. $\exists$-step (Fig. \ref{fig:forall_vs_exists}):}
+The direct comparison between the two main parallel semantics highlights the trade-off mentioned above. 
+Although the $\exists$-step encoding is theoretically more flexible, the scatter plot shows a cluster of points above the diagonal. 
+This confirms that the $\forall$-step encoding is frequently faster, suggesting that the overhead of grounding the complex $\exists$-step compatibility constraints outweighs the benefits of a slightly reduced horizon.
+
+\paragraph{$\forall$-step vs. Guess-and-Check (Fig. \ref{fig:forall_vs_guess_and_check}):}
+Finally, the comparison with the Guess-and-Check strategy ($G\&C$) challenges the assumption that the iterative approach necessarily incurs a high overhead.
+As shown in Figure \ref{fig:forall_vs_guess_and_check}, the performance is largely on par with the $\forall$-step encoding, with $G\&C$ frequently achieving even faster runtimes (points situated below the diagonal).
+This efficiency can be attributed to the reduced complexity of the \textit{generator} component. 
+Since the generator ignores circular dependency constraints, it produces a significantly smaller ground program than the full $\forall$-step encoding. 
+In domains where circular conflicts are rare, the first "guessed" plan is often valid. 
+Consequently, the combined runtime of the lightweight generator and the subsequent check is often lower than solving the stricter, more complex constraints of the $\forall$-step encoding directly.
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.48\textwidth} 
+    \centering
+    \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/algo_comparison/no modifications/sequential_vs_forall.png}
+    \caption{$S$ vs $\forall$ encoding}
+    \label{fig:sequential_vs_forall}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/algo_comparison/no modifications/forall_vs_exists.png}
+    \caption{$\forall$ vs $\exists$ encoding}
+    \label{fig:forall_vs_exists}
+  \end{subfigure}
+  
+  \vspace{0.2cm} % Reduziert von 0.5cm auf 0.2cm
+  
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/algo_comparison/no modifications/exists_vs_exists_edge.png}
+    \caption{$\exists$ vs $E$ encoding}
+    \label{fig:exist_vs_exist_edge}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/algo_comparison/no modifications/forall_vs_guess_and_check.png}
+    \caption{$\forall$ vs $G\&C$ encoding}
+    \label{fig:forall_vs_guess_and_check}
+  \end{subfigure}
+  
+  \caption{Runtime comparison between different encodings. Each point represents an instance solved by both encodings, with the x-coordinate indicating the runtime of the first encoding and the y-coordinate that of the second. Points below the diagonal indicate better performance of the first encoding.}
+  \label{fig:scatter_matrix}
+\end{figure}
+
+\section{Impact of Optimizations}
+To evaluate the effectiveness of the implemented optimizations, we compared four configurations: the baseline encoding, the encoding with $h^2$-mutexes, with the backward-propagating heuristic, and the combined configuration.
+
+\paragraph{Heuristic}
+The backward-propagating heuristic did not yield a significant improvement in coverage or runtime across the evaluated domains. This suggests that while the heuristic may guide the search towards goal-relevant states, it does not substantially reduce the search space in a way that translates to faster solving times.
+
+\paragraph{Mutexes}
+In almost all encodings, the inclusion of $h^2$-mutexes led to a reduction in runtime and an increase in coverage. This is paritcularly seen in the \textit{agricola}
+domain, where beforehand only 1 instance was solved by the sequential encoding, now 7 instances are solved by the sequential encoding with the addition of mutexes and even 5 with the $\forall$-step encoding and the guess and check strategy.
+Regarding the runtime, the mutexes often reduce the solving time in domains and encoding with high solving times before. However, the trade-off is that cpddl takes significantly more time to preprocess the instance and compute the mutexes, which can lead to an overall increase in runtime for some instances.
+Overall, the use of mutexes impacts the coverage positivley and the effect of the runtime is slightly possitive as well.
+
+
+\section{Impact of Optimizations}
+To evaluate the effectiveness of the implemented optimizations, we compared the baseline encoding against configurations equipped with $h^2$-mutexes, the backward-propagating heuristic, and a combination of both. Figure \ref{fig:scatter_matrix_opti} provides a detailed runtime comparison of these configurations.
+
+\paragraph{Heuristic Guidance (Fig. \ref{fig:base_vs_h}):}
+Contrary to expectations, the backward-propagating heuristic did not yield a significant improvement in coverage or runtime. 
+As illustrated in Figure \ref{fig:base_vs_h}, the data points align almost perfectly with the diagonal, indicating negligible deviation from the baseline performance. 
+This suggests that the search from the goal backwards do not substantially reduce the search time compared to \textit{clingo}'s internal heuristic.
+
+\paragraph{Impact of more Mutexes (Fig. \ref{fig:base_vs_s_m_clingo} \& \ref{fig:base_vs_s_m_total}):}
+In contrast, the inclusion of the $h^2$-algorithm for \textit{cppdl} resulted in a measurable performance gain. The impact is particularly pronounced in highly constrained domains such as \textit{Agricola}. In this domain, the sequential encoding solves 7 instances (compared to only 1 in the baseline) and the $\forall$-step encoding improves from 0 to 5 solved instances.
+
+Analyzing the runtime reveals a distinct trade-off between solving power and preprocessing overhead:
 \begin{itemize}
-    \item **Efficiency of Parallelism:** In domains where parallel planning is superior in coverage, it is also drastically faster. In \textit{airport}, the sequential solver averages 10.16s, while the $\forall$-step solver requires only 0.13s. In \textit{parcprinter}, the difference is even more pronounced (191s vs 0.03s).
-    \item **Overhead of Complexity:** In some domains, such as \textit{sokoban}, the Relaxed encoding (R) shows a significantly higher average runtime (66.44s) compared to $\forall$-step (21.61s) or even Sequential (19.19s). This highlights that the overhead of the more complex reachability predicates in the relaxed encoding can outweigh the benefit of fewer time steps if the domain does not strictly require such flexibility.
-    \item **Guess-and-Check Potential:** The Guess-and-Check (G\&C) strategy shows promising runtimes in specific domains. For example, in \textit{airport}, it achieves the lowest average runtime of 0.08s. However, its performance varies, which will be discussed in detail in Section
+    \item \textbf{Solver Efficiency (Fig. \ref{fig:base_vs_s_m_clingo}):} When looking exclusively at the solver runtime (\textit{clingo} time), the additional mutexes provide a drastic speedup. Most points lie well below the diagonal, showing that the mutex constraints effectively prune the search space.
+    \item \textbf{Total Runtime (Fig. \ref{fig:base_vs_s_m_total}):} When accounting for the full pipeline duration (including \textit{cpddl} preprocessing), the picture changes. 
+    For many instances, the overall runtime does not significantly improve. In fact, for easier instances, the overhead of longer searching for mutexes outweighs the time saved during the plan search, leading to a longer total runtime compared to the baseline.
+    This effect is particularly pronounced in the $\forall$-step encoding, which is already compact and thus benefits less from additional pruning.
+    In comparison, for the \textit{relaxed} $\exists$-step encoding, the total runtime with more mutexes is often lower than the baseline, indicating that "heavier" encodings profit more from the invariants.
 \end{itemize}
+
+\paragraph{Combined Configuration (Fig. \ref{fig:s_m_vs_h_s_m_total}):}
+As expected, adding the heuristic on top of the deeper mutex search does not yield further improvements. 
+Figure \ref{fig:s_m_vs_h_s_m_total} compares the encoding with the mutex optimization against the combined version. The almost perfect alignment with the diagonal confirms that the heuristic remains ineffective even in the presence of more mutexes.
+
+Figure \ref{fig:s_m_vs_h_s_m_total} confirms that the system's performance is driven almost exclusively by the constraints generated by the $h^2$ algorithm.
+\begin{figure}[t]
+  \centering
+  % --- Zeile 1: Heuristik-Analysen ---
+  \begin{subfigure}[t]{0.48\textwidth} 
+    \centering
+    % Baseline vs. Heuristic
+    \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/modifications/baseline_vs_heuristic.png}
+    \caption{Effect of Heuristic (Baseline vs. Heur.)}
+    \label{fig:base_vs_h}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    % Mutex vs. Mutex + Heuristic
+    \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/modifications/strong_mutex_vs_heuristic_strong_mutex_total_time.png}
+    \caption{Heuristic added to Mutexes}
+    \label{fig:s_m_vs_h_s_m_total}
+  \end{subfigure}
+  
+  \vspace{0.3cm} 
+  % --- Zeile 2: Mutex-Analysen ---
+
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    % Baseline vs. Mutex (Clingo Time)
+    \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/modifications/baseline_vs_strong_mutex_clingo_total_time.png}
+    \caption{Mutex Impact: Solver Time Only}
+    \label{fig:base_vs_s_m_clingo}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+      \centering
+      % Baseline vs. Mutex (Total Time)
+      \includegraphics[width=\textwidth, trim={0 0 4cm 0}, clip]{../data/comparison_experiment-eval/modifications/baseline_vs_strong_mutex_total_time.png}
+      \caption{Mutex Impact: Total Time (incl. Prep.)}
+      \label{fig:base_vs_s_m_total}
+  \end{subfigure}
+  
+  \caption{Runtime comparison of optimization techniques. Top row: The heuristic shows negligible impact (points on diagonal). Bottom row: Mutexes significantly reduce solver time (c), but preprocessing overhead affects total time on easy instances (d).}
+  \label{fig:scatter_matrix_opti}
+\end{figure}
+
+
+\section{Summary of Results}
+The experimental evaluation leads to three main conclusions regarding the performance of ASP-based planning encodings:
+
+\begin{enumerate}
+    \item \textbf{Parallelism pays off:} Parallel encodings ($\forall$-step and $\exists$-step) significantly outperform the sequential baseline in almost all standard benchmarks. The reduction of the planning horizon $T$ is the primary driver for this efficiency.
+    
+    \item \textbf{Simplicity beats flexibility:} Among the parallel variants, the strict $\forall$-step encoding proves to be the most robust. While the $\exists$-step semantics theoretically allow for shorter plans, the associated grounding overhead often negates this advantage. However, when $\exists$-step is required, the graph-based implementation ($E$) is superior to the constructive approach.
+    
+    \item \textbf{Importance of Preprocessing:} The integration of invariants, specifically $h^2$-mutexes, is crucial for solving highly constrained instances. In contrast, simple domain-independent heuristics (like backward propagation) fail to provide a tangible benefit over the solver's built-in strategies.
+\end{enumerate}
+
+These findings suggest that future improvements should focus on compact encodings (like $\forall$-step) combined with rigorous preprocessing, rather than increasingly complex relaxed semantics.
 
 
 \printbibliography

@@ -8,22 +8,39 @@
 \contentsline {section}{\numberline {2.2}Introduction to ASP}{8}{section.22}%
 \contentsline {subsection}{\numberline {2.2.1}Extension for sequential plans}{12}{subsection.26}%
 \contentsline {subsection}{\numberline {2.2.2}Extension for $\boldsymbol {\forall }$-step plans}{12}{subsection.30}%
-\contentsline {subsection}{\numberline {2.2.3}encoding for $\boldsymbol {\exists }$-step plans}{14}{subsection.36}%
-\contentsline {subsection}{\numberline {2.2.4}encoding for relaxed $\boldsymbol {\exists }$-step plans}{15}{subsection.41}%
-\contentsline {section}{\numberline {2.3}Proof of Correctness}{16}{section.45}%
-\contentsline {chapter}{\numberline {3}Method}{24}{chapter.57}%
-\contentsline {section}{\numberline {3.1}Pipeline Overview}{24}{section.58}%
-\contentsline {section}{\numberline {3.2}Changes in the ASP encodings}{24}{section.62}%
-\contentsline {section}{\numberline {3.3}Optimizations}{25}{section.63}%
-\contentsline {subsection}{\numberline {3.3.1}Mutexes}{25}{subsection.64}%
-\contentsline {subsection}{\numberline {3.3.2}Guess and Check}{26}{subsection.69}%
-\contentsline {subsection}{\numberline {3.3.3}Heuristic}{27}{subsection.71}%
-\contentsline {section}{\numberline {3.4}Experiment}{28}{section.73}%
-\contentsline {chapter}{\numberline {4}Results}{29}{chapter.74}%
-\contentsline {section}{\numberline {4.1}Overall Performance}{29}{section.75}%
-\contentsline {subsection}{\numberline {4.1.1}Coverage Analysis}{29}{subsection.78}%
-\contentsline {paragraph}{\nonumberline Sequential vs. Parallel:}{29}{paragraph*.80}%
-\contentsline {paragraph}{\nonumberline Comparison of Parallel Semantics:}{29}{paragraph*.82}%
-\contentsline {subsection}{\numberline {4.1.2}Runtime Analysis}{30}{subsection.83}%
-\contentsline {chapter}{\nonumberline Bibliography}{32}{chapter*.84}%
+\contentsline {subsection}{\numberline {2.2.3}Extension for $\boldsymbol {\exists }$-step plans}{13}{subsection.36}%
+\contentsline {subsection}{\numberline {2.2.4}Extension for relaxed $\boldsymbol {\exists }$-step plans}{15}{subsection.42}%
+\contentsline {section}{\numberline {2.3}Proof of Correctness}{16}{section.46}%
+\contentsline {chapter}{\numberline {3}Method}{25}{chapter.58}%
+\contentsline {section}{\numberline {3.1}Pipeline Overview}{25}{section.59}%
+\contentsline {section}{\numberline {3.2}Encoding Adaptation}{26}{section.67}%
+\contentsline {subsection}{\numberline {3.2.1}Post-Processing and Serialization}{26}{subsection.69}%
+\contentsline {section}{\numberline {3.3}Optimizations}{27}{section.70}%
+\contentsline {subsection}{\numberline {3.3.1}Mutexes}{27}{subsection.71}%
+\contentsline {subsection}{\numberline {3.3.2}Guess and Check Optimization}{28}{subsection.76}%
+\contentsline {subsection}{\numberline {3.3.3}Heuristic}{29}{subsection.80}%
+\contentsline {section}{\numberline {3.4}Experimental Setup}{30}{section.82}%
+\contentsline {subsection}{\numberline {3.4.1}Configurations and Encodings}{30}{subsection.83}%
+\contentsline {subsection}{\numberline {3.4.2}Benchmark Selection and Validation Criteria}{31}{subsection.88}%
+\contentsline {subsection}{\numberline {3.4.3}Computational Environment}{31}{subsection.91}%
+\contentsline {chapter}{\numberline {4}Results}{32}{chapter.92}%
+\contentsline {section}{\numberline {4.1}Overall Performance}{32}{section.93}%
+\contentsline {subsection}{\numberline {4.1.1}Coverage Analysis}{32}{subsection.96}%
+\contentsline {paragraph}{\nonumberline Sequential vs. Parallel Performance:}{32}{paragraph*.98}%
+\contentsline {paragraph}{\nonumberline Comparison of Parallel Encodings:}{32}{paragraph*.100}%
+\contentsline {subsection}{\numberline {4.1.2}Runtime Analysis}{35}{subsection.101}%
+\contentsline {subsubsection}{\nonumberline Overview across Domains}{35}{subsubsection*.103}%
+\contentsline {subsubsection}{\nonumberline Detailed Pairwise Comparison}{35}{subsubsection*.105}%
+\contentsline {paragraph}{\nonumberline $\exists $-step Implementation Variants (Fig. \ref {fig:exist_vs_exist_edge}):}{35}{paragraph*.107}%
+\contentsline {paragraph}{\nonumberline $\forall $-step vs. $\exists $-step (Fig. \ref {fig:forall_vs_exists}):}{35}{paragraph*.109}%
+\contentsline {paragraph}{\nonumberline $\forall $-step vs. Guess-and-Check (Fig. \ref {fig:forall_vs_guess_and_check}):}{35}{paragraph*.111}%
+\contentsline {section}{\numberline {4.2}Impact of Optimizations}{36}{section.113}%
+\contentsline {paragraph}{\nonumberline Heuristic}{37}{paragraph*.115}%
+\contentsline {paragraph}{\nonumberline Mutexes}{37}{paragraph*.117}%
+\contentsline {section}{\numberline {4.3}Impact of Optimizations}{37}{section.118}%
+\contentsline {paragraph}{\nonumberline Heuristic Guidance (Fig. \ref {fig:base_vs_h}):}{37}{paragraph*.120}%
+\contentsline {paragraph}{\nonumberline Impact of more Mutexes (Fig. \ref {fig:base_vs_s_m_clingo} \& \ref {fig:base_vs_s_m_total}):}{37}{paragraph*.122}%
+\contentsline {paragraph}{\nonumberline Combined Configuration (Fig. \ref {fig:s_m_vs_h_s_m_total}):}{38}{paragraph*.124}%
+\contentsline {section}{\numberline {4.4}Summary of Results}{38}{section.126}%
+\contentsline {chapter}{\nonumberline Bibliography}{40}{chapter*.130}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

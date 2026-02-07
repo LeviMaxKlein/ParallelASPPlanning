@@ -1,9 +1,11 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Pipeline for testing the different planning encodings\relax }}{24}{figure.caption.59}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Pipeline for testing the different planning encodings\relax }}{25}{figure.caption.60}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Coverage analysis: Number of solved instances per algorithm across benchmark domains. The heatmap indicates the absolute number of solved instances (left) out of the total available instances (right).\relax }}{30}{figure.caption.76}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime analysis: Average solving time (in seconds) for successfully solved instances. Red cells indicate higher runtimes, while light yellow cells indicate faster performance.\relax }}{31}{figure.caption.77}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Coverage analysis: Number of solved instances per algorithm across benchmark domains. The heatmap indicates the absolute number of solved instances (left) out of the total available instances (right).\relax }}{33}{figure.caption.94}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime analysis: Average solving time (in seconds) for successfully solved instances. Red cells indicate higher runtimes, while light yellow cells indicate faster performance.\relax }}{34}{figure.caption.95}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Runtime comparison between different encodings. Each point represents an instance solved by both encodings, with the x-coordinate indicating the runtime of the first encoding and the y-coordinate that of the second. Points below the diagonal indicate better performance of the first encoding.\relax }}{36}{figure.caption.112}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Runtime comparison of optimization techniques. Top row: The heuristic shows negligible impact (points on diagonal). Bottom row: Mutexes significantly reduce solver time (c), but preprocessing overhead affects total time on easy instances (d).\relax }}{39}{figure.caption.125}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
