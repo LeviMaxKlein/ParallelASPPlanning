@@ -39,5 +39,7 @@
 \contentsline {paragraph}{\nonumberline Impact of more Mutexes (Fig. \ref {fig:base_vs_s_m_clingo} \& \ref {fig:base_vs_s_m_total}):}{36}{paragraph*.118}%
 \contentsline {paragraph}{\nonumberline Combined Configuration (Fig. \ref {fig:s_m_vs_h_s_m_total}):}{37}{paragraph*.120}%
 \contentsline {section}{\numberline {4.3}Conclusion and Future Work}{38}{section.122}%
-\contentsline {chapter}{\nonumberline Bibliography}{40}{chapter*.123}%
+\contentsline {subsection}{\numberline {4.3.1}Conclusion}{38}{subsection.123}%
+\contentsline {subsection}{\numberline {4.3.2}Future Work}{39}{subsection.124}%
+\contentsline {chapter}{\nonumberline Bibliography}{40}{chapter*.125}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

@@ -250,16 +250,36 @@ def create_heat_map(exp_path):
         chunk_domains = domains[chunk_idx:chunk_idx+chunk_size]
         chunk_result = result_matrix[:, chunk_idx:chunk_idx+chunk_size]
         chunk_normalized_result = normalized_result_matrix[:, chunk_idx:chunk_idx+chunk_size]
+
+
+        is_last_chunk = (chunk_idx + chunk_size >= len(domains))
+
+        if is_last_chunk:
+            total_solved_chunk = np.sum(chunk_result, axis=1)
+            total_problems_chunk = sum(num_problems[d] for d in chunk_domains)
+            total_normalized = total_solved_chunk / total_problems_chunk if total_problems_chunk > 0 else np.zeros_like(total_solved_chunk, dtype=float)
+            extended_chunk_result = np.column_stack([chunk_result, total_solved_chunk])
+            extended_normalized = np.column_stack([chunk_normalized_result, total_normalized])
+            extended_labels = list(chunk_domains) + ["Total"]
+        else:
+            extended_chunk_result = chunk_result
+            extended_normalized = chunk_normalized_result
+            extended_labels = list(chunk_domains)
+        
+
         fig, ax = plt.subplots(figsize=(16,5))
-        _ = ax.imshow(chunk_normalized_result, cmap='YlGn', aspect='auto')
-        ax.set_xticks(range(len(chunk_domains)), labels=chunk_domains,
+        _ = ax.imshow(extended_normalized, cmap='YlGn', aspect='auto')
+        ax.set_xticks(range(len(extended_labels)), labels=extended_labels,
                     rotation=45, ha="right", rotation_mode="anchor")
         ax.set_yticks(range(len(algos)), labels=display_algos)
         for i in range(len(algos)):
             for j, d in enumerate(chunk_domains):
                 _ = ax.text(j, i, f"{chunk_result[i,j]} / {num_problems[d]}",
                             ha="center", va="center", color="black", fontsize=9)
-        #ax.set_title(f"Solved instances (Part {chunk_idx//chunk_size + 1})")
+            if is_last_chunk:
+                _ = ax.text(len(chunk_domains), i, f"{total_solved_chunk[i]} / {total_problems_chunk}",
+                            ha="center", va="center", color="black", fontsize=9, fontweight='bold')
+            
         fig.tight_layout()
         plt.savefig(f"{exp_path}/solved_part{chunk_idx//chunk_size + 1}.png")
         plt.close()

@@ -1198,10 +1198,9 @@ Comparing the different parallel semantics reveals a trade-off between \textit{p
     Consequently, the overhead of solving these dense constraints often outweighs the benefits gained from a possible reduced time horizon.
     
     \item \textbf{Guess-and-Check ($G\&C$):} The performance of the Guess-and-Check strategy is generally inferior to the direct encodings ($\exists$ and $E$). 
-    Although separating the cycle check from the plan generation reduces the complexity of the generator, the overhead of invoking the solver twice significantly impacts runtime.
     Crucially, when the validity check fails (i.e., the guessed plan contains a cycle), the pipeline must trigger the fallback mechanism. 
     In these cases, the runtime accumulates (time for failed G\&C + time for fallback), often leading to timeouts on instances that the pure $\forall$-step or $\exists$-step encodings could solve directly within the time limit.
-    Consequently, this strategy proves less robust for general-purpose planning compared to the integrated approaches.
+    Consequently, this strategy proves less robust for general-purpose planning compared to the integrated approaches and even solves the fewest total instances compared to the other parallel encodings.
 \end{itemize}
 
 
@@ -1342,11 +1341,24 @@ Figure \ref{fig:s_m_vs_h_s_m_total} confirms that the system's performance is dr
 \end{figure}
 
 
+
 \section{Conclusion and Future Work}
-The experimental evaluation leads to three main conclusions regarding the performance of ASP-based planning encodings:
-\textbf{Parallelism pays off:} Parallel encodings significantly outperform the sequential baseline in almost all standard benchmarks. The reduction of the planning horizon $T$ is probably the primary driver for this efficiency.
-\textbf{Simplicity beats flexibility:} Among the parallel variants, the strict $\forall$-step encoding proves to be the most robust. While the $\exists$-step semantics theoretically allow for more actions to be merged together, the associated grounding overhead often negates this advantage. However, when $\exists$-step is required, the graph-based implementation ($E$) is superior to the constructive approach.
-\textbf{Importance of Preprocessing:} The integration of invariants, specifically $h^2$-mutexes, is crucial for solving highly constrained instances. In contrast, simple domain-independent heuristics (like backward propagation) fail to provide a tangible benefit over the solver's built-in strategies.
+
+\subsection{Conclusion}
+The experimental evaluation leads to several key conclusions regarding the performance and characteristics of ASP-based planning encodings.
+First and foremost, the results demonstrate that parallelism is the primary driver for efficiency in ASP planning. Parallel encodings significantly outperform the sequential baseline across almost all standard benchmarks, primarily because they drastically reduce the required planning horizon $T$. This reduction effectively mitigates the search depth explosion that renders sequential approaches infeasible for larger instances.
+
+Regarding the comparison of parallel semantics, it became evident that compactness often outweighs theoretical flexibility. The strict $\forall$-step encoding proved to be the most robust variant. Although the $\exists$-step semantics theoretically allow for a higher compression of plans by merging more actions per step, the associated overhead of grounding the complex compatibility constraints often negates this advantage. However, in scenarios where the $\exists$-step semantics is explicitly required to find a solution, the graph-based implementation ($E$) utilizing \texttt{\#edge} constraints showed superior performance compared to the constructive approach.
+
+Furthermore, the analysis highlights the critical importance of preprocessing. The integration of invariants, specifically mutex constraints derived from the $h^2$ algorithm, proved essential for solving highly constrained instances. In contrast, simple domain-independent heuristics, such as backward propagation, failed to provide a tangible benefit over the solver's built-in strategies, suggesting that effective guidance in ASP requires more domain-specific control knowledge.
+
+\subsection{Future Work}
+While this work demonstrates the potential of ASP for STRIPS planning, several avenues for future research remain.
+One promising direction is the investigation of alternative strategies for determining the planning horizon. Instead of relying solely on \textit{clingo}'s incremental mode, future work could explore algorithms such as fixed-horizon queries, as discussed by \textcite{DIMOPOULOS_2019}, to potentially reduce the overhead of maintaining the solver state.
+
+Additionally, the Guess-and-Check strategy could be further refined by implementing more adaptive fallbacksfor for instance.
+Finally, as described in \textcite{DIMOPOULOS_2019} the encodings could be generalized to better support conditional effects and derived predicates or axiom rules.
+
 
 \printbibliography
 \end{document}
