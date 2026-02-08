@@ -35,12 +35,9 @@
 \contentsline {paragraph}{\nonumberline $\forall $-step vs. $\exists $-step (Fig. \ref {fig:forall_vs_exists}):}{35}{paragraph*.109}%
 \contentsline {paragraph}{\nonumberline $\forall $-step vs. Guess-and-Check (Fig. \ref {fig:forall_vs_guess_and_check}):}{35}{paragraph*.111}%
 \contentsline {section}{\numberline {4.2}Impact of Optimizations}{36}{section.113}%
-\contentsline {paragraph}{\nonumberline Heuristic}{37}{paragraph*.115}%
-\contentsline {paragraph}{\nonumberline Mutexes}{37}{paragraph*.117}%
-\contentsline {section}{\numberline {4.3}Impact of Optimizations}{37}{section.118}%
-\contentsline {paragraph}{\nonumberline Heuristic Guidance (Fig. \ref {fig:base_vs_h}):}{37}{paragraph*.120}%
-\contentsline {paragraph}{\nonumberline Impact of more Mutexes (Fig. \ref {fig:base_vs_s_m_clingo} \& \ref {fig:base_vs_s_m_total}):}{37}{paragraph*.122}%
-\contentsline {paragraph}{\nonumberline Combined Configuration (Fig. \ref {fig:s_m_vs_h_s_m_total}):}{38}{paragraph*.124}%
-\contentsline {section}{\numberline {4.4}Summary of Results}{38}{section.126}%
-\contentsline {chapter}{\nonumberline Bibliography}{40}{chapter*.130}%
+\contentsline {paragraph}{\nonumberline Heuristic Guidance (Fig. \ref {fig:base_vs_h}):}{37}{paragraph*.115}%
+\contentsline {paragraph}{\nonumberline Impact of more Mutexes (Fig. \ref {fig:base_vs_s_m_clingo} \& \ref {fig:base_vs_s_m_total}):}{37}{paragraph*.117}%
+\contentsline {paragraph}{\nonumberline Combined Configuration (Fig. \ref {fig:s_m_vs_h_s_m_total}):}{37}{paragraph*.119}%
+\contentsline {section}{\numberline {4.3}Summary of Results}{37}{section.121}%
+\contentsline {chapter}{\nonumberline Bibliography}{40}{chapter*.125}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

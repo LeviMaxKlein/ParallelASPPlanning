@@ -121,7 +121,7 @@ def make_parser():
     parser.add_pattern("node", r"node: (.+)\n", type=str, file="driver.log", required=True) 
     parser.add_pattern("cpddl_time", r"CPDDL TIME: ([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("models", r"Models\s*:\s*(\d+)", type=int, file="run.log")
-    parser.add_pattern("clingo_total_time", r"Time\s*:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("clingo_total_time", r"(?<!Guess\s)Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_guess_time", r"Guess Time\s*:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_search_time", r"Solving:\s*([\d.]+)s", type=float,file="run.log")
     parser.add_pattern("clingo_first_model_time", r"1st Model:\s*([\d.]+)s", type=float, file="run.log")

@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber Bachelorarbeit"] 0 "Bachelorarbeit.bcf" "Bachelorarbeit.bbl" "Bachelorarbeit" 1770480137.82723 -1
-  "Bachelorarbeit.bcf" 1770480137.59954 110074 27986b2f589b14523447dc7b680e12ba "pdflatex"
+["biber Bachelorarbeit"] 0 "Bachelorarbeit.bcf" "Bachelorarbeit.bbl" "Bachelorarbeit" 1770549719.21439 -1
+  "Bachelorarbeit.bcf" 1770549718.99507 110074 27986b2f589b14523447dc7b680e12ba "pdflatex"
   "references.bib" 1770287818.43864 5526 d21d5c38517705e6e258b2bef1327f9c ""
   (generated)
   "Bachelorarbeit.bbl"
   "Bachelorarbeit.blg"
   (rewritten before read)
-["pdflatex"] 1770480134.94864 "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" "Bachelorarbeit.pdf" "Bachelorarbeit" 1770480137.82777 0
+["pdflatex"] 1770549716.28815 "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" "Bachelorarbeit.pdf" "Bachelorarbeit" 1770549719.21472 0
   "../data/ParallelASPPlanning-eval/avg_time_part1.png" 1770471757.47675 141678 f212b503477a55e00ea5d8ffde845c24 ""
   "../data/ParallelASPPlanning-eval/avg_time_part2.png" 1770471757.89675 95851 e91d43264e4b74471030fb3c6b688ac3 ""
   "../data/ParallelASPPlanning-eval/solved_part1.png" 1770471756.56475 118971 607e78c439ee4359bd2801ed91e682ab ""
@@ -19,8 +19,8 @@
   "../data/comparison_experiment-eval/modifications/baseline_vs_strong_mutex_clingo_total_time.png" 1770477420.19711 71337 1f6f40aec754f8a763e57d8c730e4a25 ""
   "../data/comparison_experiment-eval/modifications/baseline_vs_strong_mutex_total_time.png" 1770477414.62311 72295 b8396dabd121c02bcab8c5710b202e18 ""
   "../data/comparison_experiment-eval/modifications/strong_mutex_vs_heuristic_strong_mutex_total_time.png" 1770477504.27516 61395 e4cbc5bd0c6f77f0415b5eba2844ec02 ""
-  "/dev/null" 1770461690.14803 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" 1770480131.67553 99872 f2aa98595c3312fd8053434dcb691e67 ""
+  "/dev/null" 1770549150.72492 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "/home/levlap/Documents/Bachelorarbeit/ParallelASPPlanning/writing/Bachelorarbeit.tex" 1770549709.94966 98399 1dcbdf25a56d11a3f2012bff4d445630 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -317,15 +317,15 @@
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1764115200 40900 887e0dc8cac988a9e9c574af364cf837 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1767626175.14043 4547224 5cf1c14d6ee63f23cc6525ae387ed2c9 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1767625907 7759955 417a8361b7798b1e02022c2a4fa43828 ""
-  "Bachelorarbeit.aux" 1770480137.58747 33003 d30d6a5c671ef28d9249e3cfea166a99 "pdflatex"
+  "Bachelorarbeit.aux" 1770549718.98207 32285 c1dbf8326d4254cf0d6619f54fc3b27a "pdflatex"
   "Bachelorarbeit.bbl" 1770302753.48716 24276 f00a2a955d0b43f1762c4eb6faa88651 "biber Bachelorarbeit"
-  "Bachelorarbeit.hd" 1770480136.34491 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "Bachelorarbeit.lof" 1770480137.60237 1575 f23a284990ac8f79b714674fe3d05759 "pdflatex"
-  "Bachelorarbeit.lol" 1770480137.60237 2041 4c09b4af470dc86f1d2ff69fcd8d1e4f "pdflatex"
-  "Bachelorarbeit.out" 1770480136.33575 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "Bachelorarbeit.run.xml" 1770480137.60237 2381 3736809d80bc06dc76277c6eaeeea8eb "pdflatex"
-  "Bachelorarbeit.tex" 1770480131.67553 99872 f2aa98595c3312fd8053434dcb691e67 ""
-  "Bachelorarbeit.toc" 1770480137.60237 4203 fc43637c6d22979f332198e4ea37540d "pdflatex"
+  "Bachelorarbeit.hd" 1770549717.76258 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "Bachelorarbeit.lof" 1770549718.99847 1575 585aedf17a682f08f875dc549608f7c0 "pdflatex"
+  "Bachelorarbeit.lol" 1770549718.99847 2041 4c09b4af470dc86f1d2ff69fcd8d1e4f "pdflatex"
+  "Bachelorarbeit.out" 1770549717.75407 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "Bachelorarbeit.run.xml" 1770549718.99847 2381 3736809d80bc06dc76277c6eaeeea8eb "pdflatex"
+  "Bachelorarbeit.tex" 1770549709.94966 98399 1dcbdf25a56d11a3f2012bff4d445630 ""
+  "Bachelorarbeit.toc" 1770549718.99847 3977 a82d106c39d54eedf511d776eaad4792 "pdflatex"
   "Resources/Pipeline.drawio.png" 1769005573.23985 27109 71b5ad3224ea8f7c31ddcf637cb5cd66 ""
   "_minted-Bachelorarbeit/2BEF401BA66B7AEFC6745A1901037FF30274145FFCF334B51ABEC20F3C6C0AE3.pygtex" 1767708021.07748 3462 6ec8e54145601acd8c6812f7fe5db038 ""
   "_minted-Bachelorarbeit/30128B6CA1C9C1C404BD0E4891ADE95EAFD400EB79709F341354ED78210E1DD7.pygtex" 1767703494.44714 2355 1eabe09164f2ad75bac8989daf39a0ae ""
