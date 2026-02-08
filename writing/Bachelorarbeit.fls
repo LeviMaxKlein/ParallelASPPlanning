@@ -1814,6 +1814,11 @@ INPUT ../data/ParallelASPPlanning-eval/avg_time_part2.png
 INPUT ../data/ParallelASPPlanning-eval/avg_time_part2.png
 INPUT ../data/ParallelASPPlanning-eval/avg_time_part2.png
 INPUT ../data/ParallelASPPlanning-eval/avg_time_part2.png
+INPUT ../data/ParallelASPPlanning-eval/avg_guess_check_time.png
+INPUT ../data/ParallelASPPlanning-eval/avg_guess_check_time.png
+INPUT ../data/ParallelASPPlanning-eval/avg_guess_check_time.png
+INPUT ../data/ParallelASPPlanning-eval/avg_guess_check_time.png
+INPUT ../data/ParallelASPPlanning-eval/avg_guess_check_time.png
 INPUT ../data/comparison_experiment-eval/algo_comparison/no modifications/sequential_vs_forall.png
 INPUT ../data/comparison_experiment-eval/algo_comparison/no modifications/sequential_vs_forall.png
 INPUT ../data/comparison_experiment-eval/algo_comparison/no modifications/sequential_vs_forall.png

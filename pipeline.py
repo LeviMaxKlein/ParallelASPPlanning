@@ -24,7 +24,8 @@ def get_stats(shorten_output):
 
 
 def sum_stats(guess_stat, check_stat):
-    guess_time = re.search(r'Time\s*:\s*([\d.]+)s', guess_stat)
+    guess_time_fallback = re.search(r"Guess Time\s*:\s*([\d.]+)s", guess_stat)
+    guess_time = re.search(r'(?<!Guess\s)Time\s*:\s*([\d.]+)s', guess_stat)
     guess_solving = re.search(r'Solving:\s*([\d.]+)s', guess_stat)
     guess_first = re.search(r'1st Model:\s*([\d.]+)s', guess_stat)
     guess_unsat = re.search(r'Unsat:\s*([\d.]+)s', guess_stat)
@@ -42,12 +43,22 @@ def sum_stats(guess_stat, check_stat):
     total_first = float(guess_first.group(1)) + float(check_first.group(1))
     total_unsat = float(guess_unsat.group(1)) + float(check_unsat.group(1))
     total_cpu = float(guess_cpu.group(1)) + float(check_cpu.group(1))
-    lines = [
-        f"% Models         : {check_models.group(1)}",
-        f"% Guess Time     : {float(guess_time.group(1)):.3f}s",
-        f"% Time           : {total_time:.3f}s (Solving: {total_solving:.2f}s 1st Model: {total_first:.2f}s Unsat: {total_unsat:.2f}s)",
-        f"% CPU Time       : {total_cpu:.3f}s"
-    ]
+    if guess_time_fallback:
+        lines = [
+            f"% Models         : {check_models.group(1)}",
+            f"% Guess Time     : {float(guess_time_fallback.group(1)):.3f}s",
+            f"% Time           : {total_time:.3f}s (Solving: {total_solving:.2f}s 1st Model: {total_first:.2f}s Unsat: {total_unsat:.2f}s)",
+            f"$ G&C Time       : {float(guess_time.group(1)):.3f}s",
+            f"% CPU Time       : {total_cpu:.3f}s"
+        ]
+    else:
+        lines = [
+            f"% Models         : {check_models.group(1)}",
+            f"% Guess Time     : {float(guess_time.group(1)):.3f}s",
+            f"% Time           : {total_time:.3f}s (Solving: {total_solving:.2f}s 1st Model: {total_first:.2f}s Unsat: {total_unsat:.2f}s)",
+            f"% CPU Time       : {total_cpu:.3f}s"
+        ]
+
     return "\n".join(lines)
 
 

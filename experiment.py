@@ -68,6 +68,7 @@ ATTRIBUTES = [
     "clingo_unsat_time",
     "clingo_guess_time",
     "failed_check",
+    "plan_length",
     Attribute("solved", absolute=True)
 ]
 SUITES = args.domains if args.domains else [
@@ -126,6 +127,7 @@ def make_parser():
     parser.add_pattern("clingo_search_time", r"Solving:\s*([\d.]+)s", type=float,file="run.log")
     parser.add_pattern("clingo_first_model_time", r"1st Model:\s*([\d.]+)s", type=float, file="run.log")
     parser.add_pattern("clingo_unsat_time", r"Unsat:\s*([\d.]+)s", type=float, file="run.log")
+    parser.add_pattern("plan_length", r"Value: (\d+)", type=int, file="run.log")
     parser.add_function(solved)
     parser.add_function(get_result_from_models)
     parser.add_function(failed_check)

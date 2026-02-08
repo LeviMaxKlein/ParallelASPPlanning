@@ -1164,6 +1164,14 @@ Figure \ref{fig:time} displays the average runtime. To ensure a fair comparison,
   \label{fig:time}
 \end{figure}
 
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{../data/ParallelASPPlanning-eval/avg_guess_check_time.png}
+  \caption{Average runtime for the Guess-and-Check strategy, broken down into the time spent on the initial guess and the subsequent check.}
+\end{figure}
+
+
 \subsection{Coverage Analysis}
 The coverage results in Figure \ref{fig:solved} reveal several trends regarding the effectiveness of parallel planning.
 
@@ -1172,22 +1180,22 @@ In domains that allow for a high degree of concurrency, parallel encodings signi
 Notable examples include \textit{airport}, \textit{woodworking}, and both \textit{logistics} variants. 
 For instance, in \textit{woodworking}, the sequential encoding ($S$) solves only 7 out of 50 instances, whereas all parallel encodings (with the exception of Guess-and-Check) solve the entire set.
 Similarly, in \textit{floortile}, the sequential encoding fails to solve any instance (0/40), while the \textit{relaxed} $\exists$-step encoding achieves a coverage of 38/40. 
-This confirms that the reduced time horizon $T$ enabled by parallel semantics can effectively mitigate the search depth explosion inherent to sequential planning.
-However, in more complex or inherently sequential domains like \textit{agricola} or \textit{snake}, this performance advantage is not observed.
+This confirms that the reduced time horizon $T$ enabled by parallel semantics can effectively mitigate the search depth explosion inherent to sequential planning. This is on par with the experiment of \textcite{DIMOPOULOS_2019}, where sequential encoding falls behind the parallel variants.
+However, in more complex or inherently sequential domains like \textit{agricola} or \textit{snake}, this performance advantage is not observed. 
 
 \paragraph{Comparison of Parallel Encodings:}
 Comparing the different parallel semantics reveals a trade-off between \textit{plan flexibility} (allowing shorter horizons) and \textit{encoding complexity} (grounding and solving overhead):
 \begin{itemize}
     \item \textbf{$\forall$-step ($\forall$):} Although it enforces the strictest requirements for parallel execution, the $\forall$-step encoding shows better performance in several domains (e.g., \textit{tetris}, \textit{parcprinter}), often outperforming even the more flexible variants in domains like \textit{hiking} or \textit{scanalyzer}.
-    This suggests that for many IPC domains, the capability to interleave dependent actions is not critical. Consequently, the advantage of the $\forall$-step semantics lies in its compactness: it requires fewer constraints and auxiliary atoms than the $\exists$-step variants, thereby significantly reducing the burden on the grounder and solver \parencite{DIMOPOULOS_2019}.
+    This suggests that for many IPC domains, the capability to interleave dependent actions is not critical. Consequently, the advantage of the $\forall$-step semantics lies in its compactness: it requires fewer constraints and auxiliary atoms than the $\exists$-step variants, thereby significantly reducing the burden on the grounder and solver. This is on par with the findings of \textcite{DIMOPOULOS_2019}, where $\forall$-step performs the best among the parallel encodings.
 
     \item \textbf{$\exists$-step ($\exists$ /E):} The strength of the $\exists$-step semantics is seen in domains with complex dependencies. A prime example is \textit{floortile}, where the strict $\forall$-step encoding solves only 18 out of 40 instances, whereas the $\exists$-step encoding achieves a coverage of 37/40. 
     This demonstrates that the increased flexibility of the $\exists$-step semantics enables the discovery of plans in constrained environments where the conservative $\forall$-step approach fails. 
-    Regarding the implementation variants, the graph-based alternative ($E$) generally performs on par with or marginally better than the standard constructive encoding ($\exists$), showing no significant deviation in total coverage.
+    Regarding the implementation variants, the graph-based alternative ($E$) generally performs on par with or marginally better than the standard constructive encoding ($\exists$) as in \textcite{DIMOPOULOS_2019}, showing no significant deviation in total coverage.
 
     \item \textbf{\textit{Relaxed} $\exists$-step (R):} The relaxed encoding typically yields lower coverage compared to the standard $\exists$-step variants, as observed in domains like \textit{quantum-layout}. Although the \textit{relaxed} $\exists$-step encoding theoretically enables the shortest plan horizons by allowing actions to support each other within the same step, the computational cost is significant.
     The recursive definition of the reachability predicates (\texttt{reach/3}) probably increases the complexity of the ground program.
-    Consequently, the overhead of solving these dense constraints often outweighs the benefits gained from a reduced time horizon.
+    Consequently, the overhead of solving these dense constraints often outweighs the benefits gained from a possible reduced time horizon.
     
     \item \textbf{Guess-and-Check ($G\&C$):} The performance of the Guess-and-Check strategy is generally inferior to the direct encodings ($\exists$ and $E$). 
     Although separating the cycle check from the plan generation reduces the complexity of the generator, the overhead of invoking the solver twice significantly impacts runtime.
@@ -1245,7 +1253,7 @@ Consequently, the combined runtime of the lightweight generator and the subseque
     \label{fig:forall_vs_exists}
   \end{subfigure}
   
-  \vspace{0.2cm} % Reduziert von 0.5cm auf 0.2cm
+  \vspace{0.2cm}
   
   \begin{subfigure}[t]{0.48\textwidth}
     \centering
@@ -1334,19 +1342,11 @@ Figure \ref{fig:s_m_vs_h_s_m_total} confirms that the system's performance is dr
 \end{figure}
 
 
-\section{Summary of Results}
+\section{Conclusion and Future Work}
 The experimental evaluation leads to three main conclusions regarding the performance of ASP-based planning encodings:
-
-\begin{enumerate}
-    \item \textbf{Parallelism pays off:} Parallel encodings ($\forall$-step and $\exists$-step) significantly outperform the sequential baseline in almost all standard benchmarks. The reduction of the planning horizon $T$ is the primary driver for this efficiency.
-    
-    \item \textbf{Simplicity beats flexibility:} Among the parallel variants, the strict $\forall$-step encoding proves to be the most robust. While the $\exists$-step semantics theoretically allow for shorter plans, the associated grounding overhead often negates this advantage. However, when $\exists$-step is required, the graph-based implementation ($E$) is superior to the constructive approach.
-    
-    \item \textbf{Importance of Preprocessing:} The integration of invariants, specifically $h^2$-mutexes, is crucial for solving highly constrained instances. In contrast, simple domain-independent heuristics (like backward propagation) fail to provide a tangible benefit over the solver's built-in strategies.
-\end{enumerate}
-
-These findings suggest that future improvements should focus on compact encodings (like $\forall$-step) combined with rigorous preprocessing, rather than increasingly complex relaxed semantics.
-
+\textbf{Parallelism pays off:} Parallel encodings significantly outperform the sequential baseline in almost all standard benchmarks. The reduction of the planning horizon $T$ is probably the primary driver for this efficiency.
+\textbf{Simplicity beats flexibility:} Among the parallel variants, the strict $\forall$-step encoding proves to be the most robust. While the $\exists$-step semantics theoretically allow for more actions to be merged together, the associated grounding overhead often negates this advantage. However, when $\exists$-step is required, the graph-based implementation ($E$) is superior to the constructive approach.
+\textbf{Importance of Preprocessing:} The integration of invariants, specifically $h^2$-mutexes, is crucial for solving highly constrained instances. In contrast, simple domain-independent heuristics (like backward propagation) fail to provide a tangible benefit over the solver's built-in strategies.
 
 \printbibliography
 \end{document}
