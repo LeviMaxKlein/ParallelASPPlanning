@@ -80,6 +80,49 @@
       \verb http://www.cs.utexas.edu/users/ai-lab?gel88
       \endverb
     \endentry
+    \entry{Kautz1996}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=b2f57860068ca81fddf9083bdf8e72a5}{%
+           family={Kautz},
+           familyi={K\bibinitperiod},
+           given={Henry},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7df9259d309c280814b13796b24e44a2}{%
+           family={McAllester},
+           familyi={M\bibinitperiod},
+           given={D.\bibnamedelimi A.},
+           giveni={D\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0ff75e71f593b1e7ef8dc99e4a1ff418}{%
+           family={Selman},
+           familyi={S\bibinitperiod},
+           given={Bart},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Cambridge, Massachusetts}%
+      }
+      \strng{namehash}{7728eb308119c80d92fc1a7abf825477}
+      \strng{fullhash}{7728eb308119c80d92fc1a7abf825477}
+      \strng{fullhashraw}{7728eb308119c80d92fc1a7abf825477}
+      \strng{bibnamehash}{7728eb308119c80d92fc1a7abf825477}
+      \strng{authorbibnamehash}{7728eb308119c80d92fc1a7abf825477}
+      \strng{authornamehash}{7728eb308119c80d92fc1a7abf825477}
+      \strng{authorfullhash}{7728eb308119c80d92fc1a7abf825477}
+      \strng{authorfullhashraw}{7728eb308119c80d92fc1a7abf825477}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Encoding Plans in Propositional Logic}
+      \field{year}{1996}
+      \field{pages}{374\bibrangedash 384}
+      \range{pages}{11}
+    \endentry
     \entry{Dimopoulos1997}{inproceedings}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=f225e6f3a40a85dfe2477e613cdd91d6}{%
@@ -123,6 +166,50 @@
       \verb{doi}
       \verb 10.1007/3-540-63912-8_84
       \endverb
+    \endentry
+    \entry{LIFSCHITZ200239}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3f9f7c9937297077325233d345cf9c91}{%
+           family={Lifschitz},
+           familyi={L\bibinitperiod},
+           given={Vladimir},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{3f9f7c9937297077325233d345cf9c91}
+      \strng{fullhash}{3f9f7c9937297077325233d345cf9c91}
+      \strng{fullhashraw}{3f9f7c9937297077325233d345cf9c91}
+      \strng{bibnamehash}{3f9f7c9937297077325233d345cf9c91}
+      \strng{authorbibnamehash}{3f9f7c9937297077325233d345cf9c91}
+      \strng{authornamehash}{3f9f7c9937297077325233d345cf9c91}
+      \strng{authorfullhash}{3f9f7c9937297077325233d345cf9c91}
+      \strng{authorfullhashraw}{3f9f7c9937297077325233d345cf9c91}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The idea of answer set programming is to represent a given computational problem by a logic program whose answer sets correspond to solutions, and then use an answer set solver, such as smodels or dlv, to find an answer set for this program. Applications of this method to planning are related to the line of research on the frame problem that started with the invention of formal nonmonotonic reasoning in 1980.}
+      \field{issn}{0004-3702}
+      \field{journaltitle}{Artificial Intelligence}
+      \field{note}{Knowledge Representation and Logic Programming}
+      \field{number}{1}
+      \field{title}{Answer set programming and plan generation}
+      \field{volume}{138}
+      \field{year}{2002}
+      \field{pages}{39\bibrangedash 54}
+      \range{pages}{16}
+      \verb{doi}
+      \verb https://doi.org/10.1016/S0004-3702(02)00186-8
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S0004370202001868
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S0004370202001868
+      \endverb
+      \keyw{Answer sets,Default logic,Frame problem,Logic programming,Planning}
     \endentry
     \entry{Helmert2006}{article}{}{}
       \name{author}{1}{}{%
@@ -576,6 +663,75 @@
       \verb{url}
       \verb http://dx.doi.org/10.1017/S1471068418000583
       \endverb
+    \endentry
+    \entry{potassco_guide}{misc}{}{}
+      \name{author}{8}{ul=4}{%
+        {{un=0,uniquepart=base,hash=a296fbe902a96f2ceebb7398463f3e13}{%
+           family={Gebser},
+           familyi={G\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=75758236531a52ffc97ef10f8b482f05}{%
+           family={Kaminski},
+           familyi={K\bibinitperiod},
+           given={Roland},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3fe0253f0b3212a4109e50143a91fede}{%
+           family={Kaufmann},
+           familyi={K\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fcea9ebaf01b5a334513699230ad72fc}{%
+           family={Lindauer},
+           familyi={L\bibinitperiod},
+           given={Marius},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=121398acde74ccd9e0d29d065c9c45eb}{%
+           family={Ostrowski},
+           familyi={O\bibinitperiod},
+           given={Max},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=586007140096e6d78832f56de1edf859}{%
+           family={Romero},
+           familyi={R\bibinitperiod},
+           given={Javier},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3c55d70c19bd5f5a654a6ad7ae64450c}{%
+           family={Schaub},
+           familyi={S\bibinitperiod},
+           given={Torsten},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=cc56718d2998dacb8384fa6af6cab70f}{%
+           family={Thiele},
+           familyi={T\bibinitperiod},
+           given={Sven},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7b891811f76a0db82847a74c171fdafd}
+      \strng{fullhash}{a6a011d8a8568f6237ef0817d724b33e}
+      \strng{fullhashraw}{a6a011d8a8568f6237ef0817d724b33e}
+      \strng{bibnamehash}{7b891811f76a0db82847a74c171fdafd}
+      \strng{authorbibnamehash}{7b891811f76a0db82847a74c171fdafd}
+      \strng{authornamehash}{7b891811f76a0db82847a74c171fdafd}
+      \strng{authorfullhash}{a6a011d8a8568f6237ef0817d724b33e}
+      \strng{authorfullhashraw}{a6a011d8a8568f6237ef0817d724b33e}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/potassco/guide/releases/tag/v2.2.0}}
+      \field{title}{Potassco User Guide}
+      \field{year}{2019}
     \endentry
     \entry{fiser_2025_16423302}{software}{}{}
       \name{author}{1}{}{%

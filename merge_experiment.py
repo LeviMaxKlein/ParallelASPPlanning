@@ -18,7 +18,7 @@ exp_with_h_with_s_m = "data/ParallelASPPlanning_with_heuristic_with_strong_mutex
 def aggregate_domain_variants(run1, run2):
     run1["domain"] = run1["domain"].split("-")[0]
     run2["domain"] = run2["domain"].split("-")[0]
-    return run1["domain"]
+    return run2["domain"]
 
 
 def filter_time_and_add_total_time(run):
@@ -27,12 +27,6 @@ def filter_time_and_add_total_time(run):
     
     if run["cpddl_time"] is not None and run["clingo_total_time"] is not None:
         run["total_time"] = run["cpddl_time"] + run["clingo_total_time"]
-
-    if "guess_and_check" in run.get("algorithm", ""):
-        guess_time = run.get("guess_time")
-        total_time = run.get("clingo_total_time")
-        if guess_time is not None and total_time is not None:
-            run["check_time"] = total_time - guess_time
 
     return True
 

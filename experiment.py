@@ -155,7 +155,6 @@ def remove_explained_errors(run):
 
 def create_plots():
     properties_file = Path(exp.path + "-eval") / "properties"
-    print(properties_file)
     if not os.path.exists(properties_file):
         print(f"Properties file not found: {properties_file}")
         raise FileNotFoundError

@@ -48,7 +48,7 @@ def sum_stats(guess_stat, check_stat):
             f"% Models         : {check_models.group(1)}",
             f"% Guess Time     : {float(guess_time_fallback.group(1)):.3f}s",
             f"% Time           : {total_time:.3f}s (Solving: {total_solving:.2f}s 1st Model: {total_first:.2f}s Unsat: {total_unsat:.2f}s)",
-            f"$ G&C Time       : {float(guess_time.group(1)):.3f}s",
+            f"% G&C Time       : {float(guess_time.group(1)):.3f}s",
             f"% CPU Time       : {total_cpu:.3f}s"
         ]
     else:

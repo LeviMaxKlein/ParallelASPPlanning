@@ -3,13 +3,16 @@ import numpy as np
 import os
 import json
 
-def get_algo_stats(data):
+def get_algo_stats(data, gc_data):
+
     results = {}
     problem_solutions = {} # {(domain, problem): {algo: time}}
     guess_check_times = {}
     num_problems = {}
     for run_data in data.values():
         algo = run_data.get("algorithm")
+        if "guess_and_check" in algo:
+            continue
         domain = run_data.get("domain")
         grouped_domain = domain.split("-")[0]
         problem = run_data.get("problem")
@@ -30,8 +33,31 @@ def get_algo_stats(data):
         if result == 1:
             problem_solutions[key][algo] = time
 
-            if algo == "guess_and_check":
+    if gc_data:
+        algo = "guess_and_check"
+        if algo not in results:
+            results[algo] = {}
+        
+        for run_data in gc_data.values():
+            domain = run_data.get("domain")
+            grouped_domain = domain.split("-")[0]
+            problem = run_data.get("problem")
+            result = run_data.get("solved", 0)
+            time = run_data.get("clingo_total_time", 0) if result == 1 else 0
+
+            if grouped_domain not in results[algo]:
+                results[algo][grouped_domain] = 0
+            results[algo][grouped_domain] += result
+
+            key = (domain, problem)
+            if key not in problem_solutions:
+                problem_solutions[key] = {}
+            if result == 1:
+                problem_solutions[key][algo] = time
+
+                # Extract guess/check/forall times
                 guess_time = run_data.get("clingo_guess_time", 0)
+                guess_and_check_time = run_data.get("guess_and_check_time", 0)
                 failed_check = run_data.get("failed_check", 0)
                 
                 if key not in guess_check_times:
@@ -40,10 +66,11 @@ def get_algo_stats(data):
                 if guess_time != 0:
                     if failed_check > 0:
                         # Check failed -> fallback to forall
-                        forall_time = time - guess_time
+                        forall_time = time - guess_and_check_time
+                        check_time = forall_time - guess_time
                         guess_check_times[key] = {
                             'guess': guess_time,
-                            'check': 0,
+                            'check': check_time,
                             'forall': forall_time
                         }
                     else:
@@ -127,7 +154,7 @@ def create_guess_check_heatmap(avg_guess_check, domains, exp_path):
     if filtered_time_matrix.size == 0:
         return
     
-    fig, ax = plt.subplots(figsize=(16, 4))
+    fig, ax = plt.subplots(figsize=(16, 3))
     non_zero_times = filtered_time_matrix[~np.isnan(filtered_time_matrix)]
     non_zero_times = non_zero_times[non_zero_times > 0]  # Exclude zeros
     
@@ -139,8 +166,8 @@ def create_guess_check_heatmap(avg_guess_check, domains, exp_path):
     
     im = ax.imshow(filtered_time_matrix, cmap='YlOrRd', aspect='auto', norm=norm)
     ax.set_xticks(range(len(filtered_domains)), labels=filtered_domains,
-                  rotation=45, ha="right", rotation_mode="anchor")
-    ax.set_yticks([0, 1, 2], labels=["Guess\nTime", "Check\nTime", r"$\forall$ Time"])
+                  rotation=45, ha="right", rotation_mode="anchor", fontsize=11)
+    ax.set_yticks([0, 1, 2], labels=["Guess\nTime", "Check\nTime", "Fallback\nTime"])
     
     # Add text annotations
     for i in range(3):
@@ -197,8 +224,13 @@ def create_matrices(algo_stats, filtered_times, algos, domains, num_problems):
     time_matrix = np.full((len(algos), len(domains)), np.nan)
     for row, algo in enumerate(algos):
         for col, domain in enumerate(domains):
-            result_matrix[row,col] = algo_stats[algo][domain]
-            normalized_result_matrix[row,col] = result_matrix[row,col] / num_problems[domain]
+            if domain in algo_stats.get(algo, {}):
+                result_matrix[row,col] = algo_stats[algo][domain]
+                normalized_result_matrix[row,col] = result_matrix[row,col] / num_problems[domain]
+            else:
+                result_matrix[row,col] = 0
+                normalized_result_matrix[row,col] = 0.0
+            
             if domain in filtered_times[algo]:
                 time_matrix[row,col] = np.mean(filtered_times[algo][domain])
             else:
@@ -207,8 +239,10 @@ def create_matrices(algo_stats, filtered_times, algos, domains, num_problems):
 
 
 def create_heat_map(exp_path):
+    gc_properties_file = "data/ParallelASPPlanning_guess_and_check-eval/properties"
     properties_file = os.path.join(exp_path, "properties")
     data = {}
+    gc_data = {}
     try:
         if not os.path.exists(properties_file):
             raise FileNotFoundError
@@ -216,8 +250,16 @@ def create_heat_map(exp_path):
             data = json.load(f)
     except (json.JSONDecodeError, IOError) as e:
             print(f"Error reading properties file: {e}")
+
+    try:
+        if not os.path.exists(gc_properties_file):
+            raise FileNotFoundError
+        with open(gc_properties_file, 'r') as f:
+            gc_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+            print(f"Error reading properties file: {e}")
     
-    results, problem_solutions, num_problems, guess_check_times = get_algo_stats(data)
+    results, problem_solutions, num_problems, guess_check_times = get_algo_stats(data, gc_data)
     algo_order = ["sequential", "forall", "exists", "exists_edge", "relaxed", "guess_and_check"]
     algos = [algo for algo in algo_order if algo in results]
     domains = sorted(list(filter_grouped_domains(results, algos)))
