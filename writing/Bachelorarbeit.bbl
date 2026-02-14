@@ -211,6 +211,62 @@
       \endverb
       \keyw{Answer sets,Default logic,Frame problem,Logic programming,Planning}
     \endentry
+    \entry{eiter2006}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=afcea6fea5dffb083d7000f489d2a314}{%
+           family={Eiter},
+           familyi={E\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=a2be0ec850b04b1f5e9fe3aca6bf5226}{%
+           family={Polleres},
+           familyi={P\bibinitperiod},
+           given={Axel},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {USA}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{34e206b0b972c984f744eee1237c3d9e}
+      \strng{fullhash}{34e206b0b972c984f744eee1237c3d9e}
+      \strng{fullhashraw}{34e206b0b972c984f744eee1237c3d9e}
+      \strng{bibnamehash}{34e206b0b972c984f744eee1237c3d9e}
+      \strng{authorbibnamehash}{34e206b0b972c984f744eee1237c3d9e}
+      \strng{authornamehash}{34e206b0b972c984f744eee1237c3d9e}
+      \strng{authorfullhash}{34e206b0b972c984f744eee1237c3d9e}
+      \strng{authorfullhashraw}{34e206b0b972c984f744eee1237c3d9e}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Answer set programming (ASP) with disjunction offers a powerful tool for declaratively representing and solving hard problems. Many NP-complete problems can be encoded in the answer set semantics of logic programs in a very concise and intuitive way, where the encoding reflects the typical “guess and check” nature of NP problems: The property is encoded in a way such that polynomial size certificates for it correspond to stable models of a program. However, the problem-solving capacity of full disjunctive logic programs (DLPs) is beyond NP, and captures a class of problems at the second level of the polynomial hierarchy. While these problems also have a clear “guess and check” structure, finding an encoding in a DLP reflecting this structure may sometimes be a non-obvious task, in particular if the “check” itself is a co-NP-complete problem; usually, such problems are solved by interleaving separate guess and check programs, where the check is expressed by inconsistency of the check program. In this paper, we present general transformations of head-cycle free (extended) disjunctive logic programs into stratified and positive (extended) disjunctive logic programs based on meta-interpretation techniques. The answer sets of the original and the transformed program are in simple correspondence, and, moreover, inconsistency of the original program is indicated by a designated answer set of the transformed program. Our transformations facilitate the integration of separate “guess” and “check” programs, which are often easy to obtain, automatically into a single disjunctive logic program. Our results complement recent results on meta-interpretation in ASP, and extend methods and techniques for a declarative “guess and check” problem solving paradigm through ASP.}
+      \field{issn}{1471-0684}
+      \field{journaltitle}{Theory Pract. Log. Program.}
+      \field{month}{1}
+      \field{number}{1–2}
+      \field{title}{Towards automated integration of guess and check programs in answer set programming: a meta-interpreter and applications}
+      \field{volume}{6}
+      \field{year}{2006}
+      \field{pages}{23\bibrangedash 60}
+      \range{pages}{38}
+      \verb{doi}
+      \verb 10.1017/S1471068405002577
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1017/S1471068405002577
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1017/S1471068405002577
+      \endverb
+      \keyw{answer set programming,automated program synthesis,disjunctive logic programs,guess and check paradigm,meta-interpretation}
+    \endentry
     \entry{Helmert2006}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e76d7a9be5601c1bb9c96f087b8d55df}{%

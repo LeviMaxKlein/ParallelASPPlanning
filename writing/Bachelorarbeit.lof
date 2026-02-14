@@ -1,12 +1,13 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Pipeline for testing the different planning encodings\relax }}{24}{figure.caption.54}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Pipeline for evaluating the different planning encodings\relax }}{24}{figure.caption.54}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Coverage analysis: Number of solved instances per algorithm across benchmark domains. The heatmap indicates the absolute number of solved instances (left) out of the total available instances (right).\relax }}{32}{figure.caption.88}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime analysis: Average solving time (in seconds) for successfully solved instances. Red cells indicate higher runtimes, while light yellow cells indicate faster performance.\relax }}{33}{figure.caption.89}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Average runtime for the Guess-and-Check strategy, broken down into the time spent on the initial guess and the subsequent check.\relax }}{34}{figure.caption.90}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Runtime comparison between different encodings. Each point represents an instance solved by both encodings, with the x-coordinate indicating the runtime of the first encoding and the y-coordinate that of the second. Points below the diagonal indicate better performance of the first encoding.\relax }}{36}{figure.caption.107}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Runtime comparison of optimization techniques. Top row: The heuristic shows negligible impact (points on diagonal). Bottom row: Mutexes significantly reduce solver time (c), but preprocessing overhead affects total time on easy instances (d).\relax }}{37}{figure.caption.115}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Coverage analysis: Number of solved instances per algorithm across benchmark domains. The heatmap indicates the absolute number of solved instances (left) out of the total available instances (right).\relax }}{32}{figure.caption.86}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Runtime analysis: Average solving time (in seconds) for successfully solved instances. Red cells indicate higher runtimes, while light yellow cells indicate faster performance.\relax }}{33}{figure.caption.87}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Average runtime for the Guess-and-Check strategy, broken down into the time spent on the initial guess and the subsequent check.\relax }}{34}{figure.caption.88}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Runtime comparison between different encodings. Each point represents an instance solved by both encodings, with the x-coordinate indicating the runtime of the first encoding and the y-coordinate that of the second. Points below the diagonal indicate better performance of the first encoding.\relax }}{35}{figure.caption.105}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Runtime comparison of optimization techniques.\relax }}{37}{figure.caption.113}%
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

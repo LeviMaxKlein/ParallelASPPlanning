@@ -17,29 +17,28 @@
 \contentsline {subsection}{\numberline {3.2.1}Post-Processing and Serialization}{26}{subsection.63}%
 \contentsline {section}{\numberline {3.3}Optimizations}{26}{section.64}%
 \contentsline {subsection}{\numberline {3.3.1}Mutexes}{26}{subsection.65}%
-\contentsline {subsection}{\numberline {3.3.2}Guess and Check Optimization}{27}{subsection.70}%
-\contentsline {subsection}{\numberline {3.3.3}Heuristic}{28}{subsection.74}%
-\contentsline {section}{\numberline {3.4}Experimental Setup}{29}{section.76}%
-\contentsline {subsection}{\numberline {3.4.1}Configurations and Encodings}{29}{subsection.77}%
-\contentsline {subsection}{\numberline {3.4.2}Benchmark Selection and Validation Criteria}{30}{subsection.82}%
-\contentsline {subsection}{\numberline {3.4.3}Computational Environment}{30}{subsection.85}%
-\contentsline {chapter}{\numberline {4}Results}{31}{chapter.86}%
-\contentsline {section}{\numberline {4.1}Overall Performance}{31}{section.87}%
-\contentsline {subsection}{\numberline {4.1.1}Coverage Analysis}{31}{subsection.91}%
-\contentsline {paragraph}{\nonumberline Sequential vs. Parallel Performance:}{31}{paragraph*.93}%
-\contentsline {paragraph}{\nonumberline Comparison of Parallel Encodings:}{31}{paragraph*.95}%
-\contentsline {subsection}{\numberline {4.1.2}Runtime Analysis}{34}{subsection.96}%
-\contentsline {subsubsection}{\nonumberline Overview across Domains}{34}{subsubsection*.98}%
-\contentsline {subsubsection}{\nonumberline Detailed Pairwise Comparison}{34}{subsubsection*.100}%
-\contentsline {paragraph}{\nonumberline $\exists $-step Implementation Variants (Fig. \ref {fig:exist_vs_exist_edge}):}{34}{paragraph*.102}%
-\contentsline {paragraph}{\nonumberline $\forall $-step vs. $\exists $-step (Fig. \ref {fig:forall_vs_exists}):}{34}{paragraph*.104}%
-\contentsline {paragraph}{\nonumberline $\forall $-step vs. Guess-and-Check (Fig. \ref {fig:forall_vs_guess_and_check}):}{35}{paragraph*.106}%
-\contentsline {section}{\numberline {4.2}Impact of Optimizations}{35}{section.108}%
-\contentsline {paragraph}{\nonumberline Heuristic Guidance (Fig. \ref {fig:base_vs_h}):}{35}{paragraph*.110}%
-\contentsline {paragraph}{\nonumberline Impact of more Mutexes (Fig. \ref {fig:base_vs_s_m_clingo} \& \ref {fig:base_vs_s_m_total}):}{35}{paragraph*.112}%
-\contentsline {paragraph}{\nonumberline Combined Configuration (Fig. \ref {fig:s_m_vs_h_s_m_total}):}{36}{paragraph*.114}%
-\contentsline {section}{\numberline {4.3}Conclusion and Future Work}{37}{section.116}%
-\contentsline {subsection}{\numberline {4.3.1}Conclusion}{37}{subsection.117}%
-\contentsline {subsection}{\numberline {4.3.2}Future Work}{38}{subsection.118}%
-\contentsline {chapter}{\nonumberline Bibliography}{39}{chapter*.119}%
+\contentsline {subsection}{\numberline {3.3.2}Guess and Check Optimization}{27}{subsection.67}%
+\contentsline {subsection}{\numberline {3.3.3}Heuristic}{28}{subsection.71}%
+\contentsline {section}{\numberline {3.4}Experimental Setup}{29}{section.73}%
+\contentsline {subsection}{\numberline {3.4.1}Configurations and Encodings}{29}{subsection.74}%
+\contentsline {subsection}{\numberline {3.4.2}Benchmark Selection and Validation Criteria}{30}{subsection.79}%
+\contentsline {subsection}{\numberline {3.4.3}Computational Environment}{30}{subsection.82}%
+\contentsline {chapter}{\numberline {4}Results}{31}{chapter.84}%
+\contentsline {section}{\numberline {4.1}Overall Performance}{31}{section.85}%
+\contentsline {subsection}{\numberline {4.1.1}Coverage Analysis}{31}{subsection.89}%
+\contentsline {paragraph}{\nonumberline Sequential vs. Parallel Performance:}{31}{paragraph*.91}%
+\contentsline {paragraph}{\nonumberline Comparison of Parallel Encodings:}{31}{paragraph*.93}%
+\contentsline {subsection}{\numberline {4.1.2}Runtime Analysis}{34}{subsection.94}%
+\contentsline {subsubsection}{\nonumberline Overview across Domains}{34}{subsubsection*.96}%
+\contentsline {subsubsection}{\nonumberline Detailed Pairwise Comparison}{34}{subsubsection*.98}%
+\contentsline {paragraph}{\nonumberline $\exists $-step Implementation Variants (Fig. \ref {fig:exist_vs_exist_edge}):}{34}{paragraph*.100}%
+\contentsline {paragraph}{\nonumberline $\forall $-step vs. $\exists $-step (Fig. \ref {fig:forall_vs_exists}):}{34}{paragraph*.102}%
+\contentsline {paragraph}{\nonumberline $\forall $-step vs. Guess and Check (Fig. \ref {fig:forall_vs_guess_and_check}):}{35}{paragraph*.104}%
+\contentsline {section}{\numberline {4.2}Impact of Optimizations}{36}{section.106}%
+\contentsline {paragraph}{\nonumberline Heuristic Guidance (Fig. \ref {fig:base_vs_h}):}{36}{paragraph*.108}%
+\contentsline {paragraph}{\nonumberline Impact of more Mutex Groups (Fig. \ref {fig:base_vs_s_m_clingo} \& \ref {fig:base_vs_s_m_total}):}{36}{paragraph*.110}%
+\contentsline {paragraph}{\nonumberline Combined Configuration (Fig. \ref {fig:s_m_vs_h_s_m_total}):}{36}{paragraph*.112}%
+\contentsline {chapter}{\numberline {5}Conclusion}{38}{chapter.114}%
+\contentsline {section}{\numberline {5.1}Future Work}{39}{section.115}%
+\contentsline {chapter}{\nonumberline Bibliography}{40}{chapter*.116}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
