@@ -267,36 +267,6 @@
       \endverb
       \keyw{answer set programming,automated program synthesis,disjunctive logic programs,guess and check paradigm,meta-interpretation}
     \endentry
-    \entry{Helmert2006}{article}{}{}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=e76d7a9be5601c1bb9c96f087b8d55df}{%
-           family={Helmert},
-           familyi={H\bibinitperiod},
-           given={M.},
-           giveni={M\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \strng{fullhash}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \strng{fullhashraw}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \strng{bibnamehash}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \strng{authorbibnamehash}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \strng{authornamehash}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \strng{authorfullhash}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \strng{authorfullhashraw}{e76d7a9be5601c1bb9c96f087b8d55df}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Journal of Artifical Intelligence Research}
-      \field{title}{{The Fast Downward Planning System}}
-      \field{volume}{26}
-      \field{year}{2006}
-      \field{pages}{191\bibrangedash 246}
-      \range{pages}{56}
-    \endentry
     \entry{RINTANEN20061031}{article}{}{}
       \name{author}{3}{}{%
         {{un=0,uniquepart=base,hash=515fda71c651bb7137be05148412399a}{%
@@ -830,6 +800,7 @@
       \endverb
     \endentry
   \enddatalist
+  \missing{Helmert2006}
 \endrefsection
 \endinput
 

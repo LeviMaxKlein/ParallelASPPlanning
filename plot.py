@@ -9,6 +9,9 @@ def get_algo_stats(data, gc_data):
     problem_solutions = {} # {(domain, problem): {algo: time}}
     guess_check_times = {}
     num_problems = {}
+    failed_check_count = 0
+    total_guess_and_check = 0
+
     for run_data in data.values():
         algo = run_data.get("algorithm")
         if "guess_and_check" in algo:
@@ -64,7 +67,9 @@ def get_algo_stats(data, gc_data):
                     guess_check_times[key] = {}
                 
                 if guess_time != 0:
+                    total_guess_and_check += 1
                     if failed_check > 0:
+                        failed_check_count += 1
                         # Check failed -> fallback to forall
                         forall_time = time - guess_and_check_time
                         check_time = forall_time - guess_time
@@ -97,6 +102,9 @@ def get_algo_stats(data, gc_data):
             num_problems[grouped_domain] = 0
         num_problems[grouped_domain] +=1
 
+    print(f"Total guess and check runs: {total_guess_and_check}")
+    print(f"Failed check runs: {failed_check_count}")
+    print(f"Failed check percentage: {failed_check_count / total_guess_and_check * 100:.2f}%")
 
     return results, problem_solutions, num_problems, guess_check_times
 
