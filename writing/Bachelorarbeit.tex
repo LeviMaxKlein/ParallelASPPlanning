@@ -64,6 +64,7 @@
 \usetikzlibrary{arrows.meta, positioning}
 \usepackage{subcaption}
 \usepackage{caption}
+\usepackage{pdfpages}
 
 % ============================================================
 % CODE LISTINGS
@@ -158,11 +159,12 @@
 
 \vspace*{1cm}
 \begin{center}
-\vspace*{3cm}
+%\vspace*{3cm}
 \textbf{ 
-\Large Ruprecht-Karls-Universität Heidelberg\\
+\Large Heidelberg University\\
 \smallskip
-\Large Institut für Informatik\\
+\Large Institute for Computer Science\\
+\Large Fundamentals of Intelligent Planning \\
 \smallskip
 }
 
@@ -171,8 +173,8 @@
 \textbf{\large Bachelor Thesis}
 
 \vspace{0.5\baselineskip}
-{\huge
-Parallel ASP Planning
+{\Huge
+\textbf{Parallel ASP Planning}
 }
 \end{center}
 
@@ -182,7 +184,7 @@ Parallel ASP Planning
 \begin{tabular}[l]{ll}
 Name: & Levi Maximilian Klein\\
 Student ID: & 4283957\\
-Supervisor: & Dr. Gnad\\
+Supervisor: & PD Dr. Daniel Gnad\\
 Submission date: & 17.02.2026
 \end{tabular}
 }
@@ -194,13 +196,13 @@ Submission date: & 17.02.2026
 \chapter*{Abstract}
 Automated Planning is a fundamental concept in Artificial Intelligence that focuses on finding a sequence of actions to reach a desired goal from an initial state. Answer Set Programming (ASP) provides a powerful approach to tackle this challenge by modeling dynamic domains with concise declarative rules. However, traditional sequential encodings often suffer from a \mbox{search-depth} explosion due to long planning horizons. This thesis investigates the application of parallel planning techniques to overcome this bottleneck.
 We first establish the theoretical foundations of planning tasks and define the semantics of sequential and parallel plans ($\forall$-step and $\exists$-step). Based on the framework proposed by Dimopoulos et al. (2019), specific ASP encodings for these planning strategies are presented.
-The empirical evaluation demonstrates that parallel encodings significantly outperform the sequential baseline. Specifically, the $\forall$-step encoding proves to be the most robust, solving a total of 448 out of 996 problem instances from a collection of IPC benchmark domains, whereas the sequential encoding solves only 202. Additionally, the inclusion of precomputed mutex groups improves performance in highly constrained domains like \textit{Agricola}, raising the total coverage to 457 instances while simultaneously reducing runtime for 417 instances. In contrast, neither the backward-propagating heuristic nor the \enquote{Guess and Check} strategy yielded significant performance improvements compared to the standard configuration, with \enquote{Guess and Check} solving only 366 instances.
+The empirical evaluation demonstrates that parallel encodings significantly outperform the sequential baseline. Specifically, the encoding for $\forall$-step plans proves to be the most robust, solving a total of 448 out of 996 problem instances from a collection of IPC benchmark domains, whereas the sequential encoding solves only 202. Additionally, the inclusion of precomputed mutex groups improves performance in highly constrained domains like \textit{Agricola}, raising the total coverage to 457 instances while simultaneously reducing runtime for 417 instances. In contrast, neither the backward-propagating heuristic nor the guess-and-check strategy yielded significant performance improvements compared to the standard configuration, with guess-and-check solving only 366 instances.
 
 
 \chapter*{Zusammenfassung}
 Automatische Planung ist ein fundamentales Konzept in künstlicher Intelligenz, das sich mit der Suche nach einer Abfolge von Aktionen beschäftigt, um ein gewünschtes Ziel von einem Anfangszustand aus zu erreichen. Answer Set Programming (ASP) bietet eine leistungsstarke Möglichkeit, diese Herausforderung anzugehen, indem es dynamische Domänen durch knappe deklarative Regeln modelliert.
 Allerdings leiden traditionelle sequentielle Codierungen oft unter einer Explosion der Suchtiefe aufgrund langer Planhorizonte. Diese Arbeit untersucht die Anwendung von parallelen Planungstechniken, um diese Hürde zu überwinden. Zunächst werden die theoretischen Grundlagen von Planungsaufgaben etabliert und die Semantik von sequentiellen sowie parallelen Plänen ($\forall$-step und $\exists$-step) definiert. Aufbauend auf der Arbeit von Dimopoulos et al. (2019), werden ASP-Codierungen für diese Planungsstrategien präsentiert.  
-Die empirische Evaluation zeigt, dass parallele Codierungen den sequentiellen Ansatz deutlich übertreffen. Insbesondere erweist sich die $\forall$-step Codierung als am robustesten: Sie löst insgesamt 448 von 996 Probleminstanzen aus einer IPC-Benchmark Sammlung, während der sequentielle Ansatz lediglich 202 löst. Darüber hinaus verbessert die Einbeziehung vorab berechneter Mutex Gruppen die Leistung in stark eingeschränkten Domänen, wie \textit{Agricola}, wodurch die Gesamtzahl der gelösten Instanzen auf 457 steigt und die Laufzeit für 417 Instanzen reduziert wird. Im Gegensatz dazu erzielten weder die rückwärtsgerichtete Heuristik noch die \glqq Guess and Check\grqq{} Strategie signifikante Leistungsverbesserungen im Vergleich zur Standardkonfiguration, wobei \glqq Guess and Check \grqq{} lediglich 366 Instanzen löste.  
+Die empirische Evaluation zeigt, dass parallele Codierungen den sequentiellen Ansatz deutlich übertreffen. Insbesondere erweist sich die Codierung für $\forall$-step Pläne als am robustesten: Sie löst insgesamt 448 von 996 Probleminstanzen aus einer IPC-Benchmark Sammlung, während der sequentielle Ansatz lediglich 202 löst. Darüber hinaus verbessert die Einbeziehung vorab berechneter Mutex Gruppen die Leistung in stark eingeschränkten Domänen, wie \textit{Agricola}, wodurch die Gesamtzahl der gelösten Instanzen auf 457 steigt und die Laufzeit für 417 Instanzen reduziert wird. Im Gegensatz dazu erzielten weder die rückwärtsgerichtete Heuristik noch die guess-and-check Strategie signifikante Leistungsverbesserungen im Vergleich zur Standardkonfiguration, wobei guess-and-check lediglich 366 Instanzen löste.  
 
 
 %\cleardoublepage
@@ -222,7 +224,7 @@ Die empirische Evaluation zeigt, dass parallele Codierungen den sequentiellen An
 
 \section{Motivation}
 A central objective of Artificial Intelligence is to equip systems with the ability to act autonomously in complex environments. 
-To achieve this, an agent (a computational system interacting with its environment) must be able to know the consequences of its actions and construct a sequence of steps that transforms the current state of the world into a desired goal state. 
+To achieve this, an agent (a computational system interacting with its environment) must be able to know the consequences of its actions and construct a sequence of steps that transforms the current environment into a desired goal state. 
 This process, known as Automated Planning, is crucial for applications ranging from logistics to autonomous robotics. 
 A key strength of this approach is its domain independence: Generic solvers can be applied to diverse fields without modifying their core algorithms, making it highly flexible.
 
@@ -232,7 +234,7 @@ Consequently, Automated Planning was among the first substantial applications of
 \section{Goal of the Thesis}
 Despite the expressive power of ASP, a significant gap remains between modeling a problem and solving it effectively. 
 Plans are often modeled sequentially by executing one action after another. 
-In complex domains, this can lead to an explosion of the search depth (plan horizon $T$), rendering the search for a solution computationally infeasible.
+In complex domains, this can lead to an explosion of the search-depth (planning horizon), rendering the search for a solution computationally infeasible.
 In contrast, the field of Satisfiability Testing (SAT) has demonstrated that reasoning about actions can be made significantly more effective by exploiting parallelism \parencite{Kautz1996}. 
 By allowing multiple non-conflicting actions to occur simultaneously, the necessary plan horizon can often be reduced significantly.
 This thesis builds directly upon the framework proposed by \textcite{DIMOPOULOS_2019}. 
@@ -242,11 +244,11 @@ It aims to revisit these parallel encoding strategies, investigating how they ca
 \section{Structure of the Thesis}
 Chapter \ref{theory} establishes the theoretical foundations. We formally define planning tasks and introduce the semantics for sequential and parallel plans. Subsequently, we provide a brief introduction to Answer Set Programming (ASP), present the specific encodings developed by \textcite{DIMOPOULOS_2019}, and provide formal proofs of their soundness.
 
-Chapter \ref{method} describes the methodological approach and the implementation pipeline. We detail the translation from PDDL to ASP, introduce optimization strategies and describe the setup for the empirical evaluation.
+Chapter \ref{method} describes the methodological approach and the implementation pipeline. Furthermore, we introduce different optimization strategies and describe the setup for the empirical evaluation.
 
 In Chapter \ref{result}, we analyze the results of our experiments, discussing the trade-offs between the different encoding strategies.
 
-Finally, we conclude the thesis in chapter \ref{conclusion} with a summary of our evaluation and an outlook on future work.
+Finally, we conclude the thesis in chapter \ref{conclusion} with a short summary and an outlook on future work.
 
 
 \chapter{Theory}\label{theory}
@@ -254,24 +256,24 @@ Finally, we conclude the thesis in chapter \ref{conclusion} with a summary of ou
 
 
 Before discussing the specific encodings and optimizations for parallel planning from \textcite{DIMOPOULOS_2019}, 
-we formally define planning problems with multi-valued state variables. This formalism is based on the work of \textcite{Helmert2006,DIMOPOULOS_2019} and serves as the theoretical foundation for the subsequent ASP encodings.
+we formally define planning problems with multi-valued state variables. This formalism is based on the work of \textcite{Helmert_2006,DIMOPOULOS_2019} and serves as the theoretical foundation for the subsequent ASP encodings.
 
 \begin{defi}[Multi-valued planning task]
     \label{def:MVPlan}
-    A STRIPS-like multivalued planning task according to \textcite{Helmert2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
+    A STRIPS-like multivalued planning task according to \textcite{Helmert_2006} is given by a 4 tuple $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$, where:
     \begin{itemize}
       \item $\mathcal{F}$ is a finite set of state variables, also called \textbf{fluents}. Each $x \in \mathcal{F}$ is associated with a finite domain $\dom(x)$. In any given state, a fluent $x$ is assigned exactly one value $v \in \dom(x)$.
       \item $s_0$, the \textbf{initial state}, is a total function, such that $s_0(x) \in \dom(x)$ for each $x \in \mathcal{F}$. 
       %i.e. a function that maps each fluent to a value from its domain.
       \item $s_*$, the \textbf{goal conditions}, is a partial function, such that $s_*(x) \in \dom(x)$, for each $x \in \dom(s_*)$.
       % i.e. a function that specifies the desired values for a subset of fluents.
-      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. An action $a \in \mathcal O$ is a tuple $\langle a^c, a^e \rangle$, where $a^c$ is the \textit{precondition} and $a^e$ is the \textit{postcondition} of $a$. 
+      \item $\mathcal{O}$ is a finite set of operators, also called \textbf{actions}. An action $a \in \mathcal O$ is a tuple $\langle a^c, a^e \rangle$, where $a^c$ is the \textit{precondition} and $a^e$ the \textit{postcondition} of $a$. 
       Both $a^c$ and $a^e$ are partial functions, such that $a^c(x) \in \dom(x)$ for each $x \in \dom(a^c)$ and $a^e(x) \in \dom(x)$ for each $x \in \dom(a^e)$.
     \end{itemize}
 \end{defi}
 
 \begin{remark}
-  In the definition shown in \textcite{Helmert2006}, the postconditon of actions, called \textbf{conditional effect}, is a triplet $\langle x, v, cond \rangle$. The condition \textit{cond} is a partial function, such that $cond(x) \in \dom(x)$ for each $x \in \dom(cond)$. If the condition holds in the current state, then the fluent $x$ is assigned value $v$. 
+  In the definition shown in \textcite{Helmert_2006}, the postconditon of actions, called \textbf{conditional effect}, is a triplet $\langle x, v, cond \rangle$. The condition \textit{cond} is a partial function, such that $cond(x) \in \dom(x)$ for each $x \in \dom(cond)$. If the condition holds in the current state, the fluent $x$ is assigned value $v$. 
   Note that the postcondition $a^e$ in our definition can be seen as a special case of the conditional effect, where the condition is empty.
 \end{remark}
 
@@ -291,10 +293,10 @@ we formally define planning problems with multi-valued state variables. This for
   \end{itemize}
 \end{example}
 
-Intuitively, fluents can be understood as the dynamic properties that describe the configuration of the world. In our example, this world is defined by the \textit{location} of the actor and the status of the \textit{door}. States capture a complete snapshot of the world at a given time. 
+Intuitively, fluents can be understood as the dynamic properties that describe the configuration of the world (environment). In our example, this world is defined by the \textit{location} of the actor and the status of the \textit{door}.
 Actions define the possible changes to the world, where the precondition establishes the necessary requirements for the action to be applicable and the postcondition specifies the resulting effect.
 The goal conditions represent the desired outcome of the planning task, which is typically partial, meaning we only specify the values that are explicitly relevant, leaving other variables undefined.
-The initial state represents the complete snapshot of the world at the start. In general, a state defines the system's configuration at a specific point in time. Currently, our system description remains static, being restricted to this single initial state. To introduce dynamics, a transition mechanism is needed, which specifies how actions transform one state into another.
+The initial state represents the complete snapshot of the world at the start. In general, a state defines the environment at a specific point in time. Currently, our description of the world remains static, being restricted to this single initial state. To introduce dynamics, a transition mechanism is needed, which specifies how actions transform one state into another.
 
 \begin{defi}[Successor state]
   Let $s$ be a state and $a \in \mathcal{O}$ an action.\\
@@ -306,12 +308,12 @@ The initial state represents the complete snapshot of the world at the start. In
 \begin{remark}
   Let $A_n = \langle a_1, \dots, a_n \rangle$ be a sequence of actions with length n. We define the application of $A_n$ to a state $s$ recursively by
   \[
-    o(A_n,s) = o(a_n,o(A_{n-1},s)) \text{, where }A_{n-1} = \langle a_1, \dots, a_{n-1} \rangle
+    o(A_n,s) = o(a_n,o(A_{n-1},s)) \text{, where }A_{n-1} = \langle a_1, \dots, a_{n-1} \rangle,
   \]
   if $o(A_i, s)$ is defined for all $1 \le i \le n$. We additionally define $o(\emptyset, s) := s$ for the empty sequence of actions.
 \end{remark}
 
-Therefore, a state (or more explicitly a reachable state) is any state that can be obtained from the initial state $s_0$ by applying a sequence of actions.
+Therefore, a (reachable) state is defined as one that can be obtained from the initial state $s_0$ by applying a sequence of actions.
 All reachable states and the transitions between them can be represented as a directed graph. Each node corresponds to a distinct reachable state, while the edges represent the possible actions that can be applied to transition from one state to another.
 With these fundamental building blocks, the necessary framework to describe a solution for a planning task is established.
 
@@ -347,7 +349,7 @@ This ambiguity is resolved by introducing the concept of \textit{confluence}.
 \end{defi}
 
 \begin{remark}
-  $A$ is confluent $\Leftrightarrow B$ is confluent for each $B \subseteq A$.
+  $A$ is confluent $\Rightarrow B$ is confluent for each $B \subseteq A$.
 \end{remark}
 
 \begin{example}
@@ -365,7 +367,7 @@ This ambiguity is resolved by introducing the concept of \textit{confluence}.
 
 The concept of confluence guarantees that the simultaneous execution of actions does not lead to a contradictory state.
 However, ensuring consistent effects is only one part of the problem, as the preconditions of the actions must also be considered. Unlike in sequential planning, where preconditions are simply checked in the current state, parallel planning allows for different interpretations of precondition dependencies.
-These interpretations lead to the different parallel representations of sequential plans, which have been investigated in the literature \parencite{Dimopoulos1997, RINTANEN20061031, Wehrle2007} and are specifically implemented and tested using Answer Set Programming in \textcite{DIMOPOULOS_2019}.
+These interpretations lead to the different parallel representations, which have been investigated in the literature \parencite{Dimopoulos1997, RINTANEN20061031, Wehrle2007} and are specifically implemented and tested using Answer Set Programming in \textcite{DIMOPOULOS_2019}.
 
 \begin{defi}[Parallel representations]
   Let $s$ be a state and $A = \{a_1, \dots, a_n\}$ a confluent set of actions. Then $A$ is called:
@@ -406,13 +408,13 @@ Based on these serialization concepts, we can now define the corresponding paral
 
 \begin{defi}[Parallel Plans]
   \label{def:PPlan}
-  Let $\mathcal A_m = \langle A_1, \dots, A_m \rangle$ be a sequence of confluent sets of actions. $\mathcal A_m$ is a \textit{$\forall$-step, $\exists$-step or relaxed $\exists$-step plan} iff
+  Let $\mathcal A_m = \langle A_1, \dots, A_m \rangle$ be a sequence of confluent sets of actions. $\mathcal A_m$ is a \textit{$\forall$-step, $\exists$-step} or \textit{relaxed $\exists$-step plan} iff
   \begin{itemize}
     \item $s_m(x) = s_*(x)$ for each $x \in \dom(s_*)$
     \item $A_i$ is $\forall$-step, $\exists$-step or relaxed $\exists$-step serializable in $s_{i-1}$ for $1 \le i \le m$, where \\
     \[
       s_i(x) = \begin{cases} 
-         a^e(x) & \text{if } \exists a \in A_i \text{ s.t. } x \in \dom(a^e) \\ 
+         a^e(x) & \text{if } \exists a \in A_i \text{ such that } x \in \dom(a^e) \\ 
          s_{i-1}(x) & \text{otherwise} 
       \end{cases} 
       \quad  \text{for each } x \in \mathcal F.
@@ -429,10 +431,10 @@ Based on these serialization concepts, we can now define the corresponding paral
   \end{itemize}
 \end{example}
 
-While the concept of a sequential plan is straightforward, we are effectively dealing with transitions of the form $s \xrightarrow{a} s'$. 
+While the concept of a sequential plan is straightforward; we are effectively dealing with transitions of the form $s \xrightarrow{a} s'$. 
 However in parallel planning, we generalize this transition to allow sets of actions, i.e., $s \xrightarrow{A} s'$, effectively merging multiple actions together into a single one.
 Notice how in our example the constraints on parallelism relax with each definition. In the $\exists$-step plan, the actions \textit{leave} and \textit{close} can be placed in the same step because there exists a valid sequence (\textit{leave} $\to$ \textit{close}).
-The relaxed $\exists$-step plan achieves the highest compression. Here, actions can trigger each other within the same step: \textit{getKey} establishes the precondition for \textit{open}, which in turn enables \textit{leave}. This \enquote{chaining} of effects allows us to reduce the first three sets of the $\forall$-step plan into a single one.
+The relaxed $\exists$-step plan achieves the highest compression. Here, actions can \enquote{enable} each other within the same step: \textit{getKey} establishes the precondition for \textit{open}, which in turn enables \textit{leave}. This \enquote{chaining} of effects allows us to reduce the first three sets of the $\forall$-step plan into a single one.
 
 \subsection*{Summary}
 
@@ -443,6 +445,7 @@ With these formal definitions in place, the next section will translate this the
 
 \section{Introduction to ASP} \label{asp encoding}
 The following section presents a brief overview of Answer Set Programming (ASP). The core concepts and definitions introduced here are largely based on the Potassco User Guide \parencite{potassco_guide}.
+
 Answer Set Programming is a declarative problem-solving approach oriented towards difficult (primarily NP-hard) search problems. Unlike imperative programming, where the programmer specifies the control flow to compute a solution, ASP follows a declarative paradigm: The problem is described as a logic program such that its valid models, called \textit{answer sets}, correspond to the solutions of the problem. This methodology allows for a clean separation between the problem description (the logic program) and the solving algorithms.
 
 The theoretical foundation of ASP lies in the stable model semantics of logic programming \parencite{gel88}. To formally define these programs, we first introduce their basic building blocks.
@@ -467,7 +470,7 @@ We distinguish three specific types of rules based on this structure:
     \item \textbf{Integrity Constraints} ($A_0$ is empty): Rules with an empty head, serving as a filter for solution candidates. If the body is satisfied, the rule yields a contradiction. Thus, at least one literal in the body must be false.
 \end{itemize}
 
-\subsection*{Semantics and Planning Encoding}
+\subsection*{Planning Encoding}
 A set of atoms is called a \textit{model} of a logic program if it satisfies all rules, facts, and integrity constraints. In ASP, a model is specifically called an \textit{answer set} (or stable model) if every atom in the model has a non-cyclic derivation.
 
 We can translate the formal definition of a planning task into such an ASP logic program. Following the example in \textcite{DIMOPOULOS_2019}, the problem instance is represented purely by facts:
@@ -494,7 +497,7 @@ The \textit{base} subprogram (Line 2) defines the initial state $s_0$, grounding
 
 The \textit{check(t)} subprogram (Line 4) is parametrized and starts at $t=0$. The integrity constraint enforces the goal condition, i.e. $s_*(X)=s_t(X)$ for each $X\in \dom(s_*)$. The external atom $query(t)$ ensures that this check is only active for the current search horizon $t$ (i.e., the current candidate plan length).
 
-The \textit{step(t)} subprogram (Line 6-9) is grounded for each timestep $t$ starting at $t=1$. 
+The \textit{step(t)} subprogram (Line 6--9) is grounded for each timestep $t$ starting at $t=1$. 
 The choice rule in Line 6 creates the state candidates for timestep $t$, assigning every fluent $X$ exactly one value $V$ from its domain and the choice rule in Line 7 generates arbitrary sets of actions $A \in \mathcal O$ for the current timestep $t$ in the form of \texttt{occurs(A,t)}. These actions and the generated state must obey the integrity constraints in Lines 8 and 9.
 Line 8 ensures that the postconditions of an occurring action is actually applied in the state. This also asserts the confluence of the set of actions: If the postconditions of two actions $a$ and $a'$ have different values for the same fluent (i.e. $V = a^e(X) \ne a'^e(X) = V'$), the uniqueness of the value in the choice rule (Line 6) would be violated.
 Finally, Line 9 guarantees that fluents not affected by any action keep their value from the previous timestep. Any change in a fluent's value that is not explained by an action is rejected.
@@ -513,7 +516,7 @@ This is achieved by the extension shown in Listing \ref{seq}.
   \label{seq}
 \end{listing}
 
-Line 2 implements the applicability check, enforcing that for any action occurring at timestep~$t$, all its preconditions must hold in the preceding state $s_{t-1}$. To ensure the plan remains sequential, Line 3 guarantees that only one action can occur in each timestep $t$.
+Line 1 implements the applicability check, enforcing that for any action occurring at timestep~$t$, all its preconditions must hold in the preceding state $s_{t-1}$. To ensure the plan remains sequential, Line 2 guarantees that only one action can occur in each timestep $t$.
 
 \subsection{Extension for \texorpdfstring{$\boldsymbol{\forall}$}{forall}-step plans}
 
@@ -537,7 +540,7 @@ Line 2 handles the first case by ensuring that $X$ has to remained unchanged (\e
 However, the second case requires strict isolation of these kinds of actions. 
 If an action $a$ invalidates its own precondition on fluent $X$, no other action $a'$ in the same timestep is allowed to modify $X$. 
 If such an action $a'$ existed, the execution order $\langle a', a \rangle$ would fail because $a'$ would change $X$, invalidating the precondition of $a$.
-To enforce this, Line 3 marks such actions using the predicate \texttt{single(X,t)}. 
+To enforce this, Line 3 marks such actions using the predicate \texttt{single/2}. 
 The integrity constraint in Line 4 then ensures that for any fluent $X$, at most one such action occurs per time step, preventing any interference.
 
 \subsection{Extension for \texorpdfstring{$\boldsymbol{\exists}$}{exists}-step Plans}
@@ -574,9 +577,9 @@ Line 2 of Listing \ref{exists_alt} directly translates these edges into the \tex
 A valid serialization of the actions corresponds to a reversed topological ordering of the subgraph induced by $A_t$.
 Consequently, any answer set containing a cycle within the set of occurring actions is automatically rejected by the solver's cycle-checking logic.
 
-Listing \ref{exists} implements this acyclicity checking by a recursive derivation of the predicates \texttt{apply} and \texttt{ready}. 
+Listing \ref{exists} implements this acyclicity checking by a recursive derivation of the predicates \texttt{apply/2} and \texttt{ready/2}. 
 Line 4 defines the base case: Any action that does not occur is considered $ready$ (since it does not interfere with the execution order). Line 5 marks occuring actions: If an action is successfully applied, it is also considered $ready$.
-Line 2-3 implement the ordering logic. An action $a$ can only be applied (\texttt{apply}) if all other actions $a'$ whose preconditions it invalidates are already applied or do not occur (\texttt{ready}). 
+Line 2--3 implement the ordering logic. An action $a$ can only be applied (\texttt{apply}) if all other actions $a'$ whose preconditions it invalidates are already applied or do not occur (\texttt{ready}). 
 Line 6 is the final constraint: It requires that every occurring action must eventually become $ready$.
 If the subgraph induced by $A_t$ contains a cycle (e.g., $a$ invalidates $a'$ and $a'$ invalidates $a$), neither \texttt{apply(a,t)} nor \texttt{apply(a',t)} can ever be derived, since each would wait for the other to be ready first. Consequently, the constraint in Line 6 would be violated, causing the solver to reject the model.
 
@@ -598,7 +601,7 @@ This means an action is applicable if its preconditions are established either b
 
 This logic is implemented by the predicate \texttt{reach/3}, which represents the values of fluents that are currently available. A value is reachable if it holds in the previous state (Line 1) or if it is obtained by an action that has already been applied in the current internal sequence (Line~2).
 The rule in Line 3 and 4 now checks against the reach predicate instead of the static state. Therefore, an action can safely be applied if its preconditions are reachable.
-As in the standard $\exists$-step encoding, we must still check acyclicity. Consequently, the integrity constraint in Line 7 guarantees that no such circular dependencies exist, ensuring a valid serialization.
+As in the standard encoding for $\exists$-step plans, we must still check acyclicity. Consequently, the integrity constraint in Line 7 guarantees that no such circular dependencies exist, ensuring a valid serialization.
 
 \section{Proof of Correctness}
 Having presented the ASP encodings for both sequential and the different parallel semantics, we now present the proof from \textcite{DIMOPOULOS_2019} that formally verify their correctness.
@@ -609,7 +612,7 @@ We adopt the notation from \textcite{DIMOPOULOS_2019} and decompose the logic pr
   \item $I$ denotes the set of facts representing the specific planning task instance $\langle \mathcal{F}, s_0, s_*, \mathcal{O} \rangle$ (as in Definition \ref{def:MVPlan}).
   \item $B$ corresponds to the rule in the \texttt{base} subprogram (Listing \ref{core}, Line 2).
   \item $Q(t)$ represents the goal verification rule defined in the \texttt{check(t)} subprogram (Listing \ref{core}, Line 4).
-  \item $S(t)$ denotes the transition rules defined in the \texttt{step(t)} subprogram (Listing \ref{core}, Lines 6-9).
+  \item $S(t)$ denotes the transition rules defined in the \texttt{step(t)} subprogram (Listing \ref{core}, \mbox{Lines 6--9}).
   \item $S^p(t)$ is the specific extension for $S(t)$, where:
     \begin{itemize}
         \item $p = s$ for the sequential extension (Listing \ref{seq}),
@@ -642,7 +645,7 @@ Using these components, the complete logic program for a horizon $n$ is defined 
   \item[($\Rightarrow$):] 
     Assume $A_n$ is a sequential plan. \\
     We construct a candidate set $M$ based on the plan execution and show it is indeed a stable model of $P^s(n)$.
-    The rule in B ensures that $\texttt{holds(X,V,0)} = s_0(X)$ for each $X \in \mathcal F$. The choice rule (Line 5 of Listing \ref{seq}) enforces that for any $1 \le t \le n$ and $X \in \mathcal F$, exactly one value $V$ is assigned. 
+    The rule in B ensures that $\texttt{holds(X,V,0)} = s_0(X)$ for each $X \in \mathcal F$. The choice rule (Line 6 of Listing \ref{core}) enforces that for any $1 \le t \le n$ and $X \in \mathcal F$, exactly one value $V$ is assigned. 
     Moreover, the integrity constraints (Lines 8 and 9) in $S(t)$ dictate the transition logic between states. 
     For any $1 \le t \le n$, the value $V$ of a fluent $X$ is determined by:
     \[
@@ -709,7 +712,7 @@ Using these components, the complete logic program for a horizon $n$ is defined 
 
 
       \textbf{Case 1:} $\mathcal A$ is a $\forall$-step plan. \\
-      For $1 \le t \le m$, the atom \texttt{single(X,t)} defined in $S^\forall(t)$ (Line 2 of Listing \ref{forall}) is derived iff there exists some action $a \in A_t$ that invalidates its own precondition, i.e., $X$~$\in$~$\dom(a^c)$~$\cap \dom(a^e)$ and $a^c(X) \ne a^e(X)$. 
+      For $1 \le t \le m$, the atom \texttt{single(X,t)} defined in $S^\forall(t)$ (Line 3 of Listing \ref{forall}) is derived iff there exists some action $a \in A_t$ that invalidates its own precondition, i.e., $X$~$\in$~$\dom(a^c)$~$\cap \dom(a^e)$ and $a^c(X) \ne a^e(X)$. 
       Hence, $P^\forall(m)$ cannot have any stable model $M$ apart from
       \begin{align*}
         M = I &\cup \{\texttt{occurs(a,t)} \mid a \in A_t, 1 \le t \le m\} \\
@@ -722,7 +725,7 @@ Using these components, the complete logic program for a horizon $n$ is defined 
       It remains to show that $M$ satisfies the integrity constraints in $S^\forall(t)$.
       Since for any $1 \le t \le m$, the successor state $s_t= o(\langle a_1, \dots, a_k \rangle, s_{t-1})$ is defined for \textit{any} sequence $\langle a_1, \dots, a_k \rangle$ with $\{a_1, \dots, a_k\} = A_t$, no action can interfere with the precondition of another action.
       Consequently, if \texttt{single(X,t)} is derived (meaning an action invalidates its own precondition on $X$), no other action can modify $X$, as this would create a conflict in at least one permutation. Therefore, the integrity constraint restricting the count of actions affecting $X$ with \texttt{single(X,t)} is satisfied.
-      Analogously, the constraint requiring preconditions to remain stable (Line 1 of Listing \ref{forall}) is satisfied since $s_{t-1}(X)=a^c(X)$ for each $a \in A_t$, $X \in dom(a^c)$ and $1\le t \le m$.
+      Analogously, the constraint requiring preconditions to remain stable (Line 1 and 2 of Listing \ref{forall}) is satisfied since $s_{t-1}(X)=a^c(X)$ for each $a \in A_t$, $X \in dom(a^c)$ and $1\le t \le m$.
       One can check that the remaining rules and integrity constraints in $S(t)$ are satisfied as well, so $M$ is indeed a stable model of $P^\forall(m)$. \\
 
       \textbf{Case 2:} $\mathcal A$ is a $\exists$-step plan. \\
@@ -741,12 +744,12 @@ Using these components, the complete logic program for a horizon $n$ is defined 
         M = I &\cup \{\texttt{occurs(a,t)} \mid a \in A_t, 1 \le t \le m \} \\
               &\cup \{\texttt{holds(X,V,t)} \mid X \in \mathcal F, V=s_t(X), 0 \le t \le m\} \cup \{\texttt{query(m)}\}.
       \end{align*}
-      The \texttt{\#edge} directive in Listing \ref{exists_alt} (Lines 2-3) generates an edge between two occurring actions $(a,t)$ and $(a',t)$ exactly if the condition for $E_t$ is met. Consequently, the set of edges declared in the ASP model corresponds exactly to the union of all conflict graphs $\bigcup_{t=1}^m E_t$.
+      The \texttt{\#edge} directive in Listing \ref{exists_alt} (Lines 2--3) generates an edge between two occurring actions $(a,t)$ and $(a',t)$ exactly if the condition for $E_t$ is met. Consequently, the set of edges declared in the ASP model corresponds exactly to the union of all conflict graphs $\bigcup_{t=1}^m E_t$.
       Since each $G_t$ is acyclic and the graphs for different timesteps $1 \le t < t' \le m$ are vertex-disjoint ($(a,t), \ne (a, t')$), the overall graph induced by $M$ is acyclic.
       Therefore, the acyclicity constraint is satisfied and $M$ is a stable model of $P^E(m)$. \vspace{0.5em}
 
       \textit{Analysis of }$P^\exists(m)$: \\
-      The rules defining \texttt{apply} and \texttt{ready} in $S^\exists(t)$ (Lines 2-5 in Listing \ref{exists}) effectively traverse the dependency graph $G_t$.
+      The rules defining \texttt{apply} and \texttt{ready} in $S^\exists(t)$ (Lines 2--5 in Listing \ref{exists}) effectively traverse the dependency graph $G_t$.
       Since $G_t$ is acyclic, there exists a reversed topological ordering of the actions $a \in A_t$. The derivation of atoms proceeds along this ordering: Actions with no dependencies (sinks in $G_t$) are derived as \texttt{apply} first, thereby becoming \texttt{ready}. This satisfies the conditions for their predecessors. 
       Since $G_t$ is finite and acyclic, this inductive process reaches a fixpoint where \texttt{apply(a,t)} and \texttt{ready(a,t)} hold for each $a \in \mathcal O$ and $1 \le t \le m$.
       Consequently, the integrity constraint requiring all actions to be ready (Line 6 in Listing \ref{exists}) is satisfied.
@@ -809,7 +812,7 @@ Using these components, the complete logic program for a horizon $n$ is defined 
         \item $X \notin \dom(a_{i+1}^e)$: \\
         The integrity constraint in Line 2 of Listing \ref{forall} requires that if $a_{i+1}$ has a precondition on $X$ but no postcondition, the value of $X$ cannot change in the final state $s_t$. Since $a_j$ modifies $X$, we have $s_t(X) = a_j^e(X)$. The constraint implies $s_{t-1}(X) = s_t(X)$, meaning $a_j$ effectively did not change the value relative to $s_{t-1}$. Thus, \mbox{$s_{temp}(X) = a_{i+1}^c(X)$}.
         \item $X \in \dom(a_{i+1}^e)$: \\
-        The integrity constraint in Line 4 of Listing \ref{forall} ensures that if an action ($a_{i+1}$) has a precondition on $X$ and sets a conflicting postcondition ($a^c(X) \neq a^e(X)$), it is marked as \texttt{single}. However, since another action $a_j$ also acts on $X$ (as established by the intersection), the integrity constraint in Line 5 would be violated.
+        The rule in Line 3 of Listing \ref{forall} ensures that if an action ($a_{i+1}$) has a precondition on $X$ and sets a conflicting postcondition ($a^c(X) \neq a^e(X)$), it is marked as \texttt{single}. However, since another action $a_j$ also acts on $X$ (as established by the intersection), the integrity constraint in Line 4 would be violated.
         Since $M$ is a stable model, this implies that $\texttt{single(X,t)} \notin M$ and \mbox{$s_t(X) = a_{i+1}^e(X) = a_{i+1}^c(X)=s_{t-1}(X)$} must be the case.
       \end{enumerate} 
       In both cases, $s_{temp}(X) = a_{i+1}^c(X)$, so $o(\langle a_1, \dots, a_{i+1} \rangle, s_{t-1})$ is defined.
@@ -818,7 +821,7 @@ Using these components, the complete logic program for a horizon $n$ is defined 
       \textbf{Case 2: } To show: $A_t$ is $\exists$-step serializable. \\
       The integrity constraint in Line 1 of Listing \ref{exists} guarantees that every action $a \in A_t$ is applicable in $s_{t-1}$, i.e., $o(a, s_{t-1})$ is defined.
       Furthermore, the integrity constraint in Line 6 ensures that $\texttt{ready(a,t)} \in M$ for each $a \in \mathcal O$ and the rules in Lines 4--5 guarantee that $\texttt{apply(a,t)} \in M$ for each $a \in A_t$.
-      The rule defining \texttt{apply} (Lines 2-3) imposes a dependency: An action $a$ can only be applied if all actions $a'$ whose preconditions it invalidates are marked as \texttt{ready}.
+      The rule defining \texttt{apply} (Lines 2--3) imposes a dependency: An action $a$ can only be applied if all actions $a'$ whose preconditions it invalidates are marked as \texttt{ready}.
       Since $M$ is a stable model, there exists a derivation order of the \texttt{apply} atoms that respects these dependencies. Let $\langle a_1, \dots, a_k \rangle$ be the sequence of actions in $A_t$ ordered by their derivation step.
       Consider any action $a_i$ in the sequence and a fluent $X \in dom(a_i^c)$.
       Suppose that a preceding action $a_j$ ($j < i$) invalidates this precondition, i.e., $a_j^e(X) \neq a_i^c(X)$.
@@ -857,7 +860,7 @@ With the theoretical correctness established, we now turn to the practical reali
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{Resources/pipeline4.png}
-  \caption{Pipeline for Evaluating the Different Planning Encodings}
+  \caption{Pipeline for evaluating the different planning encodings}
   \label{pipeline}
 \end{figure}
 
@@ -906,7 +909,7 @@ By using the wildcard \enquote{\texttt{\_}} for the second argument, we discard 
 Line 9 performs a sanity check to ensure that the initial state is consistent (each fluent has at most one value).
 Finally, Lines 13--14 act as an output filter, ensuring that only the relevant \texttt{occurs/2} atoms are displayed in the final answer sets.
 
-\subsection{Post-Processing and Serialization}
+\subsection{Post-Processing}
 The stable models computed by \textit{clingo} are represented as sets of atoms (e.g., \\ \texttt{occurs(action(\enquote{move},\enquote{a},\enquote{b}), 1)}).
 Standard plan validators like \textit{VAL}, however, require plans in a specific text-based format (often referred to as SAS plan) structured as \mbox{\texttt{time:(action args)}}, where \texttt{time} denotes time step $t$, \texttt{action} the action name and \texttt{args} its arguments.
 We therefore implement a lightweight post-processing module in Python.
@@ -946,8 +949,8 @@ The mutex information is provided by \textit{plasp} via the predicates \texttt{m
 In the base program, we first define which fluents belong to a mutex group (Line 3), where a group must contain at least two fluents (Line 4).
 Both integrity constraints in Line 5 and 9 ensures that no more than one fluent of each mutex group holds in each state.
 
-\subsection{Guess and Check}
-A crucial optimization for the $\exists$-step encodings is the \textit{Guess and Check} approach \parencite{eiter2006}. 
+\subsection{Guess-and-Check}
+A crucial optimization for the $\exists$-step plan encodings is the \textit{guess-and-check} approach \parencite{eiter2006}. 
 The core idea is to decouple the search for action sets from the computationally expensive verification of acyclicity.
 Instead of enforcing serializability directly during the search, we first \enquote{guess} a candidate solution that satisfies all local constraints (preconditions, effects, confluence) but ignores potential cycles. In a second step, we \enquote{check} this candidate for circular invalidations.
 
@@ -1007,15 +1010,15 @@ This creates a \enquote{pull} effect from the goal backwards to the initial stat
 To evaluate the performance of the different planning encodings and the effectiveness of the proposed optimizations, we performed a systematic comparison across four distinct experimental configurations.
 
 \subsection{Configurations and Encodings}
-We test the sequential encoding alongside the $\forall$-step, both $\exists$-step and the relaxed $\exists$-step encodings. 
-Additionally, we evaluated the \textit{Guess and Check} strategy with a fallback mechanism: If the Guess and Check approach fails to find a valid serializable plan (or a cycle is found), the system automatically falls back to another encoding (e.g. $\forall$-step). In such cases, the reported runtime is the sum of the time spent on the failed check and the time required by the fallback strategy. If this cumulative time exceeds the time limit, the instance is considered unsolved.
+We test the sequential encoding alongside the $\forall$-step, both $\exists$-step and the relaxed $\exists$-step plan encodings. 
+Additionally, we evaluated the \textit{guess-and-check} strategy with a fallback mechanism: If the guess-and-check approach fails to find a valid serializable plan (or a cycle is found), the system automatically falls back to another encoding (we use the encoding for $\forall$-step plans). In such cases, the reported runtime is the sum of the time spent on the failed check and the time required by the fallback strategy. If this cumulative time exceeds the time limit, the instance is considered unsolved.
 
 To isolate the impact of our optimizations, we run the complete benchmark set in four configurations, varying the usage of mutexes and heuristics:
 \begin{enumerate}
     \item \textbf{Baseline:} No extra mutex detection, default solver heuristics.
     \item \textbf{Mutex Groups:} \textit{cpddl} enabled with the $h^2$ option to compute additional mutex groups.
     \item \textbf{Heuristics:} Using the backward propagating heuristic (Listing \ref{heuristic}).
-    \item \textbf{Combined:} Both $h^2$ mutexes and backward heuristics enabled.
+    \item \textbf{Combined:} Both $h^2$ algorithm and backward heuristics enabled.
 \end{enumerate}
 
 \subsection{Benchmark Selection and Validation Criteria}
@@ -1043,7 +1046,7 @@ We imposed a strict time limit of 30 minutes (1800 seconds) and a memory limit o
 \section{Overall Performance}
 To get an overview of the performance of the different encodings, we first analyze the aggregated results across all benchmark domains.
 In this section, we focus exclusively on the \textit{baseline} configurations to establish a fundamental comparison. 
-We compare the sequential encoding ($S$) against the $\forall$-step ($\forall$), the $\exists$-step ($\exists$), the graph-based $\exists$-step ($E$), the relaxed $\exists$-step ($R$), and the \textit{Guess and Check} strategy ($G\&C$).
+We compare the sequential encoding ($S$) against the $\forall$-step ($\forall$), the $\exists$-step ($\exists$), the graph-based $\exists$-step ($E$), the relaxed $\exists$-step plan ($R$), and the \textit{guess-and-check} strategy ($G\&C$).
 
 Figure \ref{fig:solved} illustrates the coverage (total number of solved instances) for each domain. The heatmap indicates the absolute number of solved instances (left) out of the total available instances (right). For better readability, the data is split into two charts. Domains where no instances were solved by any algorithm are omitted.
 
@@ -1078,7 +1081,7 @@ To ensure a fair comparison, this metric is calculated only on the intersection 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{../data/ParallelASPPlanning-eval/avg_guess_check_forall_time.png}
-  \caption{Average runtime for the Guess and Check strategy}
+  \caption{Average runtime for the Guess-and-Check strategy}
   \label{fig:gc}
 \end{figure}
 
@@ -1089,58 +1092,58 @@ The coverage results in Figure \ref{fig:solved} reveal several trends regarding 
 \paragraph{Sequential vs. Parallel Performance:}
 In domains that allow for a high degree of concurrency, parallel encodings significantly outperform the sequential approach.
 Notable examples include \textit{airport}, \textit{woodworking}, and both \textit{logistics} variants. 
-As an example, in \textit{woodworking}, the sequential encoding ($S$) solves only 7 out of 50 instances, whereas all parallel encodings (with the exception of Guess and Check) solve the entire set.
-Similarly, in \textit{floortile}, the sequential encoding fails to solve any instance (0/40), while the relaxed $\exists$-step encoding achieves a coverage of 38/40. 
+As an example, in \textit{woodworking}, the sequential encoding ($S$) solves only 7 out of 50 instances, whereas all parallel encodings (except for guess-and-check) solve the entire set.
+Similarly, in \textit{floortile}, the sequential encoding fails to solve any instance (0/40), while the relaxed $\exists$-step plan encoding achieves a coverage of 38/40. 
 This confirms that the reduced time horizon enabled by parallel semantics can effectively mitigate the search depth explosion inherent to sequential planning. This is on par with the experiment of \textcite{DIMOPOULOS_2019}, where sequential encoding falls behind the parallel variants.
 However, in more complex or inherently sequential domains like \textit{agricola} or \textit{snake}, this performance advantage is not observed. 
 
 \paragraph{Comparison of Parallel Encodings:}
 Comparing the different parallel semantics reveals a trade-off between \textit{plan flexibility} (allowing shorter horizons) and \textit{encoding complexity} (grounding and solving overhead):
 
-\textbf{$\forall$-step plan:} Although it enforces the strictest requirements for parallel execution, the $\forall$-step encoding shows better performance in comparison to the other parallel encodings in several domains (e.g., \textit{tetris}, \textit{parcprinter}), often outperforming even the more flexible variants in domains like \textit{hiking} or \textit{scanalyzer}.
-This suggests that for many IPC domains, the capability to interleave dependent actions is not critical. Consequently, the advantage of the $\forall$-step semantics lies in its compactness: It requires fewer constraints and auxiliary atoms than the $\exists$-step variants, thereby significantly reducing the burden on the grounder and solver. This is on par with the findings of \textcite{DIMOPOULOS_2019}, where $\forall$-step performs the best among the parallel encodings.
+\textbf{$\forall$-step plan:} Although it enforces the strictest requirements for parallel execution, the encoding for $\forall$-step plans shows better performance in comparison to the other parallel encodings in several domains (e.g., \textit{tetris}, \textit{parcprinter}), often outperforming even the more flexible variants in domains like \textit{hiking} or \textit{scanalyzer}.
+This suggests that for many IPC domains, the capability to interleave dependent actions is not critical. Consequently, the advantage of the $\forall$-step plan semantics lies in its compactness: It requires fewer constraints and auxiliary atoms than the $\exists$-step plan variants, thereby significantly reducing the burden on the grounder and solver. This is on par with the findings of \textcite{DIMOPOULOS_2019}, where $\forall$-step plans performs the best among the parallel encodings.
 
-\textbf{$\exists$-step plan:} The strength of the $\exists$-step semantics is seen in domains with complex dependencies. A prime example is \textit{floortile}, where the strict $\forall$-step encoding solves only 18 out of 40 instances, whereas the $\exists$-step encoding achieves a coverage of 37/40. 
-This demonstrates that the increased flexibility of the $\exists$-step semantics enables the discovery of plans in constrained environments where the $\forall$-step approach fails. 
+\textbf{$\exists$-step plan:} The strength of the $\exists$-step plan semantics is seen in domains with complex dependencies. A prime example is \textit{floortile}, where the strict $\forall$-step plan encoding solves only 18 out of 40 instances, whereas the $\exists$-step plan encoding achieves a coverage of 37/40. 
+This demonstrates that the increased flexibility of the $\exists$-step plan semantics enables the discovery of plans in constrained environments where the $\forall$-step plan approach fails. 
 Regarding the implementation variants, the graph-based alternative ($E$) generally performs on par with or marginally better than the standard constructive encoding ($\exists$) as in \textcite{DIMOPOULOS_2019}, showing no significant deviation in total coverage.
 
-\textbf{Relaxed $\exists$-step plan:} The relaxed encoding typically yields lower coverage compared to the standard $\exists$-step variants, as observed in domains like \textit{quantum-layout}. Although the \textit{relaxed} $\exists$-step encoding theoretically enables the shortest plan horizons by allowing actions to support each other within the same step, the computational cost is significant.
+\textbf{Relaxed $\exists$-step plan:} The relaxed encoding typically yields lower coverage compared to the standard $\exists$-step plan variants, as observed in domains like \textit{quantum-layout}. Although the \textit{relaxed} $\exists$-step plan encoding theoretically enables the shortest plan horizons by allowing actions to support each other within the same step, the computational cost is significant.
 The recursive definition of the reachability predicates (\texttt{reach/3}) increases the complexity of the ground program.
 Consequently, the overhead of solving these dense constraints often outweighs the benefits gained from a possible reduced time horizon.
 
-\textbf{Guess and Check strategy:} The performance of the Guess and Check strategy is generally inferior to the direct encodings ($\exists$ and $E$). 
+\textbf{Guess-and-Check strategy:} The performance of the guess-and-check strategy is generally inferior to the direct encodings ($\exists$ and $E$). 
 This is primarily due to the high rate of validity check failures. When a guessed plan contains a cycle, the pipeline is forced to trigger a costly fallback mechanism.
-In these cases, which account for approximately 60\% of all runs, the cumulative runtime (combining the failed guess with the fallback search) frequently leads to timeouts on instances that pure $\forall$-step or $\exists$-step encodings could solve within the time limit.
+In these cases, which account for approximately 60\% of all runs, the cumulative runtime (combining the failed guess with the fallback search) frequently leads to timeouts on instances that pure $\forall$-step or $\exists$-step plan encodings could solve within the time limit.
 Consequently, this strategy proves less robust for general-purpose planning compared to the integrated approaches and even solves the fewest total instances compared to the other parallel encodings. 
 
 \subsection{Runtime Analysis}
 
 \subsubsection{Overview Across Domains}
-As seen in Figure \ref{fig:time} The sequential encoding ($S$) generally exhibits significantly higher runtimes compared to the parallel approaches. This discrepancy is particularly pronounced in domains with high concurrency potential, such as \textit{Gripper}, where the average runtime for $S$ is approximately 430 seconds, whereas the $\forall$-step encoding requires less than 3 seconds. This confirms that the reduced plan horizon in parallel planning typically translates to reduced solving time.
+As seen in Figure \ref{fig:time} The sequential encoding ($S$) generally exhibits significantly higher runtimes compared to the parallel approaches. This discrepancy is particularly pronounced in domains with high concurrency potential, such as \textit{Gripper}, where the average runtime for $S$ is approximately 430 seconds, whereas the $\forall$-step plan encoding requires less than 3 seconds. This confirms that the reduced plan horizon in parallel planning typically translates to reduced solving time.
 
-Among the parallel variants, the $\forall$-step encoding consistently achieves the lowest runtimes, rarely exceeding 100 seconds even on complex instances. 
+Among the parallel variants, the $\forall$-step plan encoding consistently achieves the lowest runtimes, rarely exceeding 100 seconds even on complex instances. 
 This performance advantage can be attributed to the compactness of the encoding, which imposes the least burden on the grounder and solver.
 
-The $\exists$-step encodings ($\exists$ and $E$) display higher variability. While they allow for shorter plan lengths, the increased complexity of the compatibility checks often leads to longer solving times compared to $\forall$-step, particularly in dependency-heavy domains like \textit{freecell}. 
+The $\exists$-step plan encodings ($\exists$ and $E$) display higher variability. While they allow for shorter plan lengths, the increased complexity of the compatibility checks often leads to longer solving times compared to $\forall$-step plan, particularly in dependency-heavy domains like \textit{freecell}. 
 
 \subsubsection{Detailed Pairwise Comparison}
 To investigate these performance characteristics and implementation differences in greater detail, Figure \ref{fig:scatter_matrix} provides pairwise scatter plots on common solved instances.
 
-\paragraph{$\exists$-step Implementation Variants (Fig. \ref{fig:exist_vs_exist_edge}):}
+\paragraph{$\exists$-step Plan Implementation Variants (Fig. \ref{fig:exist_vs_exist_edge}):}
 Comparing the two implementation variants reveals a distinct advantage for the graph-based approach. 
-As illustrated in Figure \ref{fig:exist_vs_exist_edge}, the alternative $\exists$-step encoding ($E$) outperforms the standard constructive encoding ($\exists$) in the majority of instances. 
+As illustrated in Figure \ref{fig:exist_vs_exist_edge}, the alternative $\exists$-step plan encoding ($E$) outperforms the standard constructive encoding ($\exists$) in the majority of instances. 
 Notably, in the \textit{Nomystery} domain, $E$ achieves a runtime reduction of over 200 seconds compared to $\exists$ on the largest instances, validating the efficiency of the \texttt{\#edge} constraints.
 
-\paragraph{$\forall$-step vs. $\exists$-step (Fig. \ref{fig:forall_vs_exists}):}
+\paragraph{$\forall$-step vs. $\exists$-step Plan (Fig. \ref{fig:forall_vs_exists}):}
 The direct comparison between the two main parallel semantics highlights the trade-off mentioned above. 
-Although the $\exists$-step encoding is theoretically more flexible, the scatter plot shows a cluster of points above the diagonal. 
-This confirms that the $\forall$-step encoding is frequently faster, suggesting that the overhead of grounding the complex $\exists$-step compatibility constraints outweighs the benefits of a slightly reduced horizon.
+Although the $\exists$-step plan encoding is theoretically more flexible, the scatter plot shows a cluster of points above the diagonal. 
+This confirms that the $\forall$-step plan encoding is frequently faster, suggesting that the overhead of grounding the complex $\exists$-step compatibility constraints outweighs the benefits of a slightly reduced horizon.
 
-\paragraph{$\forall$-step vs. Guess and Check (Fig. \ref{fig:forall_vs_guess_and_check}):}
-Finally, the comparison with the Guess and Check strategy (G\&C) reveals the limitations of separating generation and validation.
-Contrary to the potential benefits of a reduced grounding size, Figure \ref{fig:forall_vs_guess_and_check} indicates that G\&C performs slightly worse than the standard $\forall$-step encoding.
+\paragraph{$\forall$-step Plan vs. Guess-and-Check (Fig. \ref{fig:forall_vs_guess_and_check}):}
+Finally, the comparison with the guess-and-check strategy (G\&C) reveals the limitations of separating generation and validation.
+Contrary to the potential benefits of a reduced grounding size, Figure \ref{fig:forall_vs_guess_and_check} indicates that G\&C performs slightly worse than the standard $\forall$-step plan encoding.
 Although the relaxed generator produces candidate plans rapidly, the additional computational cost required to verify these plans against the full semantics negates the initial speedup, as seen in Figure \ref{fig:gc}.
-Thus, the direct solving approach of the $\forall$-step encoding remains the superior strategy for these instances.
+Thus, the direct solving approach of the $\forall$-step plan encoding remains the superior strategy for these instances.
 
 \begin{figure}[t]
   \centering
@@ -1188,7 +1191,7 @@ As illustrated in Figure \ref{fig:base_vs_h}, the data points align almost perfe
 This suggests that the search from the goal backwards do not substantially reduce the search time compared to \textit{clingo}'s internal heuristic. This is different from the findings of \textcite{DIMOPOULOS_2019}, where the heuristic showed a noticeable improvement in some domains. It is also worth noting that the effectiveness of such heuristics is often highly domain-dependent. While \textcite{DIMOPOULOS_2019} observed improvements, our evaluation covers a broader set of IPC instances where the goal distance might be less informative. Additionally, advancements in the underlying ASP solver since 2019 may have reduced the margin for improvement that external heuristics can provide.
 
 \paragraph{Impact of More Mutex Groups (Fig. \ref{fig:base_vs_s_m_clingo} \& \ref{fig:base_vs_s_m_total}):}
-In contrast, the inclusion of the $h^2$-algorithm for \textit{cpddl} resulted in a measurable performance gain. The impact is particularly emphasized in highly constrained domains such as \textit{Agricola}. In this domain, the sequential encoding solves 7 instances (compared to only 1 in the baseline) and the $\forall$-step encoding improves from 0 to 5 solved instances.
+In contrast, the inclusion of the $h^2$-algorithm for \textit{cpddl} resulted in a measurable performance gain. The impact is particularly emphasized in highly constrained domains such as \textit{Agricola}. In this domain, the sequential encoding solves 7 instances (compared to only 1 in the baseline) and the $\forall$-step plan encoding improves from 0 to 5 solved instances.
 
 Analyzing the runtime reveals a trade-off between solving power and preprocessing overhead:
 
@@ -1196,8 +1199,8 @@ Analyzing the runtime reveals a trade-off between solving power and preprocessin
 
 \textbf{Total Runtime (Fig. \ref{fig:base_vs_s_m_total}):} When accounting for the full pipeline duration (including \textit{cpddl} preprocessing), a trade-off becomes apparent. 
 For many instances, the overall runtime does not significantly improve. In fact, for easier instances, the overhead of longer searching for mutex groups outweighs the time saved during the plan search, leading to a longer total runtime compared to the baseline.
-This effect is particularly seen in the $\forall$-step encoding, which is rather compact and thus benefits less from additional pruning.
-In comparison, for the relaxed $\exists$-step encoding, the total runtime with more mutex groups is often lower than the baseline, indicating that ''heavier'' encodings profit more from the invariants.
+This effect is particularly seen in the $\forall$-step plan encoding, which is rather compact and thus benefits less from additional pruning.
+In comparison, for the relaxed $\exists$-step plan encoding, the total runtime with more mutex groups is often lower than the baseline, indicating that ''heavier'' encodings profit more from the invariants.
 
 
 \paragraph{Combined Configuration (Fig. \ref{fig:s_m_vs_h_s_m_total}):}
@@ -1245,41 +1248,45 @@ Figure \ref{fig:s_m_vs_h_s_m_total} compares the encoding with the mutex group o
   \label{fig:scatter_matrix_opti}
 \end{figure}
 
-\section{Conclusion of Resulst}
+\section{Conclusion of Results}
 The experimental evaluation leads to several key conclusions regarding the performance and characteristics of ASP-based planning encodings.
 First and foremost, the results demonstrate that parallelism is the primary driver for efficiency in ASP planning. Parallel encodings significantly outperform the sequential baseline across almost all standard benchmarks, primarily because they drastically reduce the required planning horizon. This reduction effectively mitigates the search depth explosion that renders sequential approaches infeasible for larger instances.
 
-Regarding the comparison of parallel semantics, it became evident that compactness often outweighs theoretical flexibility. The strict $\forall$-step encoding proved to be the most robust variant. Although the $\exists$-step semantics theoretically allow for a higher compression of plans by merging more actions per step, the associated overhead of grounding the complex compatibility constraints often negates this advantage. However, in scenarios where the $\exists$-step semantics is explicitly required to find a solution, the graph-based implementation ($E$) utilizing the \texttt{\#edge} directive showed superior performance compared to the constructive approach.
+Regarding the comparison of parallel semantics, it became evident that compactness often outweighs theoretical flexibility. The encoding for $\forall$-step plans proved to be the most robust variant. Although the $\exists$-step plan semantics theoretically allow for a higher compression of plans by merging more actions per step, the associated overhead of grounding the complex compatibility constraints often negates this advantage. However, in scenarios where the $\exists$-step plan semantics is explicitly required to find a solution, the graph-based implementation ($E$) utilizing the \texttt{\#edge} directive showed superior performance compared to the constructive approach.
 
 Furthermore, the analysis highlights the critical importance of preprocessing. The integration of invariants, specifically mutex group constraints derived from the $h^2$ algorithm, proved essential for solving highly constrained instances. In contrast, simple domain-independent heuristics, such as backward propagation, failed to provide a tangible benefit over the solver's built-in strategies, suggesting that effective guidance in ASP requires more domain-specific control knowledge.
 
-The results are mostly consistent with the findings of \textcite{DIMOPOULOS_2019}, with a notable exception regarding the impact of heuristic guidance and the \enquote{Guess and Check} strategy. While their study identified the combination of domain-independent heuristics and Guess and Check as the superior approach, our evaluation did not replicate this benefit. This discrepancy is likely attributable to the underlying solving control: whereas \textcite{DIMOPOULOS_2019} implemented custom algorithms for iterative plan extension, our approach relies on \textit{clingo}'s \texttt{incmode}. It appears that the internal optimizations and conflict-driven heuristics of the incremental solver are sufficiently robust to overshadow the static guidance provided by the backward-propagating heuristic, rendering the additional overhead of the Guess and Check decomposition counterproductive in our setup.
+Moreover, a comparison of plan lengths reveals a crucial trade-off. While parallel encodings find solutions faster, the resulting sequentialized plans are often longer than those produced by the sequential encoding. This indicates that a minimal parallel plan does not necessarily correspond to minimal actions. From a practical perspective, this is a critical consideration, since in real-world applications where actions correspond to time and financial costs, the runtime advantage of parallel encodings must be balanced against the potentially lower quality of the resulting plans.
 
-In summary, our findings suggest that while advanced ASP constructs like external heuristics and complex step semantics offer theoretical advantages, the most effective strategy for standard PDDL benchmarks often lies in efficient, compact encodings combined with strong preprocessing and modern solver heuristics.
+The results are mostly consistent with the findings of \textcite{DIMOPOULOS_2019}, with a notable exception regarding the impact of heuristic guidance and the guess-and-check strategy. While their study identified the combination of domain-independent heuristics and guess-and-check as the superior approach, our evaluation did not replicate this benefit. This discrepancy is likely attributable to the underlying solving control: whereas \textcite{DIMOPOULOS_2019} implemented custom algorithms for iterative plan extension, our approach relies on \textit{clingo}'s \texttt{incmode}. It appears that the internal optimizations and conflict-driven heuristics of the incremental solver are sufficiently robust to overshadow the static guidance provided by the backward-propagating heuristic, rendering the additional overhead of the guess-and-check decomposition counterproductive in our setup.
 
+In summary, our findings suggest that while advanced ASP constructs like external heuristics and complex step semantics offer theoretical advantages, the most effective strategy for standard PDDL benchmarks often lies in efficient, compact encodings combined with strong preprocessing.
 
 
 \chapter{Conclusion} \label{conclusion}
 
 In this thesis, we revisited the parallel planning framework introduced by \textcite{DIMOPOULOS_2019}, providing a re-evaluation of their encodings.
 
-The central focus of this work was the formalization and implementation of parallel planning semantics. We investigated distinct approaches for executing actions simultaneously, ranging from the strict $\forall$-step semantics to the more flexible (relaxed) $\exists$-step semantics. 
+The central focus of this work was the formalization and implementation of parallel planning semantics. We investigated distinct approaches for executing actions simultaneously, ranging from the strict $\forall$-step plan semantics to the more flexible (relaxed) $\exists$-step plan semantics. 
 We analyzed the theoretical properties of these semantics, detailed their ASP encodings, and reproduced the proof of their soundness as established by \textcite{DIMOPOULOS_2019}
 
-Beyond the theoretical foundations, we implemented a robust pipeline to evaluate the parallel plans on a collection of IPC benchmarks and integrated different optimizations to prune the search space, most notably mutex groups derived from the $h^2$ algorithm.
-We also explored the use of backward-propagating heuristics described in \textcite{DIMOPOULOS_2019} and tested a \enquote{Guess and Check} strategy for the (relaxed) $exists$-step semantics.
+Beyond the theoretical foundations, we implemented a robust pipeline to evaluate the parallel plans on a collection of IPC benchmarks and integrated different optimizations to prune the search space, most notably mutex groups derived from the $h^2$-algorithm.
+We also explored the use of backward-propagating heuristics described in \textcite{DIMOPOULOS_2019} and tested a guess-and-check strategy for the (relaxed) $exists$-step plan semantics.
 
-The experimental evaluation confirmed the practical viability of this approach. 
-Our results confirmed that parallel encodings significantly outperform the sequential baseline by reducing the planning horizon.
-Additionally, the inclusion of precomputed mutex groups generally improves the performance while neither the backward-propagating heuristic nor the \enquote{Guess and Check} strategy provided a significant advantage over the baseline.
+The experimental evaluation showed the practical viability of this approach. 
+Our results demonstrated that parallel encodings significantly outperform the sequential baseline by reducing the planning horizon. Additionally, the inclusion of precomputed mutex groups generally improves the performance while neither the backward-propagating heuristic nor the guess-and-check strategy provided a significant advantage over the baseline. 
 
-While this work redemonstrates the potential of ASP for STRIPS planning, there are several improvements and adaptations for future research.
+While this work redemonstrates the potential of ASP for planning tasks, there are several improvements and adaptations for future research.
 One promising direction is the investigation of alternative strategies for determining the planning horizon. Instead of relying solely on \textit{clingo}'s incremental mode, future work could explore algorithms such as fixed-horizon queries, as discussed by \textcite{DIMOPOULOS_2019}, to potentially reduce the overhead of maintaining the solver state.
 
-Additionally, the \enquote{Guess and Check} strategy could be further refined by implementing more adaptive fallbacks for instance.
+Additionally, the guess-and-check strategy could be further refined by implementing more adaptive fallbacks for instance.
 Finally, the encodings could be generalized to better support conditional effects, derived predicates or axiom rules.
 
 Ultimately, realizing efficient planning with ASP remains a challenging goal. By combining the structural optimizations identified in this thesis with more flexible solving strategies, ASP has the potential to become an even more competitive tool for general-purpose planning.
-
 \printbibliography
+
+
+\appendix
+\includepdf[pages=1, pagecommand={\thispagestyle{plain}}]{Einverstaendniserklaerung.pdf}
+
 \end{document}

@@ -7,18 +7,18 @@
 \contentsline {chapter}{\numberline {2}Theory}{5}{chapter.10}%
 \contentsline {section}{\numberline {2.1}Introduction to Planning Task and Parallel Planning}{5}{section.11}%
 \contentsline {section}{\numberline {2.2}Introduction to ASP}{9}{section.23}%
-\contentsline {subsection}{\numberline {2.2.1}Extension for Sequential Plans}{12}{subsection.30}%
+\contentsline {subsection}{\numberline {2.2.1}Extension for Sequential Plans}{11}{subsection.30}%
 \contentsline {subsection}{\numberline {2.2.2}Extension for $\boldsymbol {\forall }$-step plans}{12}{subsection.32}%
-\contentsline {subsection}{\numberline {2.2.3}Extension for $\boldsymbol {\exists }$-step Plans}{13}{subsection.36}%
+\contentsline {subsection}{\numberline {2.2.3}Extension for $\boldsymbol {\exists }$-step Plans}{12}{subsection.36}%
 \contentsline {subsection}{\numberline {2.2.4}Extension for Relaxed $\boldsymbol {\exists }$-step Plans}{14}{subsection.40}%
-\contentsline {section}{\numberline {2.3}Proof of Correctness}{15}{section.42}%
+\contentsline {section}{\numberline {2.3}Proof of Correctness}{14}{section.42}%
 \contentsline {chapter}{\numberline {3}Method}{22}{chapter.54}%
 \contentsline {section}{\numberline {3.1}Pipeline Overview}{22}{section.55}%
 \contentsline {section}{\numberline {3.2}Encoding Adaptation}{23}{section.63}%
-\contentsline {subsection}{\numberline {3.2.1}Post-Processing and Serialization}{23}{subsection.65}%
+\contentsline {subsection}{\numberline {3.2.1}Post-Processing}{23}{subsection.65}%
 \contentsline {section}{\numberline {3.3}Optimizations}{24}{section.66}%
 \contentsline {subsection}{\numberline {3.3.1}Mutex Groups}{24}{subsection.67}%
-\contentsline {subsection}{\numberline {3.3.2}Guess and Check}{25}{subsection.69}%
+\contentsline {subsection}{\numberline {3.3.2}Guess-and-Check}{25}{subsection.69}%
 \contentsline {subsection}{\numberline {3.3.3}Backward-Propagating Heuristic}{26}{subsection.73}%
 \contentsline {section}{\numberline {3.4}Experimental Setup}{27}{section.75}%
 \contentsline {subsection}{\numberline {3.4.1}Configurations and Encodings}{27}{subsection.76}%
@@ -32,14 +32,14 @@
 \contentsline {subsection}{\numberline {4.1.2}Runtime Analysis}{31}{subsection.96}%
 \contentsline {subsubsection}{\nonumberline Overview Across Domains}{31}{subsubsection*.98}%
 \contentsline {subsubsection}{\nonumberline Detailed Pairwise Comparison}{31}{subsubsection*.100}%
-\contentsline {paragraph}{\nonumberline $\exists $-step Implementation Variants (Fig. \ref {fig:exist_vs_exist_edge}):}{31}{paragraph*.102}%
-\contentsline {paragraph}{\nonumberline $\forall $-step vs. $\exists $-step (Fig. \ref {fig:forall_vs_exists}):}{31}{paragraph*.104}%
-\contentsline {paragraph}{\nonumberline $\forall $-step vs. Guess and Check (Fig. \ref {fig:forall_vs_guess_and_check}):}{31}{paragraph*.106}%
+\contentsline {paragraph}{\nonumberline $\exists $-step Plan Implementation Variants (Fig. \ref {fig:exist_vs_exist_edge}):}{31}{paragraph*.102}%
+\contentsline {paragraph}{\nonumberline $\forall $-step vs. $\exists $-step Plan (Fig. \ref {fig:forall_vs_exists}):}{31}{paragraph*.104}%
+\contentsline {paragraph}{\nonumberline $\forall $-step Plan vs. Guess-and-Check (Fig. \ref {fig:forall_vs_guess_and_check}):}{31}{paragraph*.106}%
 \contentsline {section}{\numberline {4.2}Impact of Optimizations}{32}{section.108}%
 \contentsline {paragraph}{\nonumberline Heuristic Guidance (Fig. \ref {fig:base_vs_h}):}{32}{paragraph*.110}%
 \contentsline {paragraph}{\nonumberline Impact of More Mutex Groups (Fig. \ref {fig:base_vs_s_m_clingo} \& \ref {fig:base_vs_s_m_total}):}{33}{paragraph*.112}%
 \contentsline {paragraph}{\nonumberline Combined Configuration (Fig. \ref {fig:s_m_vs_h_s_m_total}):}{33}{paragraph*.114}%
-\contentsline {section}{\numberline {4.3}Conclusion of Resulst}{33}{section.116}%
+\contentsline {section}{\numberline {4.3}Conclusion of Results}{33}{section.116}%
 \contentsline {chapter}{\numberline {5}Conclusion}{36}{chapter.117}%
 \contentsline {chapter}{\nonumberline Bibliography}{37}{chapter*.118}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
